@@ -1,0 +1,11 @@
+This repository is for cross-building prerequired packages.
+
+It can be used to build packages for a new Haiku architecture as well as
+for building packages for a incompatible Haiku version of the same
+architecture as the host.
+
+In order to be able to build anything, you need a haiku_cross_devel package 
+that matches the target architecture you'd like to build packages for. 
+You can build that via Haiku's build system like this:
+
+	jam -q haiku_cross_devel.hpkg
