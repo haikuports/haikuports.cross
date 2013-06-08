@@ -1,0 +1,60 @@
+From 5ff8fbd3924fa6b94c46f09345c8e0a054a19ec7 Mon Sep 17 00:00:00 2001
+From: Oliver Tappe <zooey@hirschkaefer.de>
+Date: Sat, 8 Jun 2013 13:36:52 +0200
+Subject: Always use UTF-8 locale for Haiku.
+
+
+diff --git a/gnulib/lib/config.charset b/gnulib/lib/config.charset
+index c233788..f0be4ed 100755
+--- a/gnulib/lib/config.charset
++++ b/gnulib/lib/config.charset
+@@ -478,8 +478,8 @@ case "$os" in
+ 	# space nevertheless.
+ 	echo "* UTF-8"
+ 	;;
+-    beos*)
+-	# BeOS has a single locale, and it has UTF-8 encoding.
++    beos*|haiku*)
++	# BeOS has a single locale, and it has UTF-8 encoding. Same for Haiku.
+ 	echo "* UTF-8"
+ 	;;
+     msdosdjgpp*)
+diff --git a/system.h b/system.h
+index 51fd0ae..db1af9e 100644
+--- a/system.h
++++ b/system.h
+@@ -151,7 +151,7 @@ extern int strcoll ();
+ # define va_end(args)
+ #endif
+ 
+-#if O_BINARY
++#if O_BINARY && !defined(__HAIKU__)
+ # ifdef HAVE_IO_H
+ #  include <io.h>
+ # endif
+-- 
+1.7.5
+
+
+From 90a5ee98b7e8c6042abc73438021fc5073f20e7d Mon Sep 17 00:00:00 2001
+From: Oliver Tappe <zooey@hirschkaefer.de>
+Date: Sat, 8 Jun 2013 14:19:59 +0200
+Subject: Only enter subdirs needed by makeinfo
+
+
+diff --git a/Makefile.in b/Makefile.in
+index add8f82..8c56083 100644
+--- a/Makefile.in
++++ b/Makefile.in
+@@ -450,7 +450,7 @@ TEXINFO_TEX = doc/texinfo.tex
+ @TOOLS_ONLY_FALSE@SUBDIRS = $(native_tools) gnulib/lib lib \
+ @TOOLS_ONLY_FALSE@            install-info info makeinfo po util doc 
+ 
+-@TOOLS_ONLY_TRUE@SUBDIRS = lib info install-info makeinfo util
++@TOOLS_ONLY_TRUE@SUBDIRS = gnulib/lib lib makeinfo
+ all: config.h
+ 	$(MAKE) $(AM_MAKEFLAGS) all-recursive
+ 
+-- 
+1.7.5
+
