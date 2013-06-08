@@ -41,7 +41,7 @@ BUILD()
 	automake
 	autoreconf
 	runConfigure ./configure \
-		--build=$hostMachineTriple --host=$targetMachineTriple \
+		--build=$buildMachineTriple --host=$targetMachineTriple \
 		--disable-perl-regexp --disable-nls
 	make $jobArgs
 }

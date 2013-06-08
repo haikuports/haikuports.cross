@@ -43,7 +43,7 @@ BUILD()
 {
 	libtoolize --force --copy --install
 	runConfigure ./configure \
-		--build=$hostMachineTriple --host=$targetMachineTriple \
+		--build=$buildMachineTriple --host=$targetMachineTriple \
 		--disable-nls
 	make
 }

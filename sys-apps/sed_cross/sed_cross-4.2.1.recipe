@@ -20,7 +20,6 @@ PROVIDES="
 	cmd:sed = $portVersion compat >= 4
 	"
 REQUIRES="
-	haiku >= $haikuVersion
 	"
 BUILD_REQUIRES="
 	binutils_cross_$targetArchitecture
@@ -37,7 +36,7 @@ SOURCE_DIR="sed-$portVersion"
 BUILD()
 {
 	./configure $configureDirArgs \
-		--build=$hostMachineTriple --host=$targetMachineTriple \
+		--build=$buildMachineTriple --host=$targetMachineTriple \
 		--enable-regex-tests --without-included-regex \
 		--disable-rpath --with-gnu-ld
 	make
