@@ -1,0 +1,25 @@
+From 9492c99b30005d2694c05fb78ab6e7bf5dd86709 Mon Sep 17 00:00:00 2001
+From: Oliver Tappe <zooey@hirschkaefer.de>
+Date: Sat, 8 Jun 2013 15:31:37 +0200
+Subject: Don't let m4 reenable i18n
+
+
+diff --git a/lib/regex_internal.h b/lib/regex_internal.h
+index df4a095..1c6d4ee 100644
+--- a/lib/regex_internal.h
++++ b/lib/regex_internal.h
+@@ -81,9 +81,11 @@
+ # define SIZE_MAX ((size_t) -1)
+ #endif
+ 
++#ifndef __HAIKU__
+ #if (defined MB_CUR_MAX && HAVE_WCTYPE_H && HAVE_ISWCTYPE && HAVE_WCSCOLL) || _LIBC
+ # define RE_ENABLE_I18N
+ #endif
++#endif
+ 
+ #if __GNUC__ >= 3
+ # define BE(expr, val) __builtin_expect (expr, val)
+-- 
+1.7.5
+
