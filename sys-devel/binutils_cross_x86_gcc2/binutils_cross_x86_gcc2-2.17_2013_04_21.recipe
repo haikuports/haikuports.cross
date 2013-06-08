@@ -28,7 +28,7 @@ PROVIDES="
 
 REQUIRES="
 	haiku >= $haikuVersion
-	haiku_cross_devel >= $haikuVersion
+	haiku_cross_devel_x86_gcc2 >= $haikuVersion
 	"
 BUILD_REQUIRES="
 	$REQUIRES
@@ -40,17 +40,18 @@ BUILD_PREREQUIRES="
 	cmd:gcc
 	cmd:ld
 	cmd:make
+	cmd:makeinfo
 	cmd:sed
 	cmd:tar
-	texinfo
 	"
 
 SOURCE_DIR="$portVersionedName"
 BUILD_PACKAGE_ACTIVATION_PHASE=INSTALL
 
-binutilsDir=$(pwd)/legacy/binutils
-relativeArchInstallDir="develop/tools/${portVersionedName}"
-archInstallDir="$prefix/$relativeArchInstallDir"
+sourceDir=$(pwd)/legacy/binutils
+relativeInstallDir="develop/tools/${portVersionedName}"
+installDir="$prefix/$relativeInstallDir"
+toolsBinDir="$prefix/develop/tools/bin"
 objectsDir=$(pwd)/../${portVersionedName}-obj
 
 BUILD()
@@ -58,18 +59,16 @@ BUILD()
 	rm -rf $objectsDir
 
 	# Touch all *.info files, as newer texinfos don't like their format
-	(cd $binutilsDir; find . -name \*.info | xargs touch)
+	(cd $sourceDir; find . -name \*.info | xargs touch)
 
 	# build binutils
 	mkdir -p $objectsDir
 	cd $objectsDir
-	CFLAGS=-O2 CXXFLAGS=-O2 runConfigure \
-		--omit-dirs "dataRootDir docDir execPrefix infoDir" \
-		"$binutilsDir/configure" \
-		--host=$hostMachineTriple --build=$hostMachineTriple \
-		--target=$targetMachineTriple --exec-prefix=$archInstallDir \
-		--includedir=$prefix/develop/headers/binutils \
-		--disable-nls --enable-shared=yes --disable-werror
+	CFLAGS=-O2 CXXFLAGS=-O2 "$sourceDir/configure" \
+		--build=$buildMachineTriple --host=$buildMachineTriple \
+		--target=$targetMachineTriple  --prefix=$installDir \
+		--libexecdir=$installDir/lib --mandir=$manDir \
+		--disable-nls --disable-shared --disable-werror
 	make
 }
 
@@ -83,26 +82,32 @@ INSTALL()
 	
 	echo "Strip debug info"
 
-	cd $prefix
+	cd $installDir
 	find bin -type f | xargs -r strip --strip-debug
-	strip --strip-debug $archInstallDir/$targetMachineTriple/bin/*
+	strip --strip-debug $installDir/$targetMachineTriple/bin/*
 	
 	### Symlinks ##############################################
 
 	echo "Creating required symlinks"
 
-	cd $prefix/bin
+	cd $installDir/bin
 	for p in ar as ld nm objdump ranlib strip; do
-		ln -sfn ../$relativeArchInstallDir/$targetMachineTriple/bin/$p \
+		ln -sfn ../$targetMachineTriple/bin/$p \
 			$targetMachineTriple-$p
 	done
+
+	# make all commands available in develop/tools/bin (which
+	# haikuporter will add to the path when cross building)
+	mkdir -p $toolsBinDir
+	cd $toolsBinDir
+	ln -sfn ../${portVersionedName}/bin/* .
 
 	### Cleanup #################################################
 	
 	echo "Cleanup"
 
-	cd $prefix
-	rm -rf $relativeArchInstallDir/$hostMachineTriple
+	cd $installDir
+	rm -rf $relativeInstallDir/$buildMachineTriple
 	rm -rf info
 	rm -rf lib
 	
