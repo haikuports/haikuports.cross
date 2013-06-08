@@ -35,7 +35,7 @@ SOURCE_DIR="sed-$portVersion"
 
 BUILD()
 {
-	./configure $configureDirArgs \
+	runConfigure ./configure \
 		--build=$buildMachineTriple --host=$targetMachineTriple \
 		--enable-regex-tests --without-included-regex \
 		--disable-rpath --with-gnu-ld
