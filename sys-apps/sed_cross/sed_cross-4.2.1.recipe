@@ -39,7 +39,7 @@ BUILD()
 		--build=$buildMachineTriple --host=$targetMachineTriple \
 		--enable-regex-tests --without-included-regex \
 		--disable-rpath --with-gnu-ld
-	make AR=${targetMachineTriple}-ar
+	make $jobArgs AR=${targetMachineTriple}-ar
 }
 
 INSTALL()
