@@ -1,0 +1,22 @@
+From 7e0f0a28753e5d60620f7a07b135b4bba80e7313 Mon Sep 17 00:00:00 2001
+From: Oliver Tappe <zooey@hirschkaefer.de>
+Date: Sun, 9 Jun 2013 12:05:33 +0200
+Subject: applying patch make-3.82.patch
+
+
+diff --git a/arscan.c b/arscan.c
+index 4ef8375..71d38a6 100644
+--- a/arscan.c
++++ b/arscan.c
+@@ -253,7 +253,7 @@ ar_scan (const char *archive, ar_member_func_t function, const void *arg)
+ #endif
+ 
+ #ifndef WINDOWS32
+-# ifndef __BEOS__
++# if !defined(__BEOS__) && !defined(__HAIKU__)
+ #  include <ar.h>
+ # else
+    /* BeOS 5 doesn't have <ar.h> but has archives in the same format
+-- 
+1.7.5
+
