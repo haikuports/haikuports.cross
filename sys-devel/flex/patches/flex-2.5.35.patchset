@@ -1,0 +1,123 @@
+From 0b45246c08ba27485bdf6371098bc31969d273bc Mon Sep 17 00:00:00 2001
+From: Oliver Tappe <zooey@hirschkaefer.de>
+Date: Sun, 9 Jun 2013 17:21:38 +0200
+Subject: applying patch flex-2.5.35.patch
+
+
+diff --git a/configure.in b/configure.in
+index 8f3aa95..65359c0 100644
+--- a/configure.in
++++ b/configure.in
+@@ -45,12 +45,12 @@ AC_PROG_RANLIB
+ AC_PROG_AWK
+ AC_PROG_INSTALL
+ 
+-AC_PATH_PROG(BISON, bison,bison)
++AC_CHECK_PROG(BISON, bison,bison)
+ AC_PATH_PROG(HELP2MAN, help2man, help2man)
+ 
+ # Check for a GNU m4 that supports --prefix-builtins
+ 
+-AC_PATH_PROGS(M4, gm4 gnum4 m4, m4)
++AC_CHECK_PROGS(M4, gm4 gnum4 m4, m4)
+ 
+ if test x"$M4" != x; then
+   AC_MSG_CHECKING([for GNU m4])
+diff --git a/tests/test-pthread/Makefile.am b/tests/test-pthread/Makefile.am
+index 7d2d062..78a127d 100644
+--- a/tests/test-pthread/Makefile.am
++++ b/tests/test-pthread/Makefile.am
+@@ -27,7 +27,8 @@ CLEANFILES = scanner.c scanner.h parser.c parser.h $(testname)$(EXEEXT) OUTPUT $
+ OBJS = scanner.o # parser.o
+ 
+ AM_CPPFLAGS = -I$(srcdir) -I$(top_srcdir) -I$(top_builddir)
+-LDFLAGS = -lpthread
++
++#LDFLAGS = -lpthread
+ #LFLAGS = --header="scanner.h"
+ #YFLAGS = --defines --output=parser.c
+ 
+-- 
+1.7.5
+
+
+From 2ff62e55f5950a8b30b5efd8e4d5707dfa60c45d Mon Sep 17 00:00:00 2001
+From: Oliver Tappe <zooey@hirschkaefer.de>
+Date: Sun, 9 Jun 2013 18:56:04 +0200
+Subject: Drop gettext, such that autopoint is not required
+
+
+diff --git a/configure.in b/configure.in
+index 65359c0..3e67eef 100644
+--- a/configure.in
++++ b/configure.in
+@@ -33,9 +33,6 @@ AC_CONFIG_HEADER([config.h:conf.in])
+ 
+ # checks for programs
+ 
+-AM_GNU_GETTEXT([external])
+-AM_GNU_GETTEXT_VERSION(0.12)
+-
+ AC_PROG_YACC
+ AM_PROG_LEX
+ AC_PROG_CC
+-- 
+1.7.5
+
+
+From 2d2ec459d569d096eba09f11e915635ce481a79a Mon Sep 17 00:00:00 2001
+From: Oliver Tappe <zooey@hirschkaefer.de>
+Date: Sun, 9 Jun 2013 18:57:31 +0200
+Subject: Drop requirement for libintl
+
+
+diff --git a/Makefile.am b/Makefile.am
+index 5bad607..791d5c0 100644
+--- a/Makefile.am
++++ b/Makefile.am
+@@ -122,7 +122,7 @@ SUBDIRS = \
+ 
+ localedir = $(datadir)/locale
+ AM_CPPFLAGS = -DLOCALEDIR=\"$(localedir)\" -I$(top_srcdir)/intl
+-LIBS = @LIBINTL@ @LIBS@
++LIBS = @LIBS@
+ 
+ skel.c: flex.skl mkskel.sh flexint.h tables_shared.h
+ 	sed 's/m4_/m4postproc_/g; s/m4preproc_/m4_/g' $(srcdir)/flex.skl | $(m4) -P -DFLEX_MAJOR_VERSION=`echo $(VERSION)|cut -f 1 -d .` -DFLEX_MINOR_VERSION=`echo $(VERSION)|cut -f 2 -d .` -DFLEX_SUBMINOR_VERSION=`echo $(VERSION)|cut -f 3 -d .` | sed 's/m4postproc_/m4_/g' | $(SHELL) $(srcdir)/mkskel.sh  >skel.c
+-- 
+1.7.5
+
+
+From 767702018666e0d4a90bc8719a809c7cda02b827 Mon Sep 17 00:00:00 2001
+From: Oliver Tappe <zooey@hirschkaefer.de>
+Date: Sun, 9 Jun 2013 22:30:44 +0200
+Subject: Drop po-subfolder
+
+
+diff --git a/Makefile.am b/Makefile.am
+index 791d5c0..31dfe21 100644
+--- a/Makefile.am
++++ b/Makefile.am
+@@ -116,7 +116,6 @@ SUBDIRS = \
+ 	doc \
+ 	m4  \
+ 	examples \
+-	po \
+ 	tools \
+ 	tests
+ 
+diff --git a/configure.in b/configure.in
+index 3e67eef..8b51eba 100644
+--- a/configure.in
++++ b/configure.in
+@@ -114,7 +114,6 @@ examples/Makefile
+ examples/fastwc/Makefile
+ examples/manual/Makefile
+ m4/Makefile
+-po/Makefile.in
+ tools/Makefile
+ tests/Makefile
+ tests/TEMPLATE/Makefile
+-- 
+1.7.5
+
