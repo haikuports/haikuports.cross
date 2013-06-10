@@ -9,7 +9,7 @@ REVISION="1"
 ARCHITECTURES="x86_gcc2 ?x86"
 
 PROVIDES="
-	grep_cross = $portVersion compat >= 2
+	grep_bootstrap = $portVersion compat >= 2
 	cmd:egrep = $portVersion compat >= 2
 	cmd:fgrep = $portVersion compat >= 2
 	cmd:grep = $portVersion compat >= 2
@@ -55,9 +55,4 @@ INSTALL()
 	rm $libDir/charset.alias
 	rmdir $libDir
 	rm -r $infoDir
-}
-
-TEST()
-{
-	make check
 }

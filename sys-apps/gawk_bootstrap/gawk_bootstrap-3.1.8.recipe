@@ -18,7 +18,7 @@ REVISION="2"
 ARCHITECTURES="x86_gcc2 ?x86"
 
 PROVIDES="
-	gawk_cross = $portVersion compat >= 3
+	gawk_bootstrap = $portVersion compat >= 3
 	cmd:awk = $portVersion compat >= 3
 	cmd:gawk = $portVersion compat >= 3
 	"
@@ -55,11 +55,6 @@ INSTALL()
 	$targetMachineTriple-strip $binDir/{gawk,pgawk}
 
 	rm -r $infoDir
-}
-
-TEST()
-{
-	make check
 }
 
 LICENSE="GNU GPL v3"
