@@ -50,6 +50,7 @@ BUILD_PREREQUIRES="
 	"
 
 SOURCE_DIR="$portVersionedName"
+SOURCE_EXPORT_SUBDIR="legacy/gcc"
 
 sourceDir=$(pwd)/legacy/gcc
 relativeInstallDir="develop/tools/${portVersionedName}"
