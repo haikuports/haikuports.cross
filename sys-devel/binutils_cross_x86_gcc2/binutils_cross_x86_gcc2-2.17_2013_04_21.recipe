@@ -45,8 +45,7 @@ BUILD_PREREQUIRES="
 	cmd:tar
 	"
 
-SOURCE_DIR="$portVersionedName"
-SOURCE_EXPORT_SUBDIR="legacy/binutils"
+SOURCE_DIR="$portVersionedName/legacy/binutils"
 
 BUILD_PACKAGE_ACTIVATION_PHASE=INSTALL
 

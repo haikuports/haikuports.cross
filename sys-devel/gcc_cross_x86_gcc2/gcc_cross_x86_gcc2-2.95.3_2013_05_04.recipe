@@ -49,8 +49,7 @@ BUILD_PREREQUIRES="
 	cmd:makeinfo
 	"
 
-SOURCE_DIR="$portVersionedName"
-SOURCE_EXPORT_SUBDIR="legacy/gcc"
+SOURCE_DIR="$portVersionedName/legacy/gcc"
 
 sourceDir=$(pwd)/legacy/gcc
 relativeInstallDir="develop/tools/${portVersionedName}"
