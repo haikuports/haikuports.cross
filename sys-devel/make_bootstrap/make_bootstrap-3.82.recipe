@@ -31,6 +31,7 @@ BUILD_REQUIRES="
 BUILD_PREREQUIRES="
 	haiku_devel >= $haikuVersion
 	cmd:libtoolize
+	cmd:make
 	cmd:sed
 	"
 
@@ -47,9 +48,11 @@ BUILD()
 
 INSTALL()
 {
-	./make install AR=$targetMachineTriple-ar
-	
-	$targetMachineTriple-strip $binDir/*
-	
-	rm -r $infoDir
+	make install AR=$targetMachineTriple-ar DESTDIR=$installDestDir
+		# TODO: Due to "." being in the path on Haiku, this doesn't work
+		# correctly.
+
+	$targetMachineTriple-strip $installDestDir$binDir/*
+
+	rm -r $installDestDir$infoDir
 }
