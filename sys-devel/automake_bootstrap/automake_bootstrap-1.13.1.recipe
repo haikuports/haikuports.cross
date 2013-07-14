@@ -13,6 +13,8 @@ CHECKSUM_MD5="78a0ef8216b0556b44508e7b5b0c0847"
 REVISION="1"
 ARCHITECTURES="x86_gcc2 ?x86"
 
+PATCHES="automake_bootstrap-1.13.1.patchset"
+
 PROVIDES="
 	automake_bootstrap = $portVersion compat >= 1.13
 	cmd:automake = $portVersion compat >= 1.13
@@ -46,16 +48,27 @@ SOURCE_DIR="automake-$portVersion"
 
 BUILD()
 {
-	PERL="/bin/env perl" runConfigure ./configure \
+	# The build system unfortunately uses the PERL we specify on the build host
+	# and also hard-codes it into the files installed on the target. We solve
+	# the dilemma by specifying the build platform's perl path here and replace
+	# it in the files we install later. This might still cause problems, since
+	# configure also analyzes the perl we specify and infers build properties
+	# (availability of threads), which may not match the situation on the
+	# target platform.
+	perl=$(which perl)
+	PERL="$perl" runConfigure ./configure \
 		--build=$buildMachineTriple --host=$targetMachineTriple
 	make $jobArgs
 }
 
 INSTALL()
 {
-	make install
-	
-	$targetMachineTriple-strip $binDir/*-$portVersion
+	make DESTDIR=$installDestDir install
 
-	rm -rf $infoDir
+	rm -rf $installDestDir$infoDir
+
+	# fix perl references
+	perl=$(which perl)
+	sed -i -e "s,$perl,/bin/env perl,g" \
+		$installDestDir$binDir/*
 }

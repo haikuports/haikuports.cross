@@ -1,0 +1,35 @@
+From 2b8c6e1e99f2ccb496da584ccbac28df1a06e911 Mon Sep 17 00:00:00 2001
+From: Ingo Weinhold <ingo_weinhold@gmx.de>
+Date: Sun, 14 Jul 2013 23:52:27 +0200
+Subject: configure: remove perl version/capability check
+
+Since we're cross-compiling the specified perl should be for the target
+platform and may not even run. In our case we specify the build host
+perl, which does run, but we shouldn't infer any properties that affect
+the target. Particularly make sure we don't enable threads.
+
+diff --git a/configure b/configure
+index 18cb37f..2b98843 100755
+--- a/configure
++++ b/configure
+@@ -2718,6 +2718,7 @@ fi
+ if test -z "$PERL"; then
+    as_fn_error $? "perl not found" "$LINENO" 5
+ fi
++if false; then
+ # Save details about the selected perl interpreter in config.log.
+ { echo "$as_me:$LINENO: $PERL --version" >&5
+    ($PERL --version) >&5 2>&5
+@@ -2762,6 +2763,9 @@ if test $am_cv_prog_PERL_ithreads = yes; then
+ else
+   PERL_THREADS=0;
+ fi
++else	# if false
++  PERL_THREADS=0;
++fi
+ 
+ 
+ # The test suite will skip some tests if tex is absent.
+-- 
+1.8.1.4
+
