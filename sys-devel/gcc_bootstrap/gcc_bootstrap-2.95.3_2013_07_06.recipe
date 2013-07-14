@@ -79,8 +79,7 @@ BUILD()
 	CFLAGS="-O2 -U_FORTIFY_SOURCE" CXXFLAGS="-O2" "$sourceDir/configure" \
 		--build=$buildMachineTriple --host=$targetMachineTriple \
 		--target=$targetMachineTriple --prefix=$installDir \
-		--disable-nls --enable-shared --enable-languages=c,c++ \
-		--disable-hybrid-secondary
+		--disable-nls --enable-shared --enable-languages=c,c++
 
 	make
 }
