@@ -10,11 +10,11 @@ binutilsVersion=2.17_2013_04_21
 
 COPYRIGHT="1988-2000 Free Software Foundation, Inc."
 SRC_URI="
-	git+file://$portBaseDir/../binutils_cross_x86_gcc2/work-${binutilsVersion}/sources/binutils_cross_x86_gcc2-${binutilsVersion}#d0613f2026ca25e7f673188291b63fd5d7a51c72
+	git+file://$portBaseDir/../binutils_cross_x86_gcc2/download/BuildtoolsPM.git#d0613f2026ca25e7f673188291b63fd5d7a51c72
 	git+git://github.com/haiku/BuildtoolsPM.git#d0613f2026ca25e7f673188291b63fd5d7a51c72
 	"
 REVISION="1"
-ARCHITECTURES="x86_gcc2 ?x86"
+ARCHITECTURES="x86_gcc2"
 
 PROVIDES="
 	gcc_cross_$targetArchitecture = $portVersion compat >= 2.95.3
@@ -51,7 +51,7 @@ BUILD_PREREQUIRES="
 
 SOURCE_DIR="$portVersionedName/legacy/gcc"
 
-sourceDir=$(pwd)/legacy/gcc
+sourceDir=$(pwd)
 relativeInstallDir="develop/tools/${portVersionedName}"
 installDir="$prefix/$relativeInstallDir"
 toolsBinDir="$prefix/develop/tools/bin"

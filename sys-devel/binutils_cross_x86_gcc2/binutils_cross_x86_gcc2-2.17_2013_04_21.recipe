@@ -2,7 +2,7 @@ SUMMARY="Assembler, linker and binary tools for target ${targetMachineTriple}"
 HOMEPAGE="http://www.gnu.org/software/binutils"
 SRC_URI="git+git://github.com/haiku/BuildtoolsPM.git#d0613f2026ca25e7f673188291b63fd5d7a51c72"
 REVISION="1"
-ARCHITECTURES="x86_gcc2 ?x86"
+ARCHITECTURES="x86_gcc2"
 LICENSE="
 	GNU GPL v2
 	GNU LGPL v2
@@ -30,9 +30,11 @@ REQUIRES="
 	haiku >= $haikuVersion
 	haiku_cross_devel_x86_gcc2 >= $haikuVersion
 	"
+
 BUILD_REQUIRES="
 	$REQUIRES
 	"
+
 BUILD_PREREQUIRES="
 	haiku_devel >= $haikuVersion
 	cmd:autoconf
@@ -49,7 +51,7 @@ SOURCE_DIR="$portVersionedName/legacy/binutils"
 
 BUILD_PACKAGE_ACTIVATION_PHASE=INSTALL
 
-sourceDir=$(pwd)/legacy/binutils
+sourceDir=$(pwd)
 relativeInstallDir="develop/tools/${portVersionedName}"
 installDir="$prefix/$relativeInstallDir"
 toolsBinDir="$prefix/develop/tools/bin"
