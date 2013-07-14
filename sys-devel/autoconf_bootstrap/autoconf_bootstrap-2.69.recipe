@@ -63,5 +63,5 @@ BUILD()
 
 INSTALL()
 {
-	make install
+	make DESTDIR=$installDestDir install
 }

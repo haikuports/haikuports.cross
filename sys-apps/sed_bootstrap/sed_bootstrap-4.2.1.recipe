@@ -44,13 +44,13 @@ BUILD()
 
 INSTALL()
 {
-	make install
+	make DESTDIR=$installDestDir install
 
-	$targetMachineTriple-strip $binDir/*
+	$targetMachineTriple-strip $installDestDir$binDir/*
 
-	rm $libDir/charset.alias
-	rmdir $libDir
-	rm -r $infoDir
+	rm $installDestDir$libDir/charset.alias
+	rmdir $installDestDir$libDir
+	rm -r $installDestDir$infoDir
 }
 
 LICENSE="GNU GPL v3"

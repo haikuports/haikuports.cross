@@ -50,11 +50,11 @@ BUILD()
 
 INSTALL()
 {
-	make install
-	
-	$targetMachineTriple-strip $binDir/{gawk,pgawk}
+	make DESTDIR=$installDestDir install
 
-	rm -r $infoDir
+	$targetMachineTriple-strip $installDestDir$binDir/{gawk,pgawk}
+
+	rm -r $installDestDir$infoDir
 }
 
 LICENSE="GNU GPL v3"

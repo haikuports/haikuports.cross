@@ -35,7 +35,7 @@ BUILD()
 INSTALL()
 {
 	cd makeinfo
-	make install
-	
-	$targetMachineTriple-strip $prefix/bin/makeinfo
+	make DESTDIR=$installDestDir install
+
+	$targetMachineTriple-strip $installDestDir$binDir/makeinfo
 }

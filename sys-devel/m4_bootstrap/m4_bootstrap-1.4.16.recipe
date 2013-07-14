@@ -54,10 +54,10 @@ BUILD()
 
 INSTALL()
 {
-	make install
-	
-	$targetMachineTriple-strip $binDir/*
-	
-	rm -rf $infoDir
-	rm -rf $prefix/lib
+	make DESTDIR=$installDestDir install
+
+	$targetMachineTriple-strip $installDestDir$binDir/*
+
+	rm -rf $installDestDir$infoDir
+	rm -rf $installDestDir$libDir
 }
