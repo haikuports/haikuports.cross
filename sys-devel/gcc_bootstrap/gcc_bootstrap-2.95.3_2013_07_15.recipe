@@ -84,29 +84,29 @@ BUILD()
 INSTALL()
 {
 	cd $objectsDir
-	make install
+	make DESTDIR=$installDestDir install
 
 	### Symlinks ##############################################
 
 	echo "Creating required symlinks"
 
 	# convert absolute links to relative ones
-	cd $installDir/bin
+	cd $installDestDir$installDir/bin
 	ln -sfn g++ c++
 	ln -sfn gcc cc
 	ln -sfn gcc i586-pc-haiku_gcc2-gcc
 	
 	# make all tools available via default paths
 	echo "Symlinking binaries into default path"
-	mkdir -p $prefix/bin
-	cd $prefix/bin
+	mkdir -p $installDestDir$binDir
+	cd $installDestDir$binDir
 	ln -sfn ../$relativeInstallDir/bin/* .
 	
 	### Strip #################################################
 	
 	echo "Strip debug info"
 
-	cd $installDir
+	cd $installDestDir$installDir
 	strip --strip-debug bin/*
 	strip --strip-debug lib/gcc-lib/$targetMachineTriple/2.95.3-haiku-*/* \
 		  &>/dev/null || true
@@ -115,7 +115,7 @@ INSTALL()
 	
 	echo "Cleanup"
 	
-	cd $installDir
+	cd $installDestDir$installDir
 	rm -rf info
 	rm -rf share
 	rm man/man1/cccp.1
