@@ -80,31 +80,31 @@ INSTALL()
 {
 	cd $objectsDir
 
-	make install
+	make DESTDIR=$installDestDir install
 
 	### Strip #################################################
 	
 	echo "Strip debug info"
 
-	cd $installDir
+	cd $installDestDir$installDir
 	find bin -type f | xargs -r strip --strip-debug
-	strip --strip-debug $installDir/$targetMachineTriple/bin/*
+	strip --strip-debug $installDestDir$installDir/$targetMachineTriple/bin/*
 	
 	### Symlinks ##############################################
 
 	echo "Creating required symlinks"
 
 	# remove duplicate architecture-dependent binaries from $binDir
-	cd $installDir/bin
+	cd $installDestDir$installDir/bin
 	rm ar as ld nm objdump ranlib strip
-	
+
 	# drop c++filt, as gcc2 provides its own
 	rm c++filt
 
 	# make all tools available via default paths
 	echo "Symlinking binaries into default path"
-	mkdir -p $prefix/bin
-	cd $prefix/bin
+	mkdir -p $installDestDir$binDir
+	cd $installDestDir$binDir
 	ln -sfn ../$relativeInstallDir/bin/* .
 	ln -sfn ../$relativeInstallDir/$targetMachineTriple/bin/* .
 
@@ -112,7 +112,7 @@ INSTALL()
 	
 	echo "Cleanup"
 
-	cd $installDir
+	cd $installDestDir$installDir
 	rm -rf $relativeInstallDir/$buildMachineTriple
 	rm -rf info
 	rm -rf lib
