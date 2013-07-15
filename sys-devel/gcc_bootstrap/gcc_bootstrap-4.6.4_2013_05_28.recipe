@@ -10,7 +10,7 @@ SRC_URI="
 	git+file://$portBaseDir/../binutils_bootstrap/download/BuildtoolsPM.git#db57f3c88777a0d2ca952f243d6a93c6c66dd358
 	git+git://github.com/haiku/BuildtoolsPM.git#db57f3c88777a0d2ca952f243d6a93c6c66dd358
 	"
-REVISION="1"
+REVISION="2"
 ARCHITECTURES="x86"
 
 PROVIDES="

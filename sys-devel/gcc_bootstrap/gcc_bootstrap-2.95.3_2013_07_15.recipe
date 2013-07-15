@@ -11,7 +11,7 @@ SRC_URI="
 	git+file://$portBaseDir/../gcc_cross_x86_gcc2/download/BuildtoolsPM.git#bb9d132
 	git+git://github.com/haiku/BuildtoolsPM.git#bb9d132
 	"
-REVISION="1"
+REVISION="2"
 ARCHITECTURES="x86_gcc2"
 
 PROVIDES="
@@ -71,7 +71,8 @@ BUILD()
 	cd $objectsDir
 
 	CFLAGS="-O2 -U_FORTIFY_SOURCE" CXXFLAGS="-O2" "$sourceDir/configure" \
-		--host=$targetMachineTriple --prefix=$installDir \
+		--build=$buildMachineTriple --host=$targetMachineTriple \
+		--target=$targetMachineTriple --prefix=$installDir \
 		--disable-nls --enable-shared --enable-languages=c,c++
 
 	make || true
