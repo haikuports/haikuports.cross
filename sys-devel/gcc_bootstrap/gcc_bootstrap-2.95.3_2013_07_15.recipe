@@ -9,6 +9,7 @@ LICENSE="
 COPYRIGHT="1988-2000 Free Software Foundation, Inc."
 SRC_URI="
 	git+file://$portBaseDir/../gcc_cross_x86_gcc2/download/BuildtoolsPM.git#ce0819b
+	git+file://$portBaseDir/../binutils_bootstrap/download/BuildtoolsPM.git#ce0819b
 	git+git://github.com/haiku/BuildtoolsPM.git#ce0819b
 	"
 REVISION="2"
