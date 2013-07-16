@@ -8,8 +8,8 @@ LICENSE="
 
 COPYRIGHT="1988-2000 Free Software Foundation, Inc."
 SRC_URI="
-	git+file://$portBaseDir/../gcc_cross_x86_gcc2/download/BuildtoolsPM.git#bb9d132
-	git+git://github.com/haiku/BuildtoolsPM.git#bb9d132
+	git+file://$portBaseDir/../gcc_cross_x86_gcc2/download/BuildtoolsPM.git#ce0819b
+	git+git://github.com/haiku/BuildtoolsPM.git#ce0819b
 	"
 REVISION="2"
 ARCHITECTURES="x86_gcc2"
@@ -76,7 +76,7 @@ BUILD()
 		--disable-nls --enable-shared --enable-languages=c,c++
 
 	make || true
-		# The above will fail when compiling builtinbuf.cc, but we can ignore
+		# The above will fail when compiling iostream.cc, but we can ignore
 		# that since it's trying to build libstdc++.so, which haiku provides
 		# anyway.
 }
@@ -84,7 +84,8 @@ BUILD()
 INSTALL()
 {
 	cd $objectsDir
-	make DESTDIR=$installDestDir install
+	make prefix=$installDestDir$installDir install
+		# no DESTDIR support
 
 	### Symlinks ##############################################
 
