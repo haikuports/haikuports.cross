@@ -1,0 +1,82 @@
+From 2362e28d8ef205dc5030072ddcdbc4a65550e03a Mon Sep 17 00:00:00 2001
+From: Ingo Weinhold <ingo_weinhold@gmx.de>
+Date: Wed, 17 Jul 2013 15:47:44 +0200
+Subject: Remove expat requirement
+
+
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 6cf3bab..1da411a 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -124,7 +124,6 @@ IF (ENABLE_ARCHREPO)
+ SET (ENABLE_LZMA_COMPRESSION ON)
+ ENDIF (ENABLE_ARCHREPO)
+ 
+-FIND_PACKAGE (EXPAT REQUIRED)
+ FIND_PACKAGE (ZLIB REQUIRED)
+ IF (ENABLE_LZMA_COMPRESSION)
+ FIND_PACKAGE (LZMA REQUIRED)
+@@ -274,7 +273,7 @@ set (CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS} -O3")
+ set (CMAKE_C_FLAGS_RELWITHDEBINFO "${CMAKE_C_FLAGS} -g -O3")
+ set (CMAKE_C_FLAGS_DEBUG     "${CMAKE_C_FLAGS} -g3 -O0")
+ 
+-SET (SYSTEM_LIBRARIES "-Wl,--as-needed" ${EXPAT_LIBRARY} ${ZLIB_LIBRARY})
++SET (SYSTEM_LIBRARIES "-Wl,--as-needed" ${ZLIB_LIBRARY})
+ IF (ENABLE_LZMA_COMPRESSION)
+ SET (SYSTEM_LIBRARIES ${SYSTEM_LIBRARIES} ${LZMA_LIBRARY})
+ ENDIF (ENABLE_LZMA_COMPRESSION)
+-- 
+1.8.1.4
+
+
+From a92ceb3c6a9d94c3d4fa0491c7515c5e40aab03b Mon Sep 17 00:00:00 2001
+From: Ingo Weinhold <ingo_weinhold@gmx.de>
+Date: Wed, 17 Jul 2013 16:03:29 +0200
+Subject: Include zlib include directory
+
+
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 1da411a..8a57c39 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -262,7 +262,7 @@ INCLUDE(CPack)
+ ####################################################################
+ 
+ #SET (CMAKE_INCLUDE_DIRECTORIES_BEFORE ON)
+-INCLUDE_DIRECTORIES (${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_SOURCE_DIR} ${CMAKE_SOURCE_DIR}/src ${CMAKE_SOURCE_DIR}/ext ${CMAKE_CURRENT_BINARY_DIR} ${CMAKE_BINARY_DIR}/src SYSTEM )
++INCLUDE_DIRECTORIES (${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_SOURCE_DIR} ${CMAKE_SOURCE_DIR}/src ${CMAKE_SOURCE_DIR}/ext ${CMAKE_CURRENT_BINARY_DIR} ${CMAKE_BINARY_DIR}/src ${ZLIB_INCLUDE_DIR} SYSTEM )
+ 
+ ####################################################################
+ 
+-- 
+1.8.1.4
+
+
+From 8ffaf8f4d861f9d4e9940218317f6188274855db Mon Sep 17 00:00:00 2001
+From: Ingo Weinhold <ingo_weinhold@gmx.de>
+Date: Wed, 17 Jul 2013 20:08:08 +0200
+Subject: Don't build examples and tests
+
+
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 8a57c39..91e1012 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -293,7 +293,6 @@ ADD_SUBDIRECTORY (tools)
+ IF (ENABLE_PERL OR ENABLE_PYTHON OR ENABLE_RUBY)
+     ADD_SUBDIRECTORY (bindings)
+ ENDIF (ENABLE_PERL OR ENABLE_PYTHON OR ENABLE_RUBY)
+-ADD_SUBDIRECTORY (examples)
+ 
+ MESSAGE (STATUS "Version: ${VERSION}")
+ 
+@@ -324,6 +323,3 @@ ADD_CUSTOM_TARGET (srcpackage
+ ADD_CUSTOM_TARGET (srcpackage_local
+   ${AUTOBUILD_COMMAND}
+ )
+-
+-ENABLE_TESTING()
+-ADD_SUBDIRECTORY (test)
+-- 
+1.8.1.4
+
