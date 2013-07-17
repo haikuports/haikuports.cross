@@ -40,7 +40,8 @@ PATCH()
 
 BUILD()
 {
-	mkdir -p build
+	rm -rf build
+	mkdir build
 	cd build
 
 	# prepare a toolchain file
