@@ -69,6 +69,6 @@ BUILD()
 
 INSTALL()
 {
-	make DESTDIR=$installDestDir install
+	make install
 	prepareInstalledDevelLibs libltdl
 }
