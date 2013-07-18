@@ -1,0 +1,56 @@
+SUMMARY="Standard GNU documentation format tool" 
+DESCRIPTION="Texinfo is the official documentation format of the GNU project." 
+HOMEPAGE="http://www.gnu.org/software/texinfo/" 
+COPYRIGHT="1992-2008 Free Software Foundation, Inc."
+LICENSE="GNU GPL v3"
+SRC_URI="http://ftp.gnu.org/gnu/texinfo/texinfo-4.13a.tar.gz"
+CHECKSUM_MD5="71ba711519209b5fb583fed2b3d86fcb"
+REVISION="1"
+ARCHITECTURES="x86_gcc2 ?x86"
+
+PATCHES="texinfo_bootstrap-4.13a.patch"
+
+PROVIDES="
+	texinfo_bootstrap = $portVersion compat >= 4.13
+	texinfo = $portVersion compat >= 4.13
+	cmd:info = $portVersion compat >= 4.13
+	cmd:makeinfo = $portVersion compat >= 4.13
+	cmd:install_info = $portVersion compat >= 4.13
+	cmd:texi2dvi = $portVersion compat >= 4.13
+	cmd:texi2pdf = $portVersion compat >= 4.13
+	cmd:texindex = $portVersion compat >= 4.13
+	cmd:infokey = $portVersion compat >= 4.13
+	cmd:pdftexi2dvi = $portVersion compat >= 4.13"
+REQUIRES="
+	haiku >= $haikuVersion
+	lib:libncurses
+	"
+BUILD_REQUIRES="
+	devel:libncurses
+	"
+BUILD_PREREQUIRES="
+	haiku_devel >= $haikuVersion
+	cmd:gcc
+	cmd:ld
+	cmd:${targetMachineTripleAsName}_libtoolize
+	cmd:make
+	cmd:sed
+	"
+
+SOURCE_DIR="texinfo-4.13"
+
+BUILD()
+{
+	${targetMachineTriple}-libtoolize --force --copy --install
+	runConfigure ./configure \
+		--build=$buildMachineTriple --host=$targetMachineTriple
+	make -C tools/gnulib/lib
+	make -C tools
+	make $jobArgs
+}
+
+INSTALL()
+{
+	make DESTDIR=$installDestDir install
+	rm $installDestDir$libDir/charset.alias
+}
