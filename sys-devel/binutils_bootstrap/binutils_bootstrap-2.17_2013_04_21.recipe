@@ -1,8 +1,8 @@
 SUMMARY="Assembler, linker and binary tools for target ${targetMachineTriple}"
 HOMEPAGE="http://www.gnu.org/software/binutils"
 SRC_URI="
-	git+file://$portBaseDir/../binutils_cross_x86_gcc2/download/BuildtoolsPM.git#bb9d132
-	git+git://github.com/haiku/BuildtoolsPM.git#bb9d132
+	git+file://$portBaseDir/../binutils_cross_x86_gcc2/download/BuildtoolsPM.git#ab0f66e
+	git+git://github.com/haiku/BuildtoolsPM.git#ab0f66e
 	"
 REVISION="3"
 ARCHITECTURES="x86_gcc2"
