@@ -8,11 +8,11 @@ LICENSE="
 
 COPYRIGHT="1988-2000 Free Software Foundation, Inc."
 SRC_URI="
-	git+file://$portBaseDir/../gcc_cross_x86_gcc2/download/BuildtoolsPM.git#ce0819b
-	git+file://$portBaseDir/../binutils_bootstrap/download/BuildtoolsPM.git#ce0819b
-	git+git://github.com/haiku/BuildtoolsPM.git#ce0819b
+	git+file://$portBaseDir/../gcc_cross_x86_gcc2/download/BuildtoolsPM.git#ab0f66e
+	git+file://$portBaseDir/../binutils_bootstrap/download/BuildtoolsPM.git#ab0f66e
+	git+git://github.com/haiku/BuildtoolsPM.git#ab0f66e
 	"
-REVISION="2"
+REVISION="3"
 ARCHITECTURES="x86_gcc2"
 
 PROVIDES="
@@ -24,7 +24,6 @@ PROVIDES="
 	cmd:g++ = $portVersion compat >= 2.95.3
 	cmd:gcc = $portVersion compat >= 2.95.3
 	cmd:gcov = 1.5 compat >= 1.5
-	cmd:i586_pc_haiku_gcc2_gcc = $portVersion compat >= 2.95.3
 	cmd:protoize = $portVersion compat >= 2.95.3
 	cmd:unprotoize = $portVersion compat >= 2.95.3
 	"
@@ -76,10 +75,11 @@ BUILD()
 		--target=$targetMachineTriple --prefix=$installDir \
 		--disable-nls --enable-shared --enable-languages=c,c++
 
-	make || true
-		# The above will fail when compiling iostream.cc, but we can ignore
-		# that since it's trying to build libstdc++.so, which haiku provides
-		# anyway.
+	make
+	
+	# the generated specs file insists on defaulting to a cross-compiler,
+	# we fix that by regenerating
+	gcc/xgcc -dumpspecs >gcc/specs
 }
 
 INSTALL()
@@ -103,6 +103,7 @@ INSTALL()
 	mkdir -p $installDestDir$binDir
 	cd $installDestDir$binDir
 	ln -sfn ../$relativeInstallDir/bin/* .
+	rm $targetMachineTriple-gcc
 	
 	### Strip #################################################
 	
