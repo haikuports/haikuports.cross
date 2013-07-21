@@ -18,6 +18,7 @@ ARCHITECTURES="x86_gcc2 ?x86"
 
 PROVIDES="
 	autoconf_bootstrap = $portVersion compat >= 2.60
+	autoconf = $portVersion compat >= 2.60
 	cmd:autoconf = $portVersion compat >= 2.60
 	cmd:autoheader = $portVersion compat >= 2.60
 	cmd:autom4te = $portVersion compat >= 2.60

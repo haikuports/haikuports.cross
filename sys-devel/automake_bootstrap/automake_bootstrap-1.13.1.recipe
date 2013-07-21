@@ -17,6 +17,7 @@ PATCHES="automake_bootstrap-1.13.1.patchset"
 
 PROVIDES="
 	automake_bootstrap = $portVersion compat >= 1.13
+	automake = $portVersion compat >= 1.13
 	cmd:automake = $portVersion compat >= 1.13
 	cmd:automake_1.13 = $portVersion compat >= 1.13
 	cmd:aclocal = $portVersion compat >= 1.13

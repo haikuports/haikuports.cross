@@ -17,6 +17,7 @@ ARCHITECTURES="x86_gcc2 ?x86"
 
 PROVIDES="
 	sed_bootstrap = $portVersion compat >= 4
+	sed = $portVersion compat >= 4
 	cmd:sed = $portVersion compat >= 4
 	"
 REQUIRES="

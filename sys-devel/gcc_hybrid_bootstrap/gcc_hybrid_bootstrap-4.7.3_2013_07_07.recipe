@@ -15,6 +15,7 @@ ARCHITECTURES="x86"
 
 PROVIDES="
 	gcc_bootstrap = $portVersion compat >= 4.7
+	gcc = $portVersion compat >= 4.7
 	cmd:c++ = $portVersion compat >= 4.7
 	cmd:cc = $portVersion compat >= 4.7
 	cmd:cpp = $portVersion compat >= 4.7

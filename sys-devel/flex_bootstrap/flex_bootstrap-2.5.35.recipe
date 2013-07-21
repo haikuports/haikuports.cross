@@ -13,6 +13,7 @@ ARCHITECTURES="x86_gcc2 ?x86"
 
 PROVIDES="
 	flex_bootstrap = $portVersion compat >= 2.5
+	flex = $portVersion compat >= 2.5
 	cmd:flex = $portVersion compat >= 2.5
 	lib:libfl.a = $portVersion compat >= 2.5
 	lib:libfl_pic.a = $portVersion compat >= 2.5

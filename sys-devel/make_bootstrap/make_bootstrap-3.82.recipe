@@ -19,6 +19,7 @@ ARCHITECTURES="x86_gcc2 ?x86"
 
 PROVIDES="
 	make_bootstrap = $portVersion compat >= 3.82
+	make = $portVersion compat >= 3.82
 	cmd:make = $portVersion compat >= 3.82
 	"
 REQUIRES="

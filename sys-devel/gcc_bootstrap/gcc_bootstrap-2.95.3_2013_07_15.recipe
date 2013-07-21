@@ -17,6 +17,7 @@ ARCHITECTURES="x86_gcc2"
 
 PROVIDES="
 	gcc_bootstrap = $portVersion compat >= 2.95.3
+	gcc = $portVersion compat >= 2.95.3
 	cmd:c++ = $portVersion compat >= 2.95.3
 	cmd:c++filt = $portVersion compat >= 2.95.3
 	cmd:cc = $portVersion compat >= 2.95.3

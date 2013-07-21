@@ -26,6 +26,7 @@ ARCHITECTURES="x86_gcc2 ?x86"
 
 PROVIDES="
 	m4_bootstrap = $portVersion compat >= 1.4
+	m4 = $portVersion compat >= 1.4
 	cmd:m4 = $portVersion compat >= 1.4
 	"
 REQUIRES="

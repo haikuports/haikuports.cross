@@ -10,6 +10,7 @@ ARCHITECTURES="x86_gcc2 ?x86"
 
 PROVIDES="
 	grep_bootstrap = $portVersion compat >= 2
+	grep = $portVersion compat >= 2
 	cmd:egrep = $portVersion compat >= 2
 	cmd:fgrep = $portVersion compat >= 2
 	cmd:grep = $portVersion compat >= 2

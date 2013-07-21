@@ -19,6 +19,7 @@ ARCHITECTURES="x86_gcc2 ?x86"
 
 PROVIDES="
 	gawk_bootstrap = $portVersion compat >= 3
+	gawk = $portVersion compat >= 3
 	cmd:awk = $portVersion compat >= 3
 	cmd:gawk = $portVersion compat >= 3
 	"
