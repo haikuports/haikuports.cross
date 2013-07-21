@@ -44,8 +44,9 @@ BUILD_PREREQUIRES="
 
 SOURCE_DIR="icu"
 
-buildOutputDir=/sources/icu-build
-targetOutputDir=/sources/icu-target
+sourceDir=$(pwd)
+buildOutputDir=$sourceDir/../icu-build
+targetOutputDir=$sourceDir/../icu-target
 
 BUILD()
 {
@@ -69,7 +70,7 @@ BUILD()
 INSTALL()
 {
 	cd $targetOutputDir
-	make install
+	make DESTDIR=$installDestDir install
 
 	prepareInstalledDevelLibs \
 		libicudata \
@@ -83,13 +84,13 @@ INSTALL()
 
 	# devel package
 	packageEntries devel \
-		$developDir \
-		$dataDir \
-		$libDir/icu \
-		$binDir/icu-config
+		$installDestDir$developDir \
+		$installDestDir$dataDir \
+		$installDestDir$libDir/icu \
+		$installDestDir$binDir/icu-config
 
 	# main package cleanup
-	rm -r $binDir
+	rm -r $installDestDir$binDir
 }
 
 DESCRIPTION="ICU is a mature, widely used set of C/C++ and Java libraries providing Unicode and Globalization support for software applications. ICU is widely portable and gives applications the same results on all platforms and between C/C++ and Java software.
@@ -116,8 +117,8 @@ Here are a few highlights of the services provided by ICU:
 
 # ----- devel package -------------------------------------------------------
 
-SUMMARY_devel="The ICU development files"
 PROVIDES_devel="
+	icu_bootstrap_devel = $portVersion
 	icu_devel = $portVersion
 	cmd:icu_config = $portVersion compat >= 4.8
 	devel:libicudata = 48.1.1 compat >= 48
@@ -130,5 +131,5 @@ PROVIDES_devel="
 	devel:libicuuc = 48.1.1 compat >= 48
 	"
 REQUIRES_devel="
-	icu == $portVersion base
+	icu_bootstrap == $portVersion base
 	"
