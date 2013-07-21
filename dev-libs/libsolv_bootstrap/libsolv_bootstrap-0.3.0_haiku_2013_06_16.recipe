@@ -49,10 +49,16 @@ BUILD()
 		SET(CMAKE_FIND_ROOT_PATH_MODE_INCLUDE ONLY)
 EOF
 
-	local zlibInstallDir=$crossSysrootDir/boot/common
+	local systemDir=$crossSysrootDir/boot/system
+	local systemDevelLibDir=$systemDir/$relativeDevelopLibDir
+	local zlibInstallDir=$systemDir
 	cmake -DCMAKE_TOOLCHAIN_FILE=toolchain.cmake \
+		-DHAIKU=1 \
 		-DZLIB_LIBRARY=$zlibInstallDir/$relativeDevelopLibDir/libz.so \
 		-DZLIB_INCLUDE_DIR=$zlibInstallDir/$relativeIncludeDir \
+		-DHAIKU_BE_LIBRARY=$systemDevelLibDir/libbe.so \
+		-DHAIKU_NETWORK_LIBRARY=$systemDevelLibDir/libnetwork.so \
+		-DHAIKU_PACKAGE_LIBRARY=$systemDevelLibDir/libpackage.so \
 		-DCMAKE_INSTALL_PREFIX:PATH=$prefix ..
 	make $jobArgs
 }
