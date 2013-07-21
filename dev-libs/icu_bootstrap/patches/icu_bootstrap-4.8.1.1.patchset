@@ -1,0 +1,138 @@
+From 1fbc46bac008f76ccbab28dd9e4461ed1823e471 Mon Sep 17 00:00:00 2001
+From: Oliver Tappe <zooey@hirschkaefer.de>
+Date: Mon, 15 Jul 2013 22:31:09 +0200
+Subject: applying patch icu_bootstrap-4.8.1.1.patch
+
+
+diff --git a/source/common/messagepattern.cpp b/source/common/messagepattern.cpp
+index b737049..1c10a6e 100644
+--- a/source/common/messagepattern.cpp
++++ b/source/common/messagepattern.cpp
+@@ -88,8 +88,12 @@ public:
+                   int32_t length,
+                   UErrorCode &errorCode);
+     UBool ensureCapacityForOneMore(int32_t oldLength, UErrorCode &errorCode);
+-    UBool memEquals(const MessagePatternList<T, stackCapacity> &other, int32_t length) const {
+-        return 0==uprv_memcmp(a.getAlias(), other.a.getAlias(), length*sizeof(T));
++    UBool equals(const MessagePatternList<T, stackCapacity> &other, int32_t length) const {
++		for (int32_t i=0; i<length; ++i) {
++            if (!(a.getAlias()[i] == other.a.getAlias()[i]))
++                return FALSE;
++		}
++        return TRUE;
+     }
+ 
+     MaybeStackArray<T, stackCapacity> a;
+@@ -309,7 +313,7 @@ MessagePattern::operator==(const MessagePattern &other) const {
+         msg==other.msg &&
+         // parts.equals(o.parts)
+         partsLength==other.partsLength &&
+-        (partsLength==0 || partsList->memEquals(*other.partsList, partsLength));
++        (partsLength==0 || partsList->equals(*other.partsList, partsLength));
+     // No need to compare numericValues if msg and parts are the same.
+ }
+ 
+diff --git a/source/config/mh-haiku b/source/config/mh-haiku
+index 09d43d2..b97a9c0 100644
+--- a/source/config/mh-haiku
++++ b/source/config/mh-haiku
+@@ -17,6 +17,9 @@ SHAREDLIBCPPFLAGS = -DPIC
+ LIBCPPFLAGS =
+ THREADSCPPFLAGS =
+ 
++#
++CPPFLAGS += -DU_CHARSET_IS_UTF8=1
++
+ ## Compiler switch to embed a runtime search path
+ LD_RPATH=
+ LD_RPATH_PRE = -Wl,-rpath,
+@@ -31,35 +34,35 @@ STATIC_O = ao
+ 
+ ## Compilation rules
+ %.$(STATIC_O): $(srcdir)/%.c
+-        $(COMPILE.c) $(STATICCPPFLAGS) $(STATICCFLAGS) -o $@ $<
++	$(COMPILE.c) $(STATICCPPFLAGS) $(STATICCFLAGS) -o $@ $<
+ %.o: $(srcdir)/%.c
+-        $(COMPILE.c) $(DYNAMICCPPFLAGS) $(DYNAMICCFLAGS) -o $@ $<
++	$(COMPILE.c) $(DYNAMICCPPFLAGS) $(DYNAMICCFLAGS) -o $@ $<
+ 
+ %.$(STATIC_O): $(srcdir)/%.cpp
+-        $(COMPILE.cc) $(STATICCPPFLAGS) $(STATICCXXFLAGS) -o $@ $<
++	$(COMPILE.cc) $(STATICCPPFLAGS) $(STATICCXXFLAGS) -o $@ $<
+ %.o: $(srcdir)/%.cpp
+-        $(COMPILE.cc) $(DYNAMICCPPFLAGS) $(DYNAMICCXXFLAGS) -o $@ $<
++	$(COMPILE.cc) $(DYNAMICCPPFLAGS) $(DYNAMICCXXFLAGS) -o $@ $<
+ 
+ 
+ ## Dependency rules
+ %.d: $(srcdir)/%.c
+-        @echo "generating dependency information for $<"
+-        @$(SHELL) -ec '$(GEN_DEPS.c) $< \
+-                | sed '\''s%\($*\)\.o[ :]*%\1.o $@ : %g'\'' > $@; \
+-                [ -s $@ ] || rm -f $@'
++	@echo "generating dependency information for $<"
++	@$(SHELL) -ec '$(GEN_DEPS.c) $< \
++		| sed '\''s%\($*\)\.o[ :]*%\1.o $@ : %g'\'' > $@; \
++		[ -s $@ ] || rm -f $@'
+ 
+ %.d: $(srcdir)/%.cpp
+-        @echo "generating dependency information for $<"
+-        @$(SHELL) -ec '$(GEN_DEPS.cc) $< \
+-                | sed '\''s%\($*\)\.o[ :]*%\1.o $@ : %g'\'' > $@; \
+-                [ -s $@ ] || rm -f $@'
++	@echo "generating dependency information for $<"
++	@$(SHELL) -ec '$(GEN_DEPS.cc) $< \
++		| sed '\''s%\($*\)\.o[ :]*%\1.o $@ : %g'\'' > $@; \
++		[ -s $@ ] || rm -f $@'
+ 
+ ## Versioned libraries rules
+ 
+ %.$(SO).$(SO_TARGET_VERSION_MAJOR): %.$(SO).$(SO_TARGET_VERSION)
+-        $(RM) $@ && ln -s ${<F} $@
++	$(RM) $@ && ln -s ${<F} $@
+ %.$(SO): %.$(SO).$(SO_TARGET_VERSION_MAJOR)
+-        $(RM) $@ && ln -s ${*F}.$(SO).$(SO_TARGET_VERSION) $@
++	$(RM) $@ && ln -s ${*F}.$(SO).$(SO_TARGET_VERSION) $@
+ 
+ ##  Bind internal references
+ 
+diff --git a/source/configure b/source/configure
+index eb6fbc5..1d83947 100755
+--- a/source/configure
++++ b/source/configure
+@@ -7748,6 +7748,7 @@ case "${host}" in
+ 	*-*-nto*)	platform=U_QNX ;;
+ 	*-dec-osf*) 	platform=U_OSF ;;
+ 	*-*-beos)		platform=U_BEOS ;;
++	*-*-haiku)		platform=U_HAIKU ;;
+ 	*-*-irix*)		platform=U_IRIX ;;
+ 	*-ncr-*)		platform=U_MPRAS ;;
+ 	*) 		platform=U_UNKNOWN_PLATFORM ;;
+diff --git a/source/configure.in b/source/configure.in
+index 1e2a54d..66373ad 100644
+--- a/source/configure.in
++++ b/source/configure.in
+@@ -1286,6 +1286,7 @@ case "${host}" in
+ 	*-*-nto*)	platform=U_QNX ;;
+ 	*-dec-osf*) 	platform=U_OSF ;;
+ 	*-*-beos)		platform=U_BEOS ;;
++	*-*-haiku)		platform=U_HAIKU ;;
+ 	*-*-irix*)		platform=U_IRIX ;;
+ 	*-ncr-*)		platform=U_MPRAS ;;
+ 	*) 		platform=U_UNKNOWN_PLATFORM ;;
+diff --git a/source/tools/pkgdata/pkgdata.cpp b/source/tools/pkgdata/pkgdata.cpp
+index 9bbbe7d..68af406 100644
+--- a/source/tools/pkgdata/pkgdata.cpp
++++ b/source/tools/pkgdata/pkgdata.cpp
+@@ -476,7 +476,7 @@ main(int argc, char* argv[]) {
+ 
+ static int runCommand(const char* command, UBool specialHandling) {
+     char *cmd = NULL;
+-    char cmdBuffer[SMALL_BUFFER_MAX_SIZE];
++    char cmdBuffer[64000];
+     int32_t len = strlen(command);
+ 
+     if (len == 0) {
+-- 
+1.7.10.2
+
