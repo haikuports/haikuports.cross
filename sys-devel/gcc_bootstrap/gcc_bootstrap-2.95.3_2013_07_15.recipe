@@ -77,10 +77,11 @@ BUILD()
 		--disable-nls --enable-shared --enable-languages=c,c++
 
 	make
-	
-	# the generated specs file insists on defaulting to a cross-compiler,
-	# we fix that by regenerating
-	gcc/xgcc -dumpspecs >gcc/specs
+
+	# the generated specs file insists on defaulting to a cross-compiler
+	sed -i \
+		'/^\*cross_compile:$/{ N; s/\*cross_compile:\n1/*cross_compile:\n0/ }' \
+		gcc/specs
 }
 
 INSTALL()
