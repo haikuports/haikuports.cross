@@ -50,15 +50,17 @@ targetOutputDir=$sourceDir/../icu-target
 
 BUILD()
 {
-	# make build-architecture-specific output directory and build ICU for the current architecture
+	# make build-architecture-specific output directory and build ICU for the
+	# current architecture
 	mkdir -p $buildOutputDir
 	cd $buildOutputDir
 	runConfigure ../icu/source/configure \
 		--disable-renaming --disable-samples --disable-extras
 	make $jobArgs
 
-	# now make target-architecture-specific output directory and build ICU for the target architecture,
-	# pointing at the directory containing the version that's just been built for the build architecture
+	# now make target-architecture-specific output directory and build ICU for
+	# the target architecture, pointing at the directory containing the version
+	# that's just been built for the build architecture
 	mkdir -p $targetOutputDir
 	cd $targetOutputDir
 	runConfigure ../icu/source/configure \
