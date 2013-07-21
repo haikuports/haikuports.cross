@@ -1,0 +1,35 @@
+SUMMARY="tool for building packages from build recipes"
+DESCRIPTION="haikuporter drives the process of building Haiku packages from recipe files."
+HOMEPAGE="http://ports.haiku-files.org/wiki/HaikuPorterForPM"
+SRC_URI="git+https://bitbucket.org/haikuports/haikuporter.git#c2e271a220019327dc66edc24314dfb4177212b7"
+LICENSE="MIT"
+COPYRIGHT="2007-2013 Brecht Machiels et al"
+REVISION="1"
+ARCHITECTURES="any"
+
+PROVIDES="
+	haikuporter = $portVersion
+	cmd:haikuporter = $portVersion
+	"
+REQUIRES="
+	cmd:python
+	"
+BUILD_REQUIRES="
+	"
+BUILD_PREREQUIRES="
+	"
+
+BUILD()
+{
+	true
+}
+
+INSTALL()
+{
+	haikuporterDir=$libDir/haikuporter
+	mkdir -p $installDestDir$haikuporterDir
+	cp -r haikuporter HaikuPorter $installDestDir$haikuporterDir
+
+	mkdir -p $installDestDir$binDir
+	ln -s $haikuporterDir/haikuporter $installDestDir$binDir
+}
