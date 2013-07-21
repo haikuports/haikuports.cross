@@ -26,13 +26,13 @@ REQUIRES="
 	lib:libncurses
 	"
 BUILD_REQUIRES="
+	cmd:${targetMachineTripleAsName}_libtoolize
 	devel:libncurses
 	"
 BUILD_PREREQUIRES="
 	haiku_devel >= $haikuVersion
 	cmd:gcc
 	cmd:ld
-	cmd:${targetMachineTripleAsName}_libtoolize
 	cmd:make
 	cmd:sed
 	"

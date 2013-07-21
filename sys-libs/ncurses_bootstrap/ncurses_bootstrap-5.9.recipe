@@ -37,13 +37,13 @@ REQUIRES="
 	haiku >= $haikuVersion
 	"
 BUILD_REQUIRES="
+	cmd:${targetMachineTripleAsName}_libtool
 	"
 BUILD_PREREQUIRES="
 	haiku_devel >= $haikuVersion
 	cmd:gcc
 	cmd:grep
 	cmd:ld
-	cmd:${targetMachineTripleAsName}_libtool
 	cmd:make
 	cmd:sed
 	"
