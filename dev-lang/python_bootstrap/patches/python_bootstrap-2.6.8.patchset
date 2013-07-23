@@ -1,4 +1,4 @@
-From fb6275de8c3c4d95ada814ff90c171129ae52f66 Mon Sep 17 00:00:00 2001
+From e96d5fcce7d7fd138f638d8f8f2437b5538c020f Mon Sep 17 00:00:00 2001
 From: The Haiku build system <build-system@haiku-os.org>
 Date: Fri, 19 Jul 2013 13:09:22 +0200
 Subject: applying patch python_bootstrap-2.6.8.patch
@@ -681,14 +681,14 @@ index 4fe1f45..ede6aa7 100644
 1.8.1.4
 
 
-From 15f48f87c7a9c4e8e74a3a3fe28766f1c4a2a09c Mon Sep 17 00:00:00 2001
+From 2bdbf78fa995a9506a2c7add976b3b9a32df5587 Mon Sep 17 00:00:00 2001
 From: Ingo Weinhold <ingo_weinhold@gmx.de>
 Date: Fri, 19 Jul 2013 13:29:08 +0200
 Subject: configure.in: Can't run printf("%zd") test when cross-compiling
 
 
 diff --git a/configure.in b/configure.in
-index aedd433..eecf6ec 100644
+index aedd433..ab47e8c 100644
 --- a/configure.in
 +++ b/configure.in
 @@ -3867,43 +3867,8 @@ else
@@ -733,7 +733,7 @@ index aedd433..eecf6ec 100644
 - AC_DEFINE(PY_FORMAT_SIZE_T, "z", [Define to printf format modifier for Py_ssize_t])],
 - AC_MSG_RESULT(no))
 +AC_MSG_RESULT(assuming yes)
-+AC_DEFINE(PY_FORMAT_SIZE_T, "z", [Define to printf format modifier for Py_ssize_t])],
++AC_DEFINE(PY_FORMAT_SIZE_T, "z", [Define to printf format modifier for Py_ssize_t])
  
  AC_CHECK_TYPE(socklen_t,,
    AC_DEFINE(socklen_t,int,
@@ -741,7 +741,7 @@ index aedd433..eecf6ec 100644
 1.8.1.4
 
 
-From 5876146260e65be5a7b4f3afd0634f12ce22de44 Mon Sep 17 00:00:00 2001
+From d077a17c0a195523058ea9a96ceb1be17ddb50fd Mon Sep 17 00:00:00 2001
 From: Ingo Weinhold <ingo_weinhold@gmx.de>
 Date: Fri, 19 Jul 2013 14:28:43 +0200
 Subject: Makefile.pre.in: sort out PYTHON and BUILDPYTHON
@@ -926,7 +926,7 @@ index aba9464..dbc05a3 100644
 1.8.1.4
 
 
-From 2906276afc76bbee42cba9fae2a2755df1d52ed6 Mon Sep 17 00:00:00 2001
+From 21e42713b359126241c952c97a38384b393ac7e8 Mon Sep 17 00:00:00 2001
 From: Ingo Weinhold <ingo_weinhold@gmx.de>
 Date: Fri, 19 Jul 2013 14:58:11 +0200
 Subject: configure.in: unset RUNSHARED when cross-compiling
@@ -935,7 +935,7 @@ In that case we can't use the built shared library anyway, so it can
 only be detrimental to extend the library search path to include it.
 
 diff --git a/configure.in b/configure.in
-index eecf6ec..e5696da 100644
+index ab47e8c..a9335e4 100644
 --- a/configure.in
 +++ b/configure.in
 @@ -797,6 +797,10 @@ else # shared is disabled
@@ -943,7 +943,7 @@ index eecf6ec..e5696da 100644
  fi
  
 +if test "$cross_compiling" = yes; then
-+  RUNSHARED=
++  RUNSHARED="HOST_OS=$host_os HOST_CPU=$host_cpu"
 +fi
 +
  AC_MSG_RESULT($LDLIBRARY)
@@ -953,7 +953,7 @@ index eecf6ec..e5696da 100644
 1.8.1.4
 
 
-From 4b80cf81d6799bbed038411d406969e3f69596fd Mon Sep 17 00:00:00 2001
+From 0d1e2fd3647ecb390537c0c504fc11c327644c6a Mon Sep 17 00:00:00 2001
 From: Ingo Weinhold <ingo_weinhold@gmx.de>
 Date: Fri, 19 Jul 2013 14:59:35 +0200
 Subject: Makefile.pre.in: don't set PATH when cross-compiling
@@ -961,7 +961,7 @@ Subject: Makefile.pre.in: don't set PATH when cross-compiling
 We can't use the built python in that case.
 
 diff --git a/Makefile.pre.in b/Makefile.pre.in
-index dbc05a3..577334d 100644
+index dbc05a3..802146b 100644
 --- a/Makefile.pre.in
 +++ b/Makefile.pre.in
 @@ -910,7 +910,9 @@ libinstall:	build_all $(srcdir)/Lib/$(PLATDIR)
@@ -975,6 +975,797 @@ index dbc05a3..577334d 100644
  	export PYTHONPATH; PYTHONPATH="`pwd`/Lib"; \
  	export DYLD_FRAMEWORK_PATH; DYLD_FRAMEWORK_PATH="`pwd`"; \
  	export EXE; EXE="$(BUILDEXE)"; \
+-- 
+1.8.1.4
+
+
+From eacecc59da43c95c939d842f14366a82d68c5fa3 Mon Sep 17 00:00:00 2001
+From: Ingo Weinhold <ingo_weinhold@gmx.de>
+Date: Mon, 22 Jul 2013 16:33:56 +0200
+Subject: setup.py: cross-compilation fixes
+
+Mostly taken from a patch by Roumen Petrov.
+
+diff --git a/Makefile.pre.in b/Makefile.pre.in
+index 802146b..f2187d8 100644
+--- a/Makefile.pre.in
++++ b/Makefile.pre.in
+@@ -467,18 +467,17 @@ $(DLLLIBRARY) libpython$(VERSION).dll.a: $(LIBRARY_OBJS)
+ oldsharedmods: $(SHAREDMODS)
+ 
+ 
++setup_info: setup_info.in config.status
++	$(SHELL) ./config.status $@
++
++
+ Makefile Modules/config.c: Makefile.pre \
+ 				$(srcdir)/Modules/config.c.in \
+ 				$(MAKESETUP) \
+ 				Modules/Setup.config \
+ 				Modules/Setup \
+ 				Modules/Setup.local
+-	$(SHELL) $(MAKESETUP) -c $(srcdir)/Modules/config.c.in \
+-				-s Modules \
+-				Modules/Setup.config \
+-				Modules/Setup.local \
+-				Modules/Setup
+-	@mv config.c Modules
++	$(SHELL) ./config.status Makefile
+ 	@echo "The Makefile was updated, you may need to re-run make."
+ 
+ 
+@@ -1092,12 +1091,11 @@ scriptsinstall:
+ 
+ # Build the toplevel Makefile
+ Makefile.pre: Makefile.pre.in config.status
+-	CONFIG_FILES=Makefile.pre CONFIG_HEADERS= $(SHELL) config.status
+-	$(MAKE) -f Makefile.pre Makefile
++	$(SHELL) ./config.status $@
+ 
+ # Run the configure script.
+ config.status:	$(srcdir)/configure
+-	$(SHELL) $(srcdir)/configure $(CONFIG_ARGS)
++	$(SHELL) ./config.status --recheck
+ 
+ .PRECIOUS: config.status $(PYTHON) Makefile Makefile.pre
+ 
+@@ -1112,8 +1110,8 @@ reindent:
+ # Rerun configure with the same options as it was run last time,
+ # provided the config.status script exists
+ recheck:
+-	$(SHELL) config.status --recheck
+-	$(SHELL) config.status
++	$(SHELL) ./config.status --recheck
++	$(SHELL) ./config.status
+ 
+ # Rebuild the configure script from configure.in; also rebuild pyconfig.h.in
+ autoconf:
+diff --git a/configure.in b/configure.in
+index a9335e4..b9150ab 100644
+--- a/configure.in
++++ b/configure.in
+@@ -11,6 +11,7 @@ AC_PREREQ(2.61)
+ AC_INIT(python, PYTHON_VERSION, http://www.python.org/python-bugs)
+ AC_CONFIG_SRCDIR([Include/object.h])
+ AC_CONFIG_HEADER(pyconfig.h)
++AC_CANONICAL_HOST
+ 
+ dnl This is for stuff that absolutely must end up in pyconfig.h.
+ dnl Please use pyport.h instead, if possible.
+@@ -429,10 +430,6 @@ AC_SUBST(EXPORT_MACOSX_DEPLOYMENT_TARGET)
+ CONFIGURE_MACOSX_DEPLOYMENT_TARGET=
+ EXPORT_MACOSX_DEPLOYMENT_TARGET='#'
+ 
+-AC_MSG_CHECKING(machine type as reported by uname -m)
+-ac_sys_machine=`uname -m`
+-AC_MSG_RESULT($ac_sys_machine)
+-
+ # checks for alternative programs
+ 
+ # compiler flags are generated in two sets, BASECFLAGS and OPT.  OPT is just
+@@ -943,7 +940,7 @@ yes)
+     # if using gcc on alpha, use -mieee to get (near) full IEEE 754
+     # support.  Without this, treatment of subnormals doesn't follow
+     # the standard.
+-    case $ac_sys_machine in
++    case $host in
+          alpha*)
+                 BASECFLAGS="$BASECFLAGS -mieee"
+                 ;;
+@@ -3560,9 +3557,10 @@ for py_libtermcap in "" ncursesw ncurses curses termcap; do
+   if test $py_cv_lib_readline = yes; then
+     break
+   fi
++  READLINE_LIBS=
+ done
+ # Uncomment this line if you want to use READINE_LIBS in Makefile or scripts
+-#AC_SUBST([READLINE_LIBS])
++AC_SUBST([READLINE_LIBS])
+ if test $py_cv_lib_readline = no; then
+   AC_MSG_RESULT([none])
+ else
+@@ -3910,6 +3908,7 @@ done
+ AC_MSG_RESULT(done)
+ 
+ # generate output files
++AC_CONFIG_FILES([setup_info])
+ AC_CONFIG_FILES(Makefile.pre Modules/Setup.config)
+ AC_OUTPUT
+ 
+diff --git a/setup.py b/setup.py
+index ede6aa7..1693d74 100644
+--- a/setup.py
++++ b/setup.py
+@@ -17,6 +17,21 @@ from distutils.command.install import install
+ from distutils.command.install_lib import install_lib
+ from distutils.spawn import find_executable
+ 
++def _get_platform():
++    # Get value of host platform (set only if cross-compile)
++    # otherwise value of sys.platform
++    host_platform = os.environ.get('HOST_OS')
++    if host_platform is None:
++        host_platform = sys.platform
++    for platform in ['cygwin', 'beos', 'darwin', 'atheos', 'osf1']:
++       if host_platform.startswith(platform):
++            return platform
++    return host_platform
++
++host_platform = _get_platform()
++cross_compiling = (not os.environ.get('HOST_OS') is None)
++
++
+ # This global variable is used to hold the list of modules to be disabled.
+ disabled_module_list = []
+ 
+@@ -57,7 +72,7 @@ def find_file(filename, std_dirs, paths):
+     'paths' is a list of additional locations to check; if the file is
+         found in one of them, the resulting list will contain the directory.
+     """
+-    if sys.platform == 'darwin':
++    if host_platform == 'darwin':
+         # Honor the MacOSX SDK setting when one was specified.
+         # An SDK is a directory with the same structure as a real
+         # system, but with only header files and libraries.
+@@ -67,7 +82,7 @@ def find_file(filename, std_dirs, paths):
+     for dir in std_dirs:
+         f = os.path.join(dir, filename)
+ 
+-        if sys.platform == 'darwin' and is_macosx_sdk_path(dir):
++        if host_platform == 'darwin' and is_macosx_sdk_path(dir):
+             f = os.path.join(sysroot, dir[1:], filename)
+ 
+         if os.path.exists(f): return []
+@@ -76,7 +91,7 @@ def find_file(filename, std_dirs, paths):
+     for dir in paths:
+         f = os.path.join(dir, filename)
+ 
+-        if sys.platform == 'darwin' and is_macosx_sdk_path(dir):
++        if host_platform == 'darwin' and is_macosx_sdk_path(dir):
+             f = os.path.join(sysroot, dir[1:], filename)
+ 
+         if os.path.exists(f):
+@@ -90,7 +105,7 @@ def find_library_file(compiler, libname, std_dirs, paths):
+     if result is None:
+         return None
+ 
+-    if sys.platform == 'darwin':
++    if host_platform == 'darwin':
+         sysroot = macosx_sdk_root()
+ 
+     # Check whether the found file is in one of the standard directories
+@@ -99,7 +114,7 @@ def find_library_file(compiler, libname, std_dirs, paths):
+         # Ensure path doesn't end with path separator
+         p = p.rstrip(os.sep)
+ 
+-        if sys.platform == 'darwin' and is_macosx_sdk_path(p):
++        if host_platform == 'darwin' and is_macosx_sdk_path(p):
+             if os.path.join(sysroot, p[1:]) == dirname:
+                 return [ ]
+ 
+@@ -112,7 +127,7 @@ def find_library_file(compiler, libname, std_dirs, paths):
+         # Ensure path doesn't end with path separator
+         p = p.rstrip(os.sep)
+ 
+-        if sys.platform == 'darwin' and is_macosx_sdk_path(p):
++        if host_platform == 'darwin' and is_macosx_sdk_path(p):
+             if os.path.join(sysroot, p[1:]) == dirname:
+                 return [ p ]
+ 
+@@ -313,6 +328,10 @@ class PyBuildExt(build_ext):
+             self.announce('WARNING: skipping import check for Cygwin-based "%s"'
+                 % ext.name)
+             return
++        if cross_compiling:
++            self.announce('WARNING: skipping import check for cross-compiled "%s"'
++                % ext.name)
++            return
+         ext_filename = os.path.join(
+             self.build_lib,
+             self.get_ext_filename(self.get_ext_fullname(ext.name)))
+@@ -348,16 +367,20 @@ class PyBuildExt(build_ext):
+             self.failed.append(ext.name)
+ 
+     def get_platform(self):
+-        # Get value of sys.platform
++        # Get value of host_platform
+         for platform in ['cygwin', 'beos', 'darwin', 'atheos', 'osf1']:
+-            if sys.platform.startswith(platform):
++            if host_platform.startswith(platform):
+                 return platform
+-        return sys.platform
++        return host_platform
+ 
+     def detect_modules(self):
+-        # Ensure that /usr/local is always used
+-        add_dir_to_list(self.compiler.library_dirs, '/usr/local/lib')
+-        add_dir_to_list(self.compiler.include_dirs, '/usr/local/include')
++        pyconfig_h_data = open('pyconfig.h').read()
++        setup_info_data = open('setup_info').read()
++
++        if not cross_compiling:
++            # Ensure that /usr/local is always used
++            add_dir_to_list(self.compiler.library_dirs, '/usr/local/lib')
++            add_dir_to_list(self.compiler.include_dirs, '/usr/local/include')
+ 
+         # Add paths specified in the environment variables LDFLAGS and
+         # CPPFLAGS for header and library files.
+@@ -407,11 +430,14 @@ class PyBuildExt(build_ext):
+         # lib_dirs and inc_dirs are used to search for files;
+         # if a file is found in one of those directories, it can
+         # be assumed that no additional -I,-L directives are needed.
+-        lib_dirs = self.compiler.library_dirs + [
+-            '/lib64', '/usr/lib64',
+-            '/lib', '/usr/lib',
+-            ]
+-        inc_dirs = self.compiler.include_dirs + ['/usr/include']
++        lib_dirs = self.compiler.library_dirs
++        inc_dirs = self.compiler.include_dirs
++        if not cross_compiling:
++            lib_dirs += [
++                '/lib64', '/usr/lib64',
++                '/lib', '/usr/lib',
++                ]
++            inc_dirs += ['/usr/include']
+         exts = []
+         missing = []
+ 
+@@ -606,11 +632,30 @@ class PyBuildExt(build_ext):
+ 
+         # readline
+         do_readline = self.compiler.find_library_file(lib_dirs, 'readline')
++        do_readline = re.search(r"#s*define\s+HAVE_LIBREADLINE\s+1\s*", pyconfig_h_data)
+         readline_termcap_library = ""
+         curses_library = ""
+         # Determine if readline is already linked against curses or tinfo.
+-        if do_readline and find_executable('ldd'):
+-            fp = os.popen("ldd %s" % do_readline)
++        # NOTE readline_termcap_library is flag used only if cannot determine readline libs
++        readline_conf = False
++        readline_conf_termcap = ""
++        if do_readline:
++            m = re.search(r"\s*READLINE_LIBS\s*=\s*(?P<rl>-l.*)", setup_info_data)
++            if m:
++                readline_conf = True
++                ln = m.group('rl')
++                if 'curses' in ln:
++                    readline_conf_termcap = re.sub(
++                        r'.*-l(n?cursesw?).*', r'\1', ln
++                    ).rstrip()
++                elif 'tinfo' in ln: # termcap interface split out from ncurses
++                    readline_conf_termcap = 'tinfo'
++                else: # may be readline is linked with termcap interface library
++                    readline_conf = False
++
++        if do_readline and not readline_conf and find_executable('ldd'):
++            rl_lib = self.compiler.find_library_file(lib_dirs, 'readline')
++            fp = os.popen("ldd %s" % rl_lib)
+             ldd_output = fp.readlines()
+             ret = fp.close()
+             if ret is None or ret >> 8 == 0:
+@@ -738,7 +783,7 @@ class PyBuildExt(build_ext):
+                 inc_dirs + search_for_ssl_incs_in)
+         if opensslv_h:
+             name = os.path.join(opensslv_h[0], 'openssl/opensslv.h')
+-            if sys.platform == 'darwin' and is_macosx_sdk_path(name):
++            if host_platform == 'darwin' and is_macosx_sdk_path(name):
+                 name = os.path.join(macosx_sdk_root(), name[1:])
+             try:
+                 incfile = open(name, 'r')
+@@ -877,7 +922,7 @@ class PyBuildExt(build_ext):
+ 
+         db_ver_inc_map = {}
+ 
+-        if sys.platform == 'darwin':
++        if host_platform == 'darwin':
+             sysroot = macosx_sdk_root()
+ 
+         class db_found(Exception): pass
+@@ -887,7 +932,7 @@ class PyBuildExt(build_ext):
+             for d in inc_dirs + db_inc_paths:
+                 f = os.path.join(d, "db.h")
+ 
+-                if sys.platform == 'darwin' and is_macosx_sdk_path(d):
++                if host_platform == 'darwin' and is_macosx_sdk_path(d):
+                     f = os.path.join(sysroot, d[1:], "db.h")
+ 
+                 if db_setup_debug: print "db: looking for db.h in", f
+@@ -937,7 +982,7 @@ class PyBuildExt(build_ext):
+                     db_incdir.replace("include", 'lib'),
+                 ]
+ 
+-                if sys.platform != 'darwin':
++                if host_platform != 'darwin':
+                     db_dirs_to_check = filter(os.path.isdir, db_dirs_to_check)
+ 
+                 else:
+@@ -1012,13 +1057,13 @@ class PyBuildExt(build_ext):
+         # Scan the default include directories before the SQLite specific
+         # ones. This allows one to override the copy of sqlite on OSX,
+         # where /usr/include contains an old version of sqlite.
+-        if sys.platform == 'darwin':
++        if host_platform == 'darwin':
+             sysroot = macosx_sdk_root()
+ 
+         for d in inc_dirs + sqlite_inc_paths:
+             f = os.path.join(d, "sqlite3.h")
+ 
+-            if sys.platform == 'darwin' and is_macosx_sdk_path(d):
++            if host_platform == 'darwin' and is_macosx_sdk_path(d):
+                 f = os.path.join(sysroot, d[1:], "sqlite3.h")
+ 
+             if os.path.exists(f):
+@@ -1067,13 +1112,13 @@ class PyBuildExt(build_ext):
+                 '_sqlite/util.c', ]
+ 
+             sqlite_defines = []
+-            if sys.platform != "win32":
++            if host_platform != "win32":
+                 sqlite_defines.append(('MODULE_NAME', '"sqlite3"'))
+             else:
+                 sqlite_defines.append(('MODULE_NAME', '\\"sqlite3\\"'))
+ 
+ 
+-            if sys.platform == 'darwin':
++            if host_platform == 'darwin':
+                 # In every directory on the search path search for a dynamic
+                 # library and then a static library, instead of first looking
+                 # for dynamic libraries on the entiry path.
+@@ -1107,7 +1152,7 @@ class PyBuildExt(build_ext):
+         # when attempting to compile and it will fail.
+         f = "/usr/include/db.h"
+ 
+-        if sys.platform == 'darwin':
++        if host_platform == 'darwin':
+             if is_macosx_sdk_path(f):
+                 sysroot = macosx_sdk_root()
+                 f = os.path.join(sysroot, f[1:])
+@@ -1262,7 +1307,7 @@ class PyBuildExt(build_ext):
+                     break
+             if version >= version_req:
+                 if (self.compiler.find_library_file(lib_dirs, 'z')):
+-                    if sys.platform == "darwin":
++                    if host_platform == "darwin":
+                         zlib_extra_link_args = ('-Wl,-search_paths_first',)
+                     else:
+                         zlib_extra_link_args = ()
+@@ -1294,7 +1339,7 @@ class PyBuildExt(build_ext):
+ 
+         # Gustavo Niemeyer's bz2 module.
+         if (self.compiler.find_library_file(lib_dirs, 'bz2')):
+-            if sys.platform == "darwin":
++            if host_platform == "darwin":
+                 bz2_extra_link_args = ('-Wl,-search_paths_first',)
+             else:
+                 bz2_extra_link_args = ()
+@@ -1699,7 +1744,7 @@ class PyBuildExt(build_ext):
+             # Check for the include files on Debian and {Free,Open}BSD, where
+             # they're put in /usr/include/{tcl,tk}X.Y
+             dotversion = version
+-            if '.' not in dotversion and "bsd" in sys.platform.lower():
++            if '.' not in dotversion and "bsd" in host_platform.lower():
+                 # OpenBSD and FreeBSD use Tcl/Tk library names like libtcl83.a,
+                 # but the include subdirs are named like .../include/tcl8.3.
+                 dotversion = dotversion[:-1] + '.' + dotversion[-1]
+@@ -1816,7 +1861,7 @@ class PyBuildExt(build_ext):
+ 
+     def configure_ctypes(self, ext):
+         if not self.use_system_libffi:
+-            if sys.platform == 'darwin':
++            if host_platform == 'darwin':
+                 return self.configure_ctypes_darwin(ext)
+ 
+             (srcdir,) = sysconfig.get_config_vars('srcdir')
+@@ -1834,12 +1879,14 @@ class PyBuildExt(build_ext):
+                                          ffi_configfile):
+                 from distutils.dir_util import mkpath
+                 mkpath(ffi_builddir)
+-                config_args = []
++                #FIXME: lets for now pass all top configure arguments
++                #and do not modify configure script.
++                config_args = sysconfig.get_config_var("CONFIG_ARGS")
+ 
+                 # Pass empty CFLAGS because we'll just append the resulting
+                 # CFLAGS to Python's; -g or -O2 is to be avoided.
+                 cmd = "cd %s && env CFLAGS='' '%s/configure' %s" \
+-                      % (ffi_builddir, ffi_srcdir, " ".join(config_args))
++                      % (ffi_builddir, ffi_srcdir, config_args)
+ 
+                 res = os.system(cmd)
+                 if res or not os.path.exists(ffi_configfile):
+@@ -1876,14 +1923,14 @@ class PyBuildExt(build_ext):
+                    '_ctypes/malloc_closure.c']
+         depends = ['_ctypes/ctypes.h']
+ 
+-        if sys.platform == 'darwin':
++        if host_platform == 'darwin':
+             sources.append('_ctypes/darwin/dlfcn_simple.c')
+             extra_compile_args.append('-DMACOSX')
+             include_dirs.append('_ctypes/darwin')
+ # XXX Is this still needed?
+ ##            extra_link_args.extend(['-read_only_relocs', 'warning'])
+ 
+-        elif sys.platform == 'sunos5':
++        elif host_platform == 'sunos5':
+             # XXX This shouldn't be necessary; it appears that some
+             # of the assembler code is non-PIC (i.e. it has relocations
+             # when it shouldn't. The proper fix would be to rewrite
+@@ -1894,7 +1941,7 @@ class PyBuildExt(build_ext):
+             # finding some -z option for the Sun compiler.
+             extra_link_args.append('-mimpure-text')
+ 
+-        elif sys.platform.startswith('hp-ux'):
++        elif host_platform.startswith('hp-ux'):
+             extra_link_args.append('-fPIC')
+ 
+         ext = Extension('_ctypes',
+@@ -1911,7 +1958,7 @@ class PyBuildExt(build_ext):
+         if not '--with-system-ffi' in sysconfig.get_config_var("CONFIG_ARGS"):
+             return
+ 
+-        if sys.platform == 'darwin':
++        if host_platform == 'darwin':
+             # OS X 10.5 comes with libffi.dylib; the include files are
+             # in /usr/include/ffi
+             inc_dirs.append('/usr/include/ffi')
+diff --git a/setup_info.in b/setup_info.in
+new file mode 100644
+index 0000000..2f6942c
+--- /dev/null
++++ b/setup_info.in
+@@ -0,0 +1,3 @@
++# file with data from configure file
++
++READLINE_LIBS=@READLINE_LIBS@
+-- 
+1.8.1.4
+
+
+From 4ed0befb53f910d168450a8cdbae0f898d122aaf Mon Sep 17 00:00:00 2001
+From: Ingo Weinhold <ingo_weinhold@gmx.de>
+Date: Tue, 23 Jul 2013 03:57:19 +0200
+Subject: Avoid building pgen
+
+It would need to be built for the build platform and we don't need to
+regenerate the grammar sources anyway.
+
+diff --git a/Makefile.pre.in b/Makefile.pre.in
+index f2187d8..55c0f4e 100644
+--- a/Makefile.pre.in
++++ b/Makefile.pre.in
+@@ -515,9 +515,9 @@ Modules/python.o: $(srcdir)/Modules/python.c
+ 	$(MAINCC) -c $(PY_CFLAGS) -o $@ $(srcdir)/Modules/python.c
+ 
+ 
+-$(GRAMMAR_H) $(GRAMMAR_C): $(PGEN) $(GRAMMAR_INPUT)
+-		-@$(INSTALL) -d Include
+-		-$(PGEN) $(GRAMMAR_INPUT) $(GRAMMAR_H) $(GRAMMAR_C)
++#$(GRAMMAR_H) $(GRAMMAR_C): $(PGEN) $(GRAMMAR_INPUT)
++#		-@$(INSTALL) -d Include
++#		-$(PGEN) $(GRAMMAR_INPUT) $(GRAMMAR_H) $(GRAMMAR_C)
+ 
+ $(PGEN):	$(PGENOBJS)
+ 		$(CC) $(OPT) $(LDFLAGS) $(PGENOBJS) $(LIBS) -o $(PGEN)
+-- 
+1.8.1.4
+
+
+From 5bd42cff456b1419cdcfe74917f73e7ca8bd7cdd Mon Sep 17 00:00:00 2001
+From: Ingo Weinhold <ingo_weinhold@gmx.de>
+Date: Tue, 23 Jul 2013 17:07:17 +0200
+Subject: setup.py: use host sysconfig config variables
+
+
+diff --git a/Makefile.pre.in b/Makefile.pre.in
+index 55c0f4e..659ef17 100644
+--- a/Makefile.pre.in
++++ b/Makefile.pre.in
+@@ -180,6 +180,17 @@ BUILDPYTHON=	./$(PYTHON)
+ PROFILE_TASK=	$(srcdir)/Tools/pybench/pybench.py -n 2 --with-gc --with-syscheck
+ #PROFILE_TASK=	$(srcdir)/Lib/test/regrtest.py
+ 
++SETUP_PY_ENV= \
++	CONFIG_ARGS="$(CONFIG_ARGS)" \
++	CFLAGS="$(CFLAGS)" \
++	CCSHARED="$(CCSHARED)" \
++	LDFLAGS="$(LDFLAGS)" \
++	CPPFLAGS="$(CPPFLAGS)" \
++	LIBDIR="$(LIBDIR)" \
++	INCLUDEDIR="$(INCLUDEDIR)" \
++	SO="$(SO)"
++
++
+ # === Definitions added by makesetup ===
+ 
+ 
+@@ -395,8 +406,8 @@ platform: $(BUILDPYTHON)
+ # Build the shared modules
+ sharedmods: $(BUILDPYTHON)
+ 	@case $$MAKEFLAGS in \
+-	*s*) $(RUNSHARED) CC='$(CC)' LDSHARED='$(BLDSHARED)' LDFLAGS='$(LDFLAGS)' OPT='$(OPT)' $(BUILDPYTHON) -E $(srcdir)/setup.py -q build;; \
+-	*) $(RUNSHARED) CC='$(CC)' LDSHARED='$(BLDSHARED)' LDFLAGS='$(LDFLAGS)' OPT='$(OPT)' $(BUILDPYTHON) -E $(srcdir)/setup.py build;; \
++	*s*) $(RUNSHARED) CC='$(CC)' LDSHARED='$(BLDSHARED)' LDFLAGS='$(LDFLAGS)' OPT='$(OPT)' $(SETUP_PY_ENV) $(BUILDPYTHON) -E $(srcdir)/setup.py -q build;; \
++	*) $(RUNSHARED) CC='$(CC)' LDSHARED='$(BLDSHARED)' LDFLAGS='$(LDFLAGS)' OPT='$(OPT)' $(SETUP_PY_ENV) $(BUILDPYTHON) -E $(srcdir)/setup.py build;; \
+ 	esac
+ 
+ # Build static library
+@@ -1003,7 +1014,7 @@ libainstall:	all
+ # Install the dynamically loadable modules
+ # This goes into $(exec_prefix)
+ sharedinstall:
+-	$(RUNSHARED) $(BUILDPYTHON) -E $(srcdir)/setup.py install \
++	$(RUNSHARED) $(SETUP_PY_ENV) $(BUILDPYTHON) -E $(srcdir)/setup.py install \
+ 	   	--prefix=$(prefix) \
+ 		--install-scripts=$(BINDIR) \
+ 		--install-platlib=$(DESTSHARED) \
+@@ -1084,7 +1095,7 @@ frameworkinstallextras:
+ # This installs a few of the useful scripts in Tools/scripts
+ scriptsinstall:
+ 	SRCDIR=$(srcdir) $(RUNSHARED) \
+-	$(BUILDPYTHON) $(srcdir)/Tools/scripts/setup.py install \
++	$(SETUP_PY_ENV) $(BUILDPYTHON) $(srcdir)/Tools/scripts/setup.py install \
+ 	--prefix=$(prefix) \
+ 	--install-scripts=$(BINDIR) \
+ 	--root=/$(DESTDIR)
+diff --git a/setup.py b/setup.py
+index 1693d74..cace240 100644
+--- a/setup.py
++++ b/setup.py
+@@ -28,6 +28,19 @@ def _get_platform():
+             return platform
+     return host_platform
+ 
++def _get_sysconfig_var(variable):
++    if cross_compiling and variable in os.environ:
++        return os.environ.get(variable)
++    return sysconfig.get_config_var(variable)
++
++def _get_sysconfig_vars(*args):
++    if not cross_compiling:
++        return sysconfig.get_config_vars(args)
++    result = []
++    for variable in args:
++        result.append(_get_sysconfig_var(variable))
++    return result
++
+ host_platform = _get_platform()
+ cross_compiling = (not os.environ.get('HOST_OS') is None)
+ 
+@@ -47,7 +60,7 @@ def macosx_sdk_root():
+     Return the directory of the current OSX SDK,
+     or '/' if no SDK was specified.
+     """
+-    cflags = sysconfig.get_config_var('CFLAGS')
++    cflags = _get_sysconfig_var('CFLAGS')
+     m = re.search(r'-isysroot\s+(\S+)', cflags)
+     if m is None:
+         sysroot = '/'
+@@ -175,7 +188,7 @@ class PyBuildExt(build_ext):
+ 
+         # Fix up the autodetected modules, prefixing all the source files
+         # with Modules/ and adding Python's include directory to the path.
+-        (srcdir,) = sysconfig.get_config_vars('srcdir')
++        (srcdir,) = _get_sysconfig_vars('srcdir')
+         if not srcdir:
+             # Maybe running on Windows but not using CYGWIN?
+             raise ValueError("No source directory; cannot proceed.")
+@@ -195,7 +208,7 @@ class PyBuildExt(build_ext):
+         # Platform-dependent module source and include directories
+         platform = self.get_platform()
+         if platform in ('darwin', 'mac') and ("--disable-toolbox-glue" not in
+-            sysconfig.get_config_var("CONFIG_ARGS")):
++            _get_sysconfig_var("CONFIG_ARGS")):
+             # Mac OS X also includes some mac-specific modules
+             macmoddir = os.path.join(os.getcwd(), srcdir, 'Mac/Modules')
+             moddirlist.append(macmoddir)
+@@ -255,7 +268,7 @@ class PyBuildExt(build_ext):
+         # unfortunately, distutils doesn't let us provide separate C and C++
+         # compilers
+         if compiler is not None:
+-            (ccshared,cflags) = sysconfig.get_config_vars('CCSHARED','CFLAGS')
++            (ccshared,cflags) = _get_sysconfig_vars('CCSHARED','CFLAGS')
+             args['compiler_so'] = compiler + ' ' + ccshared + ' ' + cflags
+         self.compiler.set_executables(**args)
+ 
+@@ -392,7 +405,7 @@ class PyBuildExt(build_ext):
+                 ('LDFLAGS', '-R', self.compiler.runtime_library_dirs),
+                 ('LDFLAGS', '-L', self.compiler.library_dirs),
+                 ('CPPFLAGS', '-I', self.compiler.include_dirs)):
+-            env_val = sysconfig.get_config_var(env_var)
++            env_val = _get_sysconfig_var(env_var)
+             if env_val:
+                 # To prevent optparse from raising an exception about any
+                 # options in env_val that it doesn't know about we strip out
+@@ -418,9 +431,9 @@ class PyBuildExt(build_ext):
+ 
+         if os.path.normpath(sys.prefix) != '/usr':
+             add_dir_to_list(self.compiler.library_dirs,
+-                            sysconfig.get_config_var("LIBDIR"))
++                            _get_sysconfig_var("LIBDIR"))
+             add_dir_to_list(self.compiler.include_dirs,
+-                            sysconfig.get_config_var("INCLUDEDIR"))
++                            _get_sysconfig_var("INCLUDEDIR"))
+ 
+         try:
+             have_unicode = unicode
+@@ -445,7 +458,7 @@ class PyBuildExt(build_ext):
+         config_h_vars = sysconfig.parse_config_h(open(config_h))
+ 
+         platform = self.get_platform()
+-        (srcdir,) = sysconfig.get_config_vars('srcdir')
++        (srcdir,) = _get_sysconfig_vars('srcdir')
+ 
+         # Check for AtheOS which has libraries in non-standard locations
+         if platform == 'atheos':
+@@ -469,7 +482,7 @@ class PyBuildExt(build_ext):
+             #   NOTE: using shlex.split would technically be more correct, but
+             # also gives a bootstrap problem. Let's hope nobody uses directories
+             # with whitespace in the name to store libraries.
+-            cflags, ldflags = sysconfig.get_config_vars(
++            cflags, ldflags = _get_sysconfig_vars(
+                     'CFLAGS', 'LDFLAGS')
+             for item in cflags.split():
+                 if item.startswith('-I'):
+@@ -685,7 +698,7 @@ class PyBuildExt(build_ext):
+ 
+         if platform == 'darwin':
+             os_release = int(os.uname()[2].split('.')[0])
+-            dep_target = sysconfig.get_config_var('MACOSX_DEPLOYMENT_TARGET')
++            dep_target = _get_sysconfig_var('MACOSX_DEPLOYMENT_TARGET')
+             if dep_target and dep_target.split('.') < ['10', '5']:
+                 os_release = 8
+             if os_release < 9:
+@@ -1488,7 +1501,7 @@ class PyBuildExt(build_ext):
+             if macros.get('HAVE_SEM_OPEN', False):
+                 multiprocessing_srcs.append('_multiprocessing/semaphore.c')
+ 
+-        if sysconfig.get_config_var('WITH_THREAD'):
++        if _get_sysconfig_var('WITH_THREAD'):
+             exts.append ( Extension('_multiprocessing', multiprocessing_srcs,
+                                     define_macros=macros.items(),
+                                     include_dirs=["Modules/_multiprocessing"]))
+@@ -1527,7 +1540,7 @@ class PyBuildExt(build_ext):
+ 
+ 
+         if platform == 'darwin' and ("--disable-toolbox-glue" not in
+-                sysconfig.get_config_var("CONFIG_ARGS")):
++                _get_sysconfig_var("CONFIG_ARGS")):
+ 
+             if int(os.uname()[2].split('.')[0]) >= 8:
+                 # We're on Mac OS X 10.4 or later, the compiler should
+@@ -1686,7 +1699,7 @@ class PyBuildExt(build_ext):
+ 
+         # All existing framework builds of Tcl/Tk don't support 64-bit
+         # architectures.
+-        cflags = sysconfig.get_config_vars('CFLAGS')[0]
++        cflags = _get_sysconfig_vars('CFLAGS')[0]
+         archs = re.findall('-arch\s+(\w+)', cflags)
+ 
+         if is_macosx_sdk_path(F):
+@@ -1835,7 +1848,7 @@ class PyBuildExt(build_ext):
+     def configure_ctypes_darwin(self, ext):
+         # Darwin (OS X) uses preconfigured files, in
+         # the Modules/_ctypes/libffi_osx directory.
+-        (srcdir,) = sysconfig.get_config_vars('srcdir')
++        (srcdir,) = _get_sysconfig_vars('srcdir')
+         ffi_srcdir = os.path.abspath(os.path.join(srcdir, 'Modules',
+                                                   '_ctypes', 'libffi_osx'))
+         sources = [os.path.join(ffi_srcdir, p)
+@@ -1864,7 +1877,7 @@ class PyBuildExt(build_ext):
+             if host_platform == 'darwin':
+                 return self.configure_ctypes_darwin(ext)
+ 
+-            (srcdir,) = sysconfig.get_config_vars('srcdir')
++            (srcdir,) = _get_sysconfig_vars('srcdir')
+             ffi_builddir = os.path.join(self.build_temp, 'libffi')
+             ffi_srcdir = os.path.abspath(os.path.join(srcdir, 'Modules',
+                                          '_ctypes', 'libffi'))
+@@ -1881,7 +1894,7 @@ class PyBuildExt(build_ext):
+                 mkpath(ffi_builddir)
+                 #FIXME: lets for now pass all top configure arguments
+                 #and do not modify configure script.
+-                config_args = sysconfig.get_config_var("CONFIG_ARGS")
++                config_args = _get_sysconfig_var("CONFIG_ARGS")
+ 
+                 # Pass empty CFLAGS because we'll just append the resulting
+                 # CFLAGS to Python's; -g or -O2 is to be avoided.
+@@ -1955,7 +1968,7 @@ class PyBuildExt(build_ext):
+                              sources=['_ctypes/_ctypes_test.c'])
+         self.extensions.extend([ext, ext_test])
+ 
+-        if not '--with-system-ffi' in sysconfig.get_config_var("CONFIG_ARGS"):
++        if not '--with-system-ffi' in _get_sysconfig_var("CONFIG_ARGS"):
+             return
+ 
+         if host_platform == 'darwin':
+@@ -2001,7 +2014,7 @@ class PyBuildInstallLib(install_lib):
+     # mode 644 unless they are a shared library in which case they will get
+     # mode 755. All installed directories will get mode 755.
+ 
+-    so_ext = sysconfig.get_config_var("SO")
++    so_ext = _get_sysconfig_var("SO")
+ 
+     def install(self):
+         outfiles = install_lib.install(self)
+-- 
+1.8.1.4
+
+
+From 01363ef63d2f578ed6bbf2fa336cb7059309417f Mon Sep 17 00:00:00 2001
+From: Ingo Weinhold <ingo_weinhold@gmx.de>
+Date: Tue, 23 Jul 2013 17:34:46 +0200
+Subject: setup.py: link against the built python library
+
+
+diff --git a/Makefile.pre.in b/Makefile.pre.in
+index 659ef17..b43b4e2 100644
+--- a/Makefile.pre.in
++++ b/Makefile.pre.in
+@@ -188,7 +188,8 @@ SETUP_PY_ENV= \
+ 	CPPFLAGS="$(CPPFLAGS)" \
+ 	LIBDIR="$(LIBDIR)" \
+ 	INCLUDEDIR="$(INCLUDEDIR)" \
+-	SO="$(SO)"
++	SO="$(SO)" \
++	LDLIBRARY="$(LDLIBRARY)"
+ 
+ 
+ # === Definitions added by makesetup ===
+diff --git a/setup.py b/setup.py
+index cace240..e00ade0 100644
+--- a/setup.py
++++ b/setup.py
+@@ -308,6 +308,12 @@ class PyBuildExt(build_ext):
+             if not self.configure_ctypes(ext):
+                 return
+ 
++        if cross_compiling:
++            if ext.library_dirs:
++                ext.library_dirs.append('.')
++            else:
++                ext.library_dirs = ['.']
++
+         try:
+             build_ext.build_extension(self, ext)
+         except (CCompilerError, DistutilsError), why:
+@@ -379,6 +385,17 @@ class PyBuildExt(build_ext):
+                           level=3)
+             self.failed.append(ext.name)
+ 
++    def get_libraries(self, ext):
++        if not cross_compiling:
++            return build_ext.get_libraries(self, ext)
++        library = _get_sysconfig_var('LDLIBRARY')
++        if library:
++            if library.startswith('lib'):
++                library = library[3:]
++            if library.endswith('.so'):
++                library = library[:-3]
++        return [ library ]
++
+     def get_platform(self):
+         # Get value of host_platform
+         for platform in ['cygwin', 'beos', 'darwin', 'atheos', 'osf1']:
 -- 
 1.8.1.4
 

@@ -65,6 +65,8 @@ BUILD()
 	${targetMachineTriple}-libtoolize --force --copy --install
 	aclocal
 	autoconf
+
+	CXX=${targetMachineTriple}-g++ \
 	runConfigure ./configure \
 		--build=$buildMachineTriple --host=$targetMachineTriple \
 		--enable-shared \
