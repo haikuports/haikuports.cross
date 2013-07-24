@@ -8,13 +8,10 @@ diff --git a/source/config/mh-haiku b/source/config/mh-haiku
 index 09d43d2..42feea1 100644
 --- a/source/config/mh-haiku
 +++ b/source/config/mh-haiku
-@@ -17,6 +17,12 @@ SHAREDLIBCPPFLAGS = -DPIC
+@@ -17,6 +17,9 @@ SHAREDLIBCPPFLAGS = -DPIC
  LIBCPPFLAGS =
  THREADSCPPFLAGS =
  
-+## These are the library specific LDFLAGS
-+LDFLAGSICUDT=-nodefaultlibs -nostdlib
-+
 +#
 +CPPFLAGS += -DU_CHARSET_IS_UTF8=1
 +
