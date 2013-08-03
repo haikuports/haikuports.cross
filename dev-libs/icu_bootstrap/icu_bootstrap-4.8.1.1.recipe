@@ -15,16 +15,16 @@ if [[ $targetArchitecture == 'x86_gcc2' ]]; then
 fi
 
 PROVIDES="
-	icu_bootstrap = $portVersion compat >= 4.8
-	icu = $portVersion compat >= 4.8
-	lib:libicudata = 48.1.1 compat >= 48
-	lib:libicui18n = 48.1.1 compat >= 48
-	lib:libicuio = 48.1.1 compat >= 48
-	lib:libicule = 48.1.1 compat >= 48
-	lib:libiculx = 48.1.1 compat >= 48
-	lib:libicutest = 48.1.1 compat >= 48
-	lib:libicutu = 48.1.1 compat >= 48
-	lib:libicuuc = 48.1.1 compat >= 48
+	icu_bootstrap$secondaryArchSuffix = $portVersion compat >= 4.8
+	icu$secondaryArchSuffix = $portVersion compat >= 4.8
+	lib:libicudata$secondaryArchSuffix = 48.1.1 compat >= 48
+	lib:libicui18n$secondaryArchSuffix = 48.1.1 compat >= 48
+	lib:libicuio$secondaryArchSuffix = 48.1.1 compat >= 48
+	lib:libicule$secondaryArchSuffix = 48.1.1 compat >= 48
+	lib:libiculx$secondaryArchSuffix = 48.1.1 compat >= 48
+	lib:libicutest$secondaryArchSuffix = 48.1.1 compat >= 48
+	lib:libicutu$secondaryArchSuffix = 48.1.1 compat >= 48
+	lib:libicuuc$secondaryArchSuffix = 48.1.1 compat >= 48
 	"
 REQUIRES="
 	haiku >= $haikuVersion
@@ -120,18 +120,18 @@ Here are a few highlights of the services provided by ICU:
 # ----- devel package -------------------------------------------------------
 
 PROVIDES_devel="
-	icu_bootstrap_devel = $portVersion
-	icu_devel = $portVersion
-	cmd:icu_config = $portVersion compat >= 4.8
-	devel:libicudata = 48.1.1 compat >= 48
-	devel:libicui18n = 48.1.1 compat >= 48
-	devel:libicuio = 48.1.1 compat >= 48
-	devel:libicule = 48.1.1 compat >= 48
-	devel:libiculx = 48.1.1 compat >= 48
-	devel:libicutest.so = 48.1.1 compat >= 48
-	devel:libicutu = 48.1.1 compat >= 48
-	devel:libicuuc = 48.1.1 compat >= 48
+	icu_bootstrap${secondaryArchSuffix}_devel = $portVersion
+	icu${secondaryArchSuffix}_devel = $portVersion
+	cmd:icu_config$secondaryArchSuffix = $portVersion compat >= 4.8
+	devel:libicudata$secondaryArchSuffix = 48.1.1 compat >= 48
+	devel:libicui18n$secondaryArchSuffix = 48.1.1 compat >= 48
+	devel:libicuio$secondaryArchSuffix = 48.1.1 compat >= 48
+	devel:libicule$secondaryArchSuffix = 48.1.1 compat >= 48
+	devel:libiculx$secondaryArchSuffix = 48.1.1 compat >= 48
+	devel:libicutest$secondaryArchSuffix = 48.1.1 compat >= 48
+	devel:libicutu$secondaryArchSuffix = 48.1.1 compat >= 48
+	devel:libicuuc$secondaryArchSuffix = 48.1.1 compat >= 48
 	"
 REQUIRES_devel="
-	icu_bootstrap == $portVersion base
+	icu_bootstrap$secondaryArchSuffix == $portVersion base
 	"
