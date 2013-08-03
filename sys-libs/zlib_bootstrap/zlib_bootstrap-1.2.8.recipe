@@ -7,11 +7,12 @@ SRC_URI="http://zlib.net/zlib-1.2.8.tar.gz"
 CHECKSUM_MD5="44d667c142d7cda120332623eab69f40"
 REVISION="2"
 ARCHITECTURES="x86_gcc2 ?x86"
+SECONDARY_ARCHITECTURES="x86_gcc2 x86"
 
 PROVIDES="
-	zlib_bootstrap = $portVersion compat >= 1
-	zlib = $portVersion compat >= 1
-	lib:libz = $portVersion compat >= 1
+	zlib_bootstrap$secondaryArchSuffix = $portVersion compat >= 1
+	zlib$secondaryArchSuffix = $portVersion compat >= 1
+	lib:libz$secondaryArchSuffix = $portVersion compat >= 1
 	"
 REQUIRES="
 	haiku >= $haikuVersion
@@ -32,7 +33,9 @@ SOURCE_DIR="zlib-$portVersion"
 
 PATCH()
 {
+	sed -i 's,${CMAKE_INSTALL_PREFIX}/bin',$binDir, CMakeLists.txt
 	sed -i 's,${CMAKE_INSTALL_PREFIX}/include',$includeDir, CMakeLists.txt
+	sed -i 's,${CMAKE_INSTALL_PREFIX}/lib',$libDir, CMakeLists.txt
 	sed -i 's,${CMAKE_INSTALL_PREFIX}/share/man',$manDir, CMakeLists.txt
 	sed -i 's,${CMAKE_INSTALL_PREFIX}/share/pkgconfig',$developLibDir/pkgconfig, \
 		CMakeLists.txt
@@ -48,8 +51,8 @@ BUILD()
 	cat > toolchain.cmake << EOF
 		SET(CMAKE_SYSTEM_NAME Haiku)
 		SET(CMAKE_SYSTEM_VERSION 1)
-		SET(CMAKE_C_COMPILER $targetMachineTriple-gcc)
-		SET(CMAKE_CXX_COMPILER $targetMachineTriple-g++)
+		SET(CMAKE_C_COMPILER $effectiveTargetMachineTriple-gcc)
+		SET(CMAKE_CXX_COMPILER $effectiveTargetMachineTriple-g++)
 		SET(CMAKE_FIND_ROOT_PATH $crossSysrootDir)
 		SET(CMAKE_FIND_ROOT_PATH_MODE_PROGRAM NEVER)
 		SET(CMAKE_FIND_ROOT_PATH_MODE_LIBRARY ONLY)
@@ -58,6 +61,11 @@ EOF
 
 	cmake -DCMAKE_TOOLCHAIN_FILE=toolchain.cmake \
 		-DCMAKE_INSTALL_PREFIX:PATH=$prefix ..
+
+	# The build host might still sport a cmake which doesn't know Haiku's gcc 4
+	# doesn't support -nostart anymore. Hack the link script accordingly.
+	sed -i 's,-nostart,-shared,g' CMakeFiles/zlib.dir/link.txt
+
 	make $jobArgs
 }
 
@@ -77,10 +85,10 @@ INSTALL()
 # ----- devel package -------------------------------------------------------
 
 PROVIDES_devel="
-	zlib_bootstrap_devel = $portVersion compat >= 1
-	zlib_devel = $portVersion compat >= 1
-	devel:libz = $portVersion compat >= 1
+	zlib_bootstrap${secondaryArchSuffix}_devel = $portVersion compat >= 1
+	zlib${secondaryArchSuffix}_devel = $portVersion compat >= 1
+	devel:libz${secondaryArchSuffix} = $portVersion compat >= 1
 	"
 REQUIRES_devel="
-	zlib_bootstrap == $portVersion base
+	zlib${secondaryArchSuffix}_bootstrap == $portVersion base
 	"
