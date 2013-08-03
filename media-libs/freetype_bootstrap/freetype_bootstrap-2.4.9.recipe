@@ -7,11 +7,12 @@ SRC_URI="http://download.savannah.gnu.org/releases/freetype/freetype-2.4.9.tar.b
 CHECKSUM_MD5="77a893dae81fd5b896632715ca041179"
 REVISION="1"
 ARCHITECTURES="x86_gcc2 ?x86"
+SECONDARY_ARCHITECTURES="x86_gcc2 x86"
 
 PROVIDES="
-	freetype_bootstrap = $portVersion
-	freetype = $portVersion
-	lib:libfreetype = 6.8.1 compat >= 6
+	freetype_bootstrap$secondaryArchSuffix = $portVersion
+	freetype$secondaryArchSuffix = $portVersion
+	lib:libfreetype$secondaryArchSuffix = 6.8.1 compat >= 6
 	"
 REQUIRES="
 	haiku >= $haikuVersion
@@ -35,7 +36,7 @@ BUILD()
 {
 	./autogen.sh
 	runConfigure ./configure \
-		--build=$buildMachineTriple --host=$targetMachineTriple
+		--build=$buildMachineTriple --host=$effectiveTargetMachineTriple
 	make $jobArgs
 }
 
@@ -56,11 +57,11 @@ INSTALL()
 # ----- devel package -------------------------------------------------------
 
 PROVIDES_devel="
-	freetype_bootstrap_devel = $portVersion
-	freetype_devel = $portVersion
-	cmd:freetype_config = $portVersion
-	devel:libfreetype = 6.8.1 compat >= 6
+	freetype_bootstrap${secondaryArchSuffix}_devel = $portVersion
+	freetype${secondaryArchSuffix}_devel = $portVersion
+	cmd:freetype_config${secondaryArchSuffix} = $portVersion
+	devel:libfreetype${secondaryArchSuffix} = 6.8.1 compat >= 6
 	"
 REQUIRES_devel="
-	freetype_bootstrap == $portVersion base
+	freetype_bootstrap${secondaryArchSuffix} == $portVersion base
 	"
