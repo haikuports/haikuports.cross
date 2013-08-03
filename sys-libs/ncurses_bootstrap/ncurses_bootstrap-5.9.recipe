@@ -139,8 +139,8 @@ The distribution includes the library and support utilities, including a terminf
 # ----- devel package -------------------------------------------------------
 
 PROVIDES_devel="
-	ncurses_bootstrap_devel$secondaryArchSuffix = $portVersion compat >= 5
-	ncurses_devel$secondaryArchSuffix = $portVersion compat >= 5
+	ncurses_bootstrap${secondaryArchSuffix}_devel = $portVersion compat >= 5
+	ncurses${secondaryArchSuffix}_devel = $portVersion compat >= 5
 	cmd:ncurses5_config$secondaryArchSuffix = $portVersion compat >= 5
 	cmd:ncursesw5_config$secondaryArchSuffix = $portVersion compat >= 5
 	devel:libform$secondaryArchSuffix = $portVersion compat >= 5
