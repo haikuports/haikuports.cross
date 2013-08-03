@@ -10,6 +10,7 @@ SRC_URI="ftp://ftp.gnu.org/gnu/libtool/libtool-2.4.tar.gz"
 CHECKSUM_MD5="b32b04148ecdd7344abc6fe8bd1bb021"
 REVISION="1"
 ARCHITECTURES="x86_gcc2 ?x86"
+SECONDARY_ARCHITECTURES="x86_gcc2 x86"
 
 PATCHES="
 	2.4/adjust_config_for_packaging.patch
@@ -17,9 +18,9 @@ PATCHES="
 	"
 
 PROVIDES="
-	libtool_cross_${targetMachineTripleAsName} = $portVersion compat >= 2.4
-	cmd:${targetMachineTripleAsName}_libtool = $portVersion compat >= 2.4
-	cmd:${targetMachineTripleAsName}_libtoolize = $portVersion compat >= 2.4
+	libtool_cross_${effectiveTargetMachineTripleAsName} = $portVersion compat >= 2.4
+	cmd:${effectiveTargetMachineTripleAsName}_libtool = $portVersion compat >= 2.4
+	cmd:${effectiveTargetMachineTripleAsName}_libtoolize = $portVersion compat >= 2.4
 	devel:libltdl = 7.3.0 compat >= 7
 	lib:libltdl = 7.3.0 compat >= 7
 	"
@@ -51,7 +52,8 @@ BUILD()
 	./bootstrap
 	SED='sed' NM='nm' LD=ld runConfigure ./configure \
 		--with-gnu-ld \
-		--host=$targetMachineTriple --program-prefix=${targetMachineTriple}-
+		--host=$effectiveTargetMachineTriple \
+		--program-prefix=${effectiveTargetMachineTriple}-
 	make $jobArgs
 	# Desperate move to remove the absolute paths from libtool. For some reason
 	# only for the C++ compiler those are set (not for the C compiler). In
