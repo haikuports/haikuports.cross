@@ -90,5 +90,5 @@ PROVIDES_devel="
 	devel:libz${secondaryArchSuffix} = $portVersion compat >= 1
 	"
 REQUIRES_devel="
-	zlib${secondaryArchSuffix}_bootstrap == $portVersion base
+	zlib_bootstrap${secondaryArchSuffix} == $portVersion base
 	"
