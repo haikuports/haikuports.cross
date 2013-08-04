@@ -5,32 +5,39 @@ SRC_URI="
 	git+file://$portBaseDir/../binutils_cross_x86/download/BuildtoolsPM.git#db2a6d28f6c6a92cfb1c619b0828dfbf6b87ca30
 	git+git://github.com/haiku/BuildtoolsPM.git#db2a6d28f6c6a92cfb1c619b0828dfbf6b87ca30"
 REVISION="3"
-ARCHITECTURES="x86"
 LICENSE="
 	GNU GPL v2
 	GNU LGPL v2
 	"
 COPYRIGHT="1988-2013 Free Software Foundation, Inc."
 
+ARCHITECTURES="x86"
+if [ $effectiveTargetArchitecture != x86_gcc2 ]; then
+	# x86_gcc2 is fine as primary target architecture as long as we're building
+	# for a different secondary architecture.
+	ARCHITECTURES="$ARCHITECTURES x86_gcc2"
+fi
+SECONDARY_ARCHITECTURES="x86"
+
 PROVIDES="
-	binutils_bootstrap = $portVersion compat >= 2.23
-	binutils = $portVersion compat >= 2.23
-	cmd:addr2line = $portVersion compat >= 2.23
-	cmd:ar = $portVersion compat >= 2.23
-	cmd:as = $portVersion compat >= 2.23
-	cmd:c++filt = $portVersion compat >= 2.23
-	cmd:elfedit = $portVersion compat >= 2.23
-	cmd:gprof = $portVersion compat >= 2.23
-	cmd:ld = $portVersion compat >= 2.23
-	cmd:ld.bfd = $portVersion compat >= 2.23
-	cmd:nm = $portVersion compat >= 2.23
-	cmd:objcopy = $portVersion compat >= 2.23
-	cmd:objdump = $portVersion compat >= 2.23
-	cmd:ranlib = $portVersion compat >= 2.23
-	cmd:readelf = $portVersion compat >= 2.23
-	cmd:size = $portVersion compat >= 2.23
-	cmd:strings = $portVersion compat >= 2.23
-	cmd:strip = $portVersion compat >= 2.23
+	binutils_bootstrap$secondaryArchSuffix = $portVersion compat >= 2.23
+	binutils$secondaryArchSuffix = $portVersion compat >= 2.23
+	cmd:addr2line$secondaryArchSuffix = $portVersion compat >= 2.23
+	cmd:ar$secondaryArchSuffix = $portVersion compat >= 2.23
+	cmd:as$secondaryArchSuffix = $portVersion compat >= 2.23
+	cmd:c++filt$secondaryArchSuffix = $portVersion compat >= 2.23
+	cmd:elfedit$secondaryArchSuffix = $portVersion compat >= 2.23
+	cmd:gprof$secondaryArchSuffix = $portVersion compat >= 2.23
+	cmd:ld$secondaryArchSuffix = $portVersion compat >= 2.23
+	cmd:ld.bfd$secondaryArchSuffix = $portVersion compat >= 2.23
+	cmd:nm$secondaryArchSuffix = $portVersion compat >= 2.23
+	cmd:objcopy$secondaryArchSuffix = $portVersion compat >= 2.23
+	cmd:objdump$secondaryArchSuffix = $portVersion compat >= 2.23
+	cmd:ranlib$secondaryArchSuffix = $portVersion compat >= 2.23
+	cmd:readelf$secondaryArchSuffix = $portVersion compat >= 2.23
+	cmd:size$secondaryArchSuffix = $portVersion compat >= 2.23
+	cmd:strings$secondaryArchSuffix = $portVersion compat >= 2.23
+	cmd:strip$secondaryArchSuffix = $portVersion compat >= 2.23
 	"
 
 REQUIRES="
@@ -38,8 +45,9 @@ REQUIRES="
 	"
 BUILD_REQUIRES="
 	$REQUIRES
-	binutils_cross_${targetArchitecture}
-	gcc_cross_${targetArchitecture}
+	binutils_cross_${effectiveTargetArchitecture}
+	gcc_cross_${effectiveTargetArchitecture}
+	devel:libz$secondaryArchSuffix
 	"
 BUILD_PREREQUIRES="
 	haiku_devel >= $haikuVersion
@@ -51,10 +59,9 @@ BUILD_PREREQUIRES="
 	cmd:makeinfo
 	cmd:sed
 	cmd:tar
-	zlib_devel
 	"
 
-SOURCE_DIR="$portVersionedName/binutils"
+SOURCE_DIR="binutils-$portVersion/binutils"
 BUILD_PACKAGE_ACTIVATION_PHASE=INSTALL
 
 sourceDir=$(pwd)
@@ -64,11 +71,6 @@ objectsDir=$(pwd)/../${portVersionedName}-obj
 
 BUILD()
 {
-# TODO: drop this once we have a proper gcc4 compiler
-mkdir -p /boot/develop
-ln -sfn /boot/common/develop/abi /boot/develop/abi
-ln -sfn /boot/system/develop/headers /boot/develop/headers
-
 	rm -rf $objectsDir
 
 	# Touch all *.info files, as newer texinfos don't like their format
@@ -78,57 +80,54 @@ ln -sfn /boot/system/develop/headers /boot/develop/headers
 	cd $objectsDir
 
 	CFLAGS=-O2 CXXFLAGS=-O2 "$sourceDir/configure" \
-		--build=$buildMachineTriple --host=$targetMachineTriple \
-		--target=$targetMachineTriple  --prefix=$installDir \
+		--build=$buildMachineTriple --host=$effectiveTargetMachineTriple \
+		--target=$effectiveTargetMachineTriple  --prefix=$installDir \
 		--libexecdir=$installDir/lib --mandir=$manDir \
 		--disable-nls --disable-shared --disable-werror
-	make
+	make $jobArgs
 }
 
 INSTALL()
 {
-# TODO: drop this once we have a proper gcc4 compiler
-mkdir -p /boot/develop
-ln -sfn /boot/common/develop/abi /boot/develop/abi
-ln -sfn /boot/system/develop/headers /boot/develop/headers
-
 	cd $objectsDir
 
-	make install
+	make DESTDIR=$installDestDir install
 
 	### Strip #################################################
 	
 	echo "Strip debug info"
 
-	$targetMachineTriple-strip --strip-debug $installDir/bin/*
-	$targetMachineTriple-strip --strip-debug $installDir/$targetMachineTriple/bin/*
-	
+	$effectiveTargetMachineTriple-strip --strip-debug \
+		$installDestDir$installDir/bin/*
+	$effectiveTargetMachineTriple-strip --strip-debug \
+		$installDestDir$installDir/$effectiveTargetMachineTriple/bin/*
+
 	### Symlinks ##############################################
 
 	echo "Creating required symlinks"
 
-	cd $installDir/bin
+	cd $installDestDir$installDir/bin
 	for p in ar as ld ld.bfd nm objdump ranlib strip; do
-		ln -sfn ../$targetMachineTriple/bin/$p $p
+		ln -sfn ../$effectiveTargetMachineTriple/bin/$p $p
 	done
-	cd $installDir/$targetMachineTriple/bin
+	cd $installDestDir$installDir/$effectiveTargetMachineTriple/bin
 	ln -sfn ld.bfd ld
 
-	# these are the system binutils, so make all commands available in /bin
-	mkdir $prefix/bin
-	cd $prefix/bin
-	ln -sfn ../${relativeInstallDir}/bin/* .
+	# make all commands available in /bin[/<arch>]
+	mkdir -p $installDestDir$binDir
+	cd $installDestDir$binDir
+	symlinkRelative -sfn $installDestDir$installDir/bin/* $installDestDir$binDir
 
 	### Cleanup #################################################
 	
 	echo "Cleanup"
 
-	cd $installDir
+	cd $installDestDir$installDir
 	rm -rf share
 	rm -rf lib
 	
 	# delete man pages for commands that we aren't including
-	cd $manDir
+	cd $installDestDir$manDir
 	for cmd in dlltool nlmconv windmc windres; do
 		rm -f man1/$cmd.1
 	done
@@ -154,5 +153,5 @@ DESCRIPTION="
 	    strings - Lists printable strings from files.
 	    strip - Discards symbols.
 
-	The tools of this package can be used for cross-builds to $targetMachineTriple.	
+	The tools of this package can be used for cross-builds to $effectiveTargetMachineTriple.
 	"
