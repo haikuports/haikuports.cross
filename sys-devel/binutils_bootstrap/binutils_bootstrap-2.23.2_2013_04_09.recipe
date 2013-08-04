@@ -47,7 +47,6 @@ BUILD_REQUIRES="
 	$REQUIRES
 	binutils_cross_${effectiveTargetArchitecture}
 	gcc_cross_${effectiveTargetArchitecture}
-	devel:libz$secondaryArchSuffix
 	"
 BUILD_PREREQUIRES="
 	haiku_devel >= $haikuVersion
