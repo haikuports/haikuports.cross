@@ -29,12 +29,11 @@ REQUIRES="
 	haiku >= $haikuVersion
 	"
 BUILD_REQUIRES="
-	$REQUIRES
-	binutils_cross_${targetArchitecture}
-	gcc_cross_${targetArchitecture}
 	"
 BUILD_PREREQUIRES="
 	haiku_devel >= $haikuVersion
+	binutils_cross_${targetArchitecture}
+	gcc_cross_${targetArchitecture}
 	cmd:autoconf
 	cmd:flex
 	cmd:gcc
@@ -90,11 +89,11 @@ ln -sfn /boot/common/develop/abi /boot/develop/abi
 ln -sfn /boot/system/develop/headers /boot/develop/headers
 
 	cd $objectsDir
-	
+
 	make install
 
 	### Strip #################################################
-	
+
 	echo "Strip debug info"
 
 	cd $installDir
@@ -104,7 +103,7 @@ ln -sfn /boot/system/develop/headers /boot/develop/headers
 			lib/gcc/$targetMachineTriple/*/$f
 	done
 	$targetMachineTriple-strip --strip-debug lib/*.a
-	
+
 	### Symlinks ##############################################
 
 	echo "Creating required symlinks"
@@ -112,12 +111,12 @@ ln -sfn /boot/system/develop/headers /boot/develop/headers
 	# make all tools available via default paths
 	mkdir -p $prefix/bin
 	cd $prefix/bin
-	for f in c++ cpp g++ gcc gcov; do 
+	for f in c++ cpp g++ gcc gcov; do
 		ln -sfn ../$relativeInstallDir/bin/$f .
 	done
 
 	### Cleanup ###############################################
-	
+
 	echo "Cleanup"
 	rm -rf $installDir/info
 	rm -rf $installDir/share

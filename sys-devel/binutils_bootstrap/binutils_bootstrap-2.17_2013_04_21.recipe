@@ -35,13 +35,12 @@ REQUIRES="
 	"
 
 BUILD_REQUIRES="
-	$REQUIRES
-	binutils_cross_${targetArchitecture}
-	gcc_cross_${targetArchitecture}
 	"
 
 BUILD_PREREQUIRES="
 	haiku_devel >= $haikuVersion
+	binutils_cross_${targetArchitecture}
+	gcc_cross_${targetArchitecture}
 	cmd:autoconf
 	cmd:flex
 	cmd:gcc
@@ -71,7 +70,7 @@ BUILD()
 
 	mkdir -p $objectsDir
 	cd $objectsDir
-	
+
 	CFLAGS=-O2 CXXFLAGS=-O2 "$sourceDir/configure" \
 		--build=$buildMachineTriple --host=$targetMachineTriple \
 		--target=$targetMachineTriple --prefix=$installDir \
@@ -87,13 +86,13 @@ INSTALL()
 	make DESTDIR=$installDestDir install
 
 	### Strip #################################################
-	
+
 	echo "Strip debug info"
 
 	cd $installDestDir$installDir
 	find bin -type f | xargs -r strip --strip-debug
 	strip --strip-debug $installDestDir$installDir/$targetMachineTriple/bin/*
-	
+
 	### Symlinks ##############################################
 
 	echo "Creating required symlinks"
@@ -113,14 +112,14 @@ INSTALL()
 	ln -sfn ../$relativeInstallDir/$targetMachineTriple/bin/* .
 
 	### Cleanup #################################################
-	
+
 	echo "Cleanup"
 
 	cd $installDestDir$installDir
 	rm -rf $relativeInstallDir/$buildMachineTriple
 	rm -rf info
 	rm -rf lib
-	
+
 	# delete man pages for commands that we aren't including
 	for cmd in dlltool nlmconv windres; do
 		rm -f documentation/man/man1/$targetMachineTriple-$cmd.1
@@ -129,12 +128,12 @@ INSTALL()
 
 DESCRIPTION="
 	The GNU Binutils are a collection of binary tools. The main ones are:
-	
+
 	    ld - the GNU linker.
 	    as - the GNU assembler.
-	
+
 	But they also include:
-	
+
 	    addr2line - Converts addresses into filenames and line numbers.
 	    ar - A utility for creating, modifying and extracting from archives.
 	    c++filt - Filter to demangle encoded C++ symbols.
@@ -147,5 +146,5 @@ DESCRIPTION="
 	    strings - Lists printable strings from files.
 	    strip - Discards symbols.
 
-	The tools of this package can be used for cross-builds to $targetMachineTriple.	
+	The tools of this package can be used for cross-builds to $targetMachineTriple.
 	"

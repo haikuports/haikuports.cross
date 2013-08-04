@@ -33,12 +33,11 @@ REQUIRES="
 	haiku >= $haikuVersion
 	"
 BUILD_REQUIRES="
-	$REQUIRES
-	binutils_cross_${targetArchitecture}
-	gcc_cross_${targetArchitecture}
 	"
 BUILD_PREREQUIRES="
 	haiku_devel >= $haikuVersion
+	binutils_cross_${targetArchitecture}
+	gcc_cross_${targetArchitecture}
 	cmd:autoconf
 	cmd:flex
 	cmd:gcc
@@ -114,7 +113,7 @@ INSTALL()
 	cd $installDir/bin
 	ln -sfn $targetMachineTriple-g++ $targetMachineTriple-c++
 	ln -sfn $targetMachineTriple-gcc $targetMachineTriple-cc
-	
+
 	# make all commands available in develop/tools/bin (which
 	# haikuporter will add to the path when cross building)
 	mkdir -p $toolsBinDir
@@ -122,39 +121,39 @@ INSTALL()
 	ln -sfn ../${portVersionedName}/bin/$targetMachineTriple-* .
 	ln -sfn ../${portVersionedName}/bin/cpp $targetMachineTriple-cpp
 	ln -sfn ../${portVersionedName}/bin/gcov $targetMachineTriple-gcov
-	
+
 	### Strip #################################################
-	
+
 	echo "Strip debug info"
 
 	cd $installDir
 	strip --strip-debug bin/*
 	strip --strip-debug lib/gcc-lib/$targetMachineTriple/2.95.3-haiku-*/* \
 		  &>/dev/null || true
-	
+
 	### Cleanup ###############################################
-	
+
 	echo "Cleanup"
-	
+
 	cd $installDir
 	rm -rf info
 	rm -rf share
 	rm man/man1/cccp.1
-	
+
 	rm -f lib/gcc-lib/$targetMachineTriple/2.95.3-haiku-*/include/math.h
 	rm -rf $targetMachineTriple/lib
 	ln -sfn $crossSysrootDir/boot/system/develop/lib $targetMachineTriple/lib
 	rm -rf $targetMachineTriple/sys-include
 	ln -sfn $crossSysrootDir/boot/system/develop/headers \
 			$targetMachineTriple/sys-include
-	
+
 	### C++ includes ##########################################
-	
+
 	echo "Install C++ includes & library"
-	
+
 	rm -rf include/g++
 	ln -snf /boot/system/develop/headers/c++/2.95.3 include/g++
-	
+
 	ln -snf /boot/system/lib/libstdc++.r4.so lib/
 	ln -snf /boot/system/lib/libstdc++.so lib/
 }

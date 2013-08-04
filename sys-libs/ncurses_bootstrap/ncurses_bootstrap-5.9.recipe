@@ -1,5 +1,5 @@
 SUMMARY="New curses library"
-HOMEPAGE="http://www.gnu.org/software/ncurses/ncurses.html" 
+HOMEPAGE="http://www.gnu.org/software/ncurses/ncurses.html"
 SRC_URI="http://ftp.gnu.org/pub/gnu/ncurses/ncurses-5.9.tar.gz"
 CHECKSUM_MD5="8cb9c412e5f2d96bc6f459aa8c6282a1"
 LICENSE="MIT"
@@ -48,10 +48,10 @@ if [ -n "$secondaryArchSuffix" ]; then
 fi
 
 BUILD_REQUIRES="
-	cmd:${effectiveTargetMachineTripleAsName}_libtool
 	"
 BUILD_PREREQUIRES="
 	haiku_devel >= $haikuVersion
+	cmd:${effectiveTargetMachineTripleAsName}_libtool
 	cmd:gcc
 	cmd:grep
 	cmd:ld

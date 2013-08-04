@@ -1,6 +1,6 @@
-SUMMARY="Standard GNU documentation format tool" 
-DESCRIPTION="Texinfo is the official documentation format of the GNU project." 
-HOMEPAGE="http://www.gnu.org/software/texinfo/" 
+SUMMARY="Standard GNU documentation format tool"
+DESCRIPTION="Texinfo is the official documentation format of the GNU project."
+HOMEPAGE="http://www.gnu.org/software/texinfo/"
 COPYRIGHT="1992-2008 Free Software Foundation, Inc."
 LICENSE="GNU GPL v3"
 SRC_URI="http://ftp.gnu.org/gnu/texinfo/texinfo-4.13a.tar.gz"
@@ -26,11 +26,13 @@ REQUIRES="
 	lib:libncurses
 	"
 BUILD_REQUIRES="
-	cmd:${targetMachineTripleAsName}_libtoolize
 	devel:libncurses
 	"
 BUILD_PREREQUIRES="
 	haiku_devel >= $haikuVersion
+	binutils_cross_$targetArchitecture
+	gcc_cross_$targetArchitecture
+	cmd:${targetMachineTripleAsName}_libtoolize
 	cmd:gcc
 	cmd:ld
 	cmd:make

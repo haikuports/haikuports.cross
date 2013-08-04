@@ -31,13 +31,13 @@ PROVIDES="
 REQUIRES="
 	haiku >= $haikuVersion
 	haiku_cross_devel_${recipeArchitecture} >= $haikuVersion
-	binutils_cross_${recipeArchitecture}
 	"
 BUILD_REQUIRES="
-	$REQUIRES
+	haiku_cross_devel_${recipeArchitecture} >= $haikuVersion
 	"
 BUILD_PREREQUIRES="
 	haiku_devel >= $haikuVersion
+	binutils_cross_${recipeArchitecture}
 	cmd:autoconf
 	cmd:flex
 	cmd:gcc
@@ -67,7 +67,7 @@ BUILD()
 		echo "*** please set appropriate target architecture in haikuports.conf"
 		exit 1
 	fi
-	
+
 # TODO: drop this once we have a proper gcc4 compiler
 mkdir -p /boot/develop
 ln -sfn /boot/common/develop/abi /boot/develop/abi
@@ -114,7 +114,7 @@ ln -sfn /boot/system/develop/headers /boot/develop/headers
 	cd $installDir/bin
 	ln -sfn $targetMachineTriple-g++ $targetMachineTriple-c++
 	ln -sfn $targetMachineTriple-gcc $targetMachineTriple-cc
-	
+
 	# make all commands available in develop/tools/bin (which
 	# haikuporter will add to the path when cross building)
 	mkdir -p $toolsBinDir
@@ -122,7 +122,7 @@ ln -sfn /boot/system/develop/headers /boot/develop/headers
 	ln -sfn ../${portVersionedName}/bin/* .
 
 	### Strip #################################################
-	
+
 	echo "Strip debug info"
 
 	strip --strip-debug $installDir/bin/*
@@ -131,9 +131,9 @@ ln -sfn /boot/system/develop/headers /boot/develop/headers
 		strip --strip-debug $f
 	done
 	strip --strip-debug $installDir/$targetMachineTriple/lib/*.a
-	
+
 	### Cleanup ###############################################
-	
+
 	echo "Cleanup"
 	rm -rf $installDir/info
 	rm -rf $installDir/share

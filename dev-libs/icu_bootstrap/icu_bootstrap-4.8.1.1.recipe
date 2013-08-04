@@ -1,5 +1,5 @@
 SUMMARY="International Components for Unicode (ICU)"
-HOMEPAGE="http://www.icu-project.org" 
+HOMEPAGE="http://www.icu-project.org"
 LICENSE="ICU"
 COPYRIGHT="1997-2011 IBM Corporation and others."
 SRC_URI="http://download.icu-project.org/files/icu4c/4.8.1.1/icu4c-4_8_1_1-src.tgz"
@@ -30,12 +30,11 @@ REQUIRES="
 	haiku >= $haikuVersion
 	"
 BUILD_REQUIRES="
-	$REQUIRES
-	binutils_cross_$targetArchitecture
-	gcc_cross_$targetArchitecture
 	"
 BUILD_PREREQUIRES="
 	haiku_devel >= $haikuVersion
+	binutils_cross_$targetArchitecture
+	gcc_cross_$targetArchitecture
 	cmd:gcc
 	cmd:ld
 	cmd:make

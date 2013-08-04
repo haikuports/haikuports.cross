@@ -34,13 +34,13 @@ REQUIRES="
 	lib:libz
 	"
 BUILD_REQUIRES="
-	binutils_cross_$targetArchitecture
-	gcc_cross_$targetArchitecture
 	devel:libncurses
 	devel:libz
 	"
 BUILD_PREREQUIRES="
 	haiku_devel >= $haikuVersion
+	binutils_cross_$targetArchitecture
+	gcc_cross_$targetArchitecture
 	cmd:aclocal
 	cmd:autoconf
 	cmd:find

@@ -33,11 +33,11 @@ REQUIRES="
 	cmd:sh
 	"
 BUILD_REQUIRES="
-	binutils_cross_$targetArchitecture
-	gcc_cross_$targetArchitecture
 	"
 BUILD_PREREQUIRES="
 	haiku_devel >= $haikuVersion
+	binutils_cross_$targetArchitecture
+	gcc_cross_$targetArchitecture
 	cmd:autoconf >= 2.60
 	cmd:make
 	cmd:makeinfo

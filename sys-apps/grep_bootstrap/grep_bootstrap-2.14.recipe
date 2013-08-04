@@ -19,12 +19,11 @@ REQUIRES="
 	haiku >= $haikuVersion
 	"
 BUILD_REQUIRES="
-	$REQUIRES
-	binutils_cross_$targetArchitecture
-	gcc_cross_$targetArchitecture
 	"
 BUILD_PREREQUIRES="
 	haiku_devel >= $haikuVersion
+	binutils_cross_$targetArchitecture
+	gcc_cross_$targetArchitecture
 	cmd:aclocal
 	cmd:autoconf
 	cmd:automake

@@ -44,12 +44,11 @@ REQUIRES="
 	haiku >= $haikuVersion
 	"
 BUILD_REQUIRES="
-	$REQUIRES
-	binutils_cross_${effectiveTargetArchitecture}
-	gcc_cross_${effectiveTargetArchitecture}
 	"
 BUILD_PREREQUIRES="
 	haiku_devel >= $haikuVersion
+	binutils_cross_${effectiveTargetArchitecture}
+	gcc_cross_${effectiveTargetArchitecture}
 	cmd:autoconf
 	cmd:flex
 	cmd:gcc
@@ -93,7 +92,7 @@ INSTALL()
 	make DESTDIR=$installDestDir install
 
 	### Strip #################################################
-	
+
 	echo "Strip debug info"
 
 	$effectiveTargetMachineTriple-strip --strip-debug \
@@ -118,13 +117,13 @@ INSTALL()
 	symlinkRelative -sfn $installDestDir$installDir/bin/* $installDestDir$binDir
 
 	### Cleanup #################################################
-	
+
 	echo "Cleanup"
 
 	cd $installDestDir$installDir
 	rm -rf share
 	rm -rf lib
-	
+
 	# delete man pages for commands that we aren't including
 	cd $installDestDir$manDir
 	for cmd in dlltool nlmconv windmc windres; do
@@ -134,12 +133,12 @@ INSTALL()
 
 DESCRIPTION="
 	The GNU Binutils are a collection of binary tools. The main ones are:
-	
+
 	    ld - the GNU linker.
 	    as - the GNU assembler.
-	
+
 	But they also include:
-	
+
 	    addr2line - Converts addresses into filenames and line numbers.
 	    ar - A utility for creating, modifying and extracting from archives.
 	    c++filt - Filter to demangle encoded C++ symbols.
