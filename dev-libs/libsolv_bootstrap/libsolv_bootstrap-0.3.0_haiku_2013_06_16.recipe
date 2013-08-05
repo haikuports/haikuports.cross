@@ -7,23 +7,25 @@ SRC_URI="git+git://github.com/weinhold/libsolv.git#ef4a8778ef567224feb35019b7115
 REVISION="1"
 ARCHITECTURES="x86_gcc2 ?x86"
 
+PATCHES="libsolv_bootstrap-0.3.0_haiku_2013_06_16.patchset"
+
 PROVIDES="
-	libsolv_bootstrap = $portVersion
-	libsolv = $portVersion
-	lib:libsolv = $portVersion
-	lib:libsolvext = $portVersion
+	libsolv_bootstrap$secondaryArchSuffix = $portVersion
+	libsolv$secondaryArchSuffix = $portVersion
+	lib:libsolv$secondaryArchSuffix = $portVersion
+	lib:libsolvext$secondaryArchSuffix = $portVersion
 	"
 REQUIRES="
 	haiku >= $haikuVersion
-	lib:libz
+	lib:libz$secondaryArchSuffix
 	"
 BUILD_REQUIRES="
-	devel:libz
+	devel:libz$secondaryArchSuffix
 	"
 BUILD_PREREQUIRES="
 	haiku_devel >= $haikuVersion
-	binutils_cross_$targetArchitecture
-	gcc_cross_$targetArchitecture
+	binutils_cross_$effectiveTargetArchitecture
+	gcc_cross_$effectiveTargetArchitecture
 	cmd:cmake
 	cmd:gcc
 	cmd:ld
@@ -32,6 +34,13 @@ BUILD_PREREQUIRES="
 	"
 
 SOURCE_DIR="libsolv-$portVersion"
+
+PATCH()
+{
+	sed -i 's,${CMAKE_INSTALL_PREFIX}/bin',$binDir, CMakeLists.txt
+	sed -i 's,${CMAKE_INSTALL_PREFIX}/include',$includeDir, \
+		src/CMakeLists.txt ext/CMakeLists.txt
+}
 
 BUILD()
 {
@@ -43,8 +52,8 @@ BUILD()
 	cat > toolchain.cmake << EOF
 		SET(CMAKE_SYSTEM_NAME Haiku)
 		SET(CMAKE_SYSTEM_VERSION 1)
-		SET(CMAKE_C_COMPILER $targetMachineTriple-gcc)
-		SET(CMAKE_CXX_COMPILER $targetMachineTriple-g++)
+		SET(CMAKE_C_COMPILER $effectiveTargetMachineTriple-gcc)
+		SET(CMAKE_CXX_COMPILER $effectiveTargetMachineTriple-g++)
 		SET(CMAKE_FIND_ROOT_PATH $crossSysrootDir)
 		SET(CMAKE_FIND_ROOT_PATH_MODE_PROGRAM NEVER)
 		SET(CMAKE_FIND_ROOT_PATH_MODE_LIBRARY ONLY)
@@ -61,7 +70,14 @@ EOF
 		-DHAIKU_BE_LIBRARY=$systemDevelLibDir/libbe.so \
 		-DHAIKU_NETWORK_LIBRARY=$systemDevelLibDir/libnetwork.so \
 		-DHAIKU_PACKAGE_LIBRARY=$systemDevelLibDir/libpackage.so \
-		-DCMAKE_INSTALL_PREFIX:PATH=$prefix ..
+		-DCMAKE_INSTALL_PREFIX:PATH=$prefix \
+		-DLIB=$relativeLibDir \
+		..
+
+	# The build host might still sport a cmake which doesn't know Haiku's gcc 4
+	# doesn't support -nostart anymore. Hack the link script accordingly.
+	sed -i 's,-nostart,-shared,g' src/CMakeFiles/libsolv.dir/link.txt
+
 	make $jobArgs
 }
 
@@ -73,17 +89,13 @@ INSTALL()
 	# set up the develop directory correctly
 	prepareInstalledDevelLibs libsolv libsolvext
 
-	mkdir -p $installDestDir$includeDir
-	mv $installDestDir$prefix/include/* $installDestDir$includeDir
-	rmdir $installDestDir$prefix/include
-
 	# move cmake files
 	mkdir -p $installDestDir$dataDir
 	mv $installDestDir$prefix/share/cmake $installDestDir$dataDir
 	rmdir $installDestDir$prefix/share
 
 	# We don't want the executables.
-	rm -r $installDestDir$binDir
+	rm -r $installDestDir$prefix/bin
 
 	# devel package
 	packageEntries devel \
@@ -94,11 +106,11 @@ INSTALL()
 # ----- devel package -------------------------------------------------------
 
 PROVIDES_devel="
-	libsolv_bootstrap_devel = $portVersion
-	libsolv_devel = $portVersion
-	devel:libsolv = $portVersion
-	devel:libsolvext = $portVersion
+	libsolv_bootstrap${secondaryArchSuffix}_devel = $portVersion
+	libsolv${secondaryArchSuffix}_devel = $portVersion
+	devel:libsolv${secondaryArchSuffix} = $portVersion
+	devel:libsolvext${secondaryArchSuffix} = $portVersion
 	"
 REQUIRES_devel="
-	libsolv_bootstrap == $portVersion base
+	libsolv_bootstrap${secondaryArchSuffix} == $portVersion base
 	"
