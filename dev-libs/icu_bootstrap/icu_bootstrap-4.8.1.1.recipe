@@ -9,7 +9,7 @@ ARCHITECTURES="x86_gcc2 ?x86"
 
 PATCHES="icu_bootstrap-4.8.1.1.patchset"
 
-if [[ $targetArchitecture == 'x86_gcc2' ]]; then
+if [[ $effectiveTargetArchitecture == 'x86_gcc2' ]]; then
 	PATCHES+="
 		icu_bootstrap-4.8.1.1-x86_gcc2.patchset"
 fi
@@ -33,8 +33,8 @@ BUILD_REQUIRES="
 	"
 BUILD_PREREQUIRES="
 	haiku_devel >= $haikuVersion
-	binutils_cross_$targetArchitecture
-	gcc_cross_$targetArchitecture
+	binutils_cross_$effectiveTargetArchitecture
+	gcc_cross_$effectiveTargetArchitecture
 	cmd:gcc
 	cmd:ld
 	cmd:make
@@ -63,7 +63,8 @@ BUILD()
 	mkdir -p $targetOutputDir
 	cd $targetOutputDir
 	runConfigure ../icu/source/configure \
-		--host=$targetMachineTriple --with-cross-build=$buildOutputDir \
+		--host=$effectiveTargetMachineTriple \
+		--with-cross-build=$buildOutputDir \
 		--disable-renaming --disable-samples --disable-extras
 	make $jobArgs
 }
