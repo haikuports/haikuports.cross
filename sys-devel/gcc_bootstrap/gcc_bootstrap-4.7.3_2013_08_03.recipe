@@ -36,12 +36,11 @@ REQUIRES="
 	haiku >= $haikuVersion
 	"
 BUILD_REQUIRES="
-	$REQUIRES
-	binutils_cross_${effectiveTargetArchitecture}
-	gcc_cross_${effectiveTargetArchitecture}
 	"
 BUILD_PREREQUIRES="
 	haiku_devel >= $haikuVersion
+	binutils_cross_${effectiveTargetArchitecture}
+	gcc_cross_${effectiveTargetArchitecture}
 	cmd:autoconf
 	cmd:flex
 	cmd:gcc
