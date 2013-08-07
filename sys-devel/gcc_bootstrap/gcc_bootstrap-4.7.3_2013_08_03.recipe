@@ -7,9 +7,9 @@ LICENSE="
 	"
 COPYRIGHT="1988-2013 Free Software Foundation, Inc."
 SRC_URI="
-	git+file://$portBaseDir/../gcc_cross_x86/download/BuildtoolsPM.git#eddee0bfd68206ef70acf2300cdbee8a4b18467b
-	git+file://$portBaseDir/../binutils_bootstrap/download/BuildtoolsPM.git#eddee0bfd68206ef70acf2300cdbee8a4b18467b
-	git+git://github.com/haiku/BuildtoolsPM.git#eddee0bfd68206ef70acf2300cdbee8a4b18467b
+	git+file://$portBaseDir/../gcc_cross_x86/download/BuildtoolsPM.git#7a87db2a172a406b79540188a23e52491ad3b741
+	git+file://$portBaseDir/../binutils_bootstrap/download/BuildtoolsPM.git#7a87db2a172a406b79540188a23e52491ad3b741
+	git+git://github.com/haiku/BuildtoolsPM.git#7a87db2a172a406b79540188a23e52491ad3b741
 	"
 REVISION="1"
 ARCHITECTURES="x86"
@@ -72,7 +72,8 @@ BUILD()
 
 	local additionalConfigureFlags
 	if [ -n "$secondaryArchSuffix" ]; then
-		additionalConfigureFlags=--enable-hybrid-secondary
+		additionalConfigureFlags="\
+			--with-hybrid-secondary=${effectiveTargetArchitecture}"
 	fi
 
 	CFLAGS="-O2 -U_FORTIFY_SOURCE" CXXFLAGS="-O2" "$sourceDir/configure" \
