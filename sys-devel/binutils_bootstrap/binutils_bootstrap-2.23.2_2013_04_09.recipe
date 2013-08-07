@@ -81,7 +81,13 @@ BUILD()
 		--build=$buildMachineTriple --host=$effectiveTargetMachineTriple \
 		--target=$effectiveTargetMachineTriple  --prefix=$installDir \
 		--libexecdir=$installDir/lib --mandir=$manDir \
-		--disable-nls --disable-shared --disable-werror
+		--disable-nls --disable-shared --disable-werror \
+		--with-sysroot=/
+		# Note: The sysroot option is normally superfluous. We have to specify
+		# it, however, since we need to configure gcc with a sysroot, which
+		# causes ld to be invoked with --sysroot, which makes ld unhappy, if it
+		# hasn't been configured with a sysroot itself. Ideally we'd fix the
+		# gcc build system issue causing the whole issue.
 	make $jobArgs
 }
 

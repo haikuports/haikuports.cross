@@ -86,6 +86,8 @@ BUILD()
 		--with-sysroot=/ \
 		--with-build-sysroot=$installDestDir/ \
 		$additionalConfigureFlags
+		# Note: The --with-sysroot=/ is rather silly, but --with-build-sysroot
+		# only works when --with-sysroot has been given as well.
 
 	make $jobArgs
 }
