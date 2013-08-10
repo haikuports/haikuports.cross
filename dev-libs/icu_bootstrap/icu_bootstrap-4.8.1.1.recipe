@@ -6,6 +6,7 @@ SRC_URI="http://download.icu-project.org/files/icu4c/4.8.1.1/icu4c-4_8_1_1-src.t
 CHECKSUM_MD5="ea93970a0275be6b42f56953cd332c17"
 REVISION="1"
 ARCHITECTURES="x86_gcc2 ?x86"
+SECONDARY_ARCHITECTURES="x86_gcc2 x86"
 
 PATCHES="icu_bootstrap-4.8.1.1.patchset"
 
@@ -27,12 +28,12 @@ PROVIDES="
 	lib:libicuuc$secondaryArchSuffix = 48.1.1 compat >= 48
 	"
 REQUIRES="
-	haiku >= $haikuVersion
+	haiku$secondaryArchSuffix >= $haikuVersion
 	"
 BUILD_REQUIRES="
 	"
 BUILD_PREREQUIRES="
-	haiku_devel >= $haikuVersion
+	haiku${secondaryArchSuffix}_devel >= $haikuVersion
 	binutils_cross_$effectiveTargetArchitecture
 	gcc_cross_$effectiveTargetArchitecture
 	cmd:gcc

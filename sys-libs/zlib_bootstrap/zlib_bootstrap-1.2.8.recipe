@@ -15,7 +15,7 @@ PROVIDES="
 	lib:libz$secondaryArchSuffix = $portVersion compat >= 1
 	"
 REQUIRES="
-	haiku >= $haikuVersion
+	haiku$secondaryArchSuffix >= $haikuVersion
 	"
 BUILD_REQUIRES="
 	"
