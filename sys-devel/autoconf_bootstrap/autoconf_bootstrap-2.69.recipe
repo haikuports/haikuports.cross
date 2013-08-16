@@ -68,7 +68,7 @@ INSTALL()
 
 	# fix path to perl in scripts using it
 	cd $packagingBaseDir/$portName/bin
-	PERLPATH=$portPackageLinksDir/cmd:perl/bin/perl
+	PERLPATH=$portPackageLinksDir/cmd~perl/bin/perl
 	for file in autoheader autom4te autoreconf autoscan autoupdate ifnames; do
 		sed -i -e "s, /usr/bin/perl, $PERLPATH,g" \
 			-e "s, /bin/perl, $PERLPATH,g" $file
