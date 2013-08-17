@@ -114,9 +114,12 @@ INSTALL()
 
 	echo "Creating required symlinks"
 
+	# create missing cc symlink
+	ln -sf gcc $installDir/bin/cc
+
 	# make all tools available via default paths
 	mkdir -p $installDestDir$binDir
-	for f in c++ cpp g++ gcc gcov; do
+	for f in c++ cc cpp g++ gcc gcov; do
 		symlinkRelative -sfn $installDestDir$installDir/bin/$f \
 			$installDestDir$binDir
 	done
