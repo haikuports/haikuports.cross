@@ -5,7 +5,8 @@ COPYRIGHT="2007-2013, Novell Inc."
 HOMEPAGE="http://github.com/openSUSE/libsolv"
 SRC_URI="git+git://github.com/weinhold/libsolv.git#ef4a8778ef567224feb35019b711507ae1d6e7c3"
 REVISION="1"
-ARCHITECTURES="x86_gcc2 ?x86"
+ARCHITECTURES="x86_gcc2 x86"
+SECONDARY_ARCHITECTURES="x86_gcc2 x86"
 
 PATCHES="libsolv_bootstrap-0.3.0_haiku_2013_06_16.patchset"
 
