@@ -1,11 +1,13 @@
 SUMMARY="tool for building packages from build recipes"
 DESCRIPTION="haikuporter drives the process of building Haiku packages from recipe files."
 HOMEPAGE="http://ports.haiku-files.org/wiki/HaikuPorterForPM"
-SRC_URI="git+https://bitbucket.org/haikuports/haikuporter.git#a30126b"
+SRC_URI="git+https://bitbucket.org/haikuports/haikuporter.git#89ac3bec1a92a682d3acf58d8f71337ae37f068c"
 LICENSE="MIT"
 COPYRIGHT="2007-2013 Brecht Machiels et al"
 REVISION="1"
 ARCHITECTURES="any"
+
+DISABLE_SOURCE_PACKAGE=yes
 
 PROVIDES="
 	haikuporter = $portVersion
