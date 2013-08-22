@@ -95,11 +95,11 @@ BUILD()
 INSTALL()
 {
 	cd $objectsDir
-	
+
 	make DESTDIR=$installDestDir install
 
 	### Strip #################################################
-	
+
 	echo "Strip debug info"
 
 	cd $installDestDir$installDir
@@ -109,13 +109,13 @@ INSTALL()
 			lib/gcc/$effectiveTargetMachineTriple/*/$f
 	done
 	$effectiveTargetMachineTriple-strip --strip-debug lib/*.a
-	
+
 	### Symlinks ##############################################
 
 	echo "Creating required symlinks"
 
 	# create missing cc symlink
-	ln -sf gcc $installDir/bin/cc
+	ln -sf gcc $installDestDir$installDir/bin/cc
 
 	# make all tools available via default paths
 	mkdir -p $installDestDir$binDir
@@ -136,7 +136,7 @@ INSTALL()
 	ln -sfn g++ $installDestDir$installDir/bin/c++
 
 	### Cleanup ###############################################
-	
+
 	echo "Cleanup"
 	rm -rf $installDestDir$installDir/info
 	rm -rf $installDestDir$installDir/share

@@ -41,12 +41,12 @@ PROVIDES="
 	"
 
 REQUIRES="
-	haiku >= $haikuVersion
+	haiku$secondaryArchSuffix >= $haikuVersion
 	"
 BUILD_REQUIRES="
 	"
 BUILD_PREREQUIRES="
-	haiku_devel >= $haikuVersion
+	haiku${secondaryArchSuffix}_devel >= $haikuVersion
 	binutils_cross_${effectiveTargetArchitecture}
 	gcc_cross_${effectiveTargetArchitecture}
 	cmd:autoconf
@@ -63,7 +63,7 @@ SOURCE_DIR="binutils-$portVersion/binutils"
 BUILD_PACKAGE_ACTIVATION_PHASE=INSTALL
 
 sourceDir=$(pwd)
-relativeInstallDir="develop/tools/${portVersionedName}"
+relativeInstallDir="develop/tools$secondaryArchSubDir"
 installDir="$prefix/$relativeInstallDir"
 objectsDir=$(pwd)/../${portVersionedName}-obj
 
@@ -77,10 +77,12 @@ BUILD()
 	mkdir -p $objectsDir
 	cd $objectsDir
 
-	CFLAGS=-O2 CXXFLAGS=-O2 "$sourceDir/configure" \
+	CFLAGS=-O2 CXXFLAGS=-O2 runConfigure "$sourceDir/configure" \
 		--build=$buildMachineTriple --host=$effectiveTargetMachineTriple \
-		--target=$effectiveTargetMachineTriple  --prefix=$installDir \
-		--libexecdir=$installDir/lib --mandir=$manDir \
+		--target=$effectiveTargetMachineTriple \
+		--exec-prefix=$installDir \
+		--includedir=$includeDir/binutils \
+		--docdir=$docDir \
 		--disable-nls --disable-shared --disable-werror \
 		--with-sysroot=/
 		# Note: The sysroot option is normally superfluous. We have to specify
@@ -97,38 +99,37 @@ INSTALL()
 
 	make DESTDIR=$installDestDir install
 
+	# Remove the development libraries and headers. Nobody uses those anyway.
+	rm $installDestDir$libDir/*.a $installDestDir$libDir/*.la
+	rm -r $installDestDir$developDir/headers
+
+	# no info documentation
+	rm -r $installDestDir$infoDir
+
 	### Strip #################################################
 
 	echo "Strip debug info"
 
-	$effectiveTargetMachineTriple-strip --strip-debug \
-		$installDestDir$installDir/bin/*
-	$effectiveTargetMachineTriple-strip --strip-debug \
-		$installDestDir$installDir/$effectiveTargetMachineTriple/bin/*
+	$effectiveTargetMachineTriple-strip --strip-debug $installDestDir$binDir/*
 
 	### Symlinks ##############################################
 
 	echo "Creating required symlinks"
 
-	cd $installDestDir$installDir/bin
-	for p in ar as ld ld.bfd nm objdump ranlib strip; do
-		ln -sfn ../$effectiveTargetMachineTriple/bin/$p $p
+	# There are copies of a subset of the commands below installDir. We
+	# overwrite those with symlinks to the ones in binDir.
+	for file in $installDestDir$installDir/$effectiveTargetMachineTriple/bin/*
+	do
+		symlinkRelative -sfn $installDestDir$binDir/$(basename $file) $file
 	done
-	cd $installDestDir$installDir/$effectiveTargetMachineTriple/bin
-	ln -sfn ld.bfd ld
 
-	# make all commands available in /bin[/<arch>]
-	mkdir -p $installDestDir$binDir
+	# ld.bfd is a copy of ld -- symlink instead
 	cd $installDestDir$binDir
-	symlinkRelative -sfn $installDestDir$installDir/bin/* $installDestDir$binDir
+	ln -sf ld ld.bfd
 
 	### Cleanup #################################################
 
 	echo "Cleanup"
-
-	cd $installDestDir$installDir
-	rm -rf share
-	rm -rf lib
 
 	# delete man pages for commands that we aren't including
 	cd $installDestDir$manDir

@@ -1,46 +1,52 @@
-SUMMARY="Assembler, linker and binary tools for target ${targetMachineTriple}"
+SUMMARY="Assembler, linker and binary tools for target ${effectiveTargetMachineTriple}"
 HOMEPAGE="http://www.gnu.org/software/binutils"
 SRC_URI="
 	git+file://$portBaseDir/../binutils_cross_x86_gcc2/download/BuildtoolsPM.git#ab0f66e
 	git+git://github.com/haiku/BuildtoolsPM.git#ab0f66e
 	"
 REVISION="3"
-ARCHITECTURES="x86_gcc2"
 LICENSE="
 	GNU GPL v2
 	GNU LGPL v2
 	"
 COPYRIGHT="1988-2006 Free Software Foundation, Inc."
 
+ARCHITECTURES="x86_gcc2"
+if [ $effectiveTargetArchitecture = x86_gcc2 -a $targetArchitecture = x86 ]
+then
+	ARCHITECTURES="$ARCHITECTURES x86"
+fi
+SECONDARY_ARCHITECTURES="x86_gcc2"
+
 PROVIDES="
-	binutils_bootstrap = $portVersion compat >= 2.17
-	binutils = $portVersion compat >= 2.17
-	cmd:addr2line = $portVersion compat >= 2.17
-	cmd:ar = $portVersion compat >= 2.17
-	cmd:as = $portVersion compat >= 2.17
-	cmd:gprof = $portVersion compat >= 2.17
-	cmd:ld = $portVersion compat >= 2.17
-	cmd:nm = $portVersion compat >= 2.17
-	cmd:objcopy = $portVersion compat >= 2.17
-	cmd:objdump = $portVersion compat >= 2.17
-	cmd:ranlib = $portVersion compat >= 2.17
-	cmd:readelf = $portVersion compat >= 2.17
-	cmd:size = $portVersion compat >= 2.17
-	cmd:strings = $portVersion compat >= 2.17
-	cmd:strip = $portVersion compat >= 2.17
+	binutils_bootstrap$secondaryArchSuffix = $portVersion compat >= 2.17
+	binutils$secondaryArchSuffix = $portVersion compat >= 2.17
+	cmd:addr2line$secondaryArchSuffix = $portVersion compat >= 2.17
+	cmd:ar$secondaryArchSuffix = $portVersion compat >= 2.17
+	cmd:as$secondaryArchSuffix = $portVersion compat >= 2.17
+	cmd:gprof$secondaryArchSuffix = $portVersion compat >= 2.17
+	cmd:ld$secondaryArchSuffix = $portVersion compat >= 2.17
+	cmd:nm$secondaryArchSuffix = $portVersion compat >= 2.17
+	cmd:objcopy$secondaryArchSuffix = $portVersion compat >= 2.17
+	cmd:objdump$secondaryArchSuffix = $portVersion compat >= 2.17
+	cmd:ranlib$secondaryArchSuffix = $portVersion compat >= 2.17
+	cmd:readelf$secondaryArchSuffix = $portVersion compat >= 2.17
+	cmd:size$secondaryArchSuffix = $portVersion compat >= 2.17
+	cmd:strings$secondaryArchSuffix = $portVersion compat >= 2.17
+	cmd:strip$secondaryArchSuffix = $portVersion compat >= 2.17
 	"
 
 REQUIRES="
-	haiku >= $haikuVersion
+	haiku$secondaryArchSuffix >= $haikuVersion
 	"
 
 BUILD_REQUIRES="
 	"
 
 BUILD_PREREQUIRES="
-	haiku_devel >= $haikuVersion
-	binutils_cross_${targetArchitecture}
-	gcc_cross_${targetArchitecture}
+	haiku${secondaryArchSuffix}_devel >= $haikuVersion
+	binutils_cross_${effectiveTargetArchitecture}
+	gcc_cross_${effectiveTargetArchitecture}
 	cmd:autoconf
 	cmd:flex
 	cmd:gcc
@@ -56,9 +62,8 @@ SOURCE_DIR="$portVersionedName/legacy/binutils"
 BUILD_PACKAGE_ACTIVATION_PHASE=INSTALL
 
 sourceDir=$(pwd)
-relativeInstallDir="develop/tools/${portVersionedName}"
+relativeInstallDir="develop/tools$secondaryArchSubDir"
 installDir="$prefix/$relativeInstallDir"
-toolsBinDir="$prefix/develop/tools/bin"
 objectsDir=$(pwd)/../${portVersionedName}-obj
 
 BUILD()
@@ -71,10 +76,12 @@ BUILD()
 	mkdir -p $objectsDir
 	cd $objectsDir
 
-	CFLAGS=-O2 CXXFLAGS=-O2 "$sourceDir/configure" \
-		--build=$buildMachineTriple --host=$targetMachineTriple \
-		--target=$targetMachineTriple --prefix=$installDir \
-		--libexecdir=$installDir/lib --mandir=$manDir \
+	CFLAGS=-O2 CXXFLAGS=-O2 runConfigure --omit-dirs "docDir dataRootDir" \
+		"$sourceDir/configure" \
+		--build=$buildMachineTriple --host=$effectiveTargetMachineTriple \
+		--target=$effectiveTargetMachineTriple \
+		--exec-prefix=$installDir \
+		--includedir=$includeDir/binutils \
 		--disable-nls --disable-shared --disable-werror
 	make
 }
@@ -85,44 +92,41 @@ INSTALL()
 
 	make DESTDIR=$installDestDir install
 
+	# Remove the development libraries and headers. Nobody uses those anyway.
+	rm -r $installDestDir$libDir
+	rm -r $installDestDir$developDir/headers
+
+	# no info documentation
+	rm -r $installDestDir$infoDir
+
+	# drop c++filt, as gcc2 provides its own
+	rm $installDestDir$binDir/c++filt
+
 	### Strip #################################################
 
 	echo "Strip debug info"
 
-	cd $installDestDir$installDir
-	find bin -type f | xargs -r strip --strip-debug
-	strip --strip-debug $installDestDir$installDir/$targetMachineTriple/bin/*
+	cd $installDestDir$prefix
+	strip --strip-debug $installDestDir$binDir/*
 
 	### Symlinks ##############################################
 
 	echo "Creating required symlinks"
 
-	# remove duplicate architecture-dependent binaries from $binDir
-	cd $installDestDir$installDir/bin
-	rm ar as ld nm objdump ranlib strip
-
-	# drop c++filt, as gcc2 provides its own
-	rm c++filt
-
-	# make all tools available via default paths
-	echo "Symlinking binaries into default path"
-	mkdir -p $installDestDir$binDir
-	cd $installDestDir$binDir
-	ln -sfn ../$relativeInstallDir/bin/* .
-	ln -sfn ../$relativeInstallDir/$targetMachineTriple/bin/* .
+	# There are copies of a subset of the commands below installDir. We
+	# overwrite those with symlinks to the ones in binDir.
+	for file in $installDestDir$installDir/i586-pc-haiku/bin/*; do
+		symlinkRelative -sfn $installDestDir$binDir/$(basename $file) $file
+	done
 
 	### Cleanup #################################################
 
 	echo "Cleanup"
 
-	cd $installDestDir$installDir
-	rm -rf $relativeInstallDir/$buildMachineTriple
-	rm -rf info
-	rm -rf lib
-
 	# delete man pages for commands that we aren't including
-	for cmd in dlltool nlmconv windres; do
-		rm -f documentation/man/man1/$targetMachineTriple-$cmd.1
+	cd $installDestDir$manDir
+	for cmd in c++filt dlltool nlmconv windmc windres; do
+		rm -f man1/$cmd.1
 	done
 }
 
@@ -146,5 +150,5 @@ DESCRIPTION="
 	    strings - Lists printable strings from files.
 	    strip - Discards symbols.
 
-	The tools of this package can be used for cross-builds to $targetMachineTriple.
+	The tools of this package can be used for cross-builds to $effectiveTargetMachineTriple.
 	"
