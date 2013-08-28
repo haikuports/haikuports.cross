@@ -33,5 +33,6 @@ INSTALL()
 	cp -r haikuporter HaikuPorter $installDestDir$haikuporterDir
 
 	mkdir -p $installDestDir$binDir
-	ln -sfn ../lib/haikuporter/haikuporter $installDestDir$binDir
+	symlinkRelative -s "$installDestDir$haikuporterDir/haikuporter" \
+		"$installDestDir$binDir"
 }
