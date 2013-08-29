@@ -15,7 +15,7 @@ COPYRIGHT="1988-2010 Free Software Foundation, Inc."
 SRC_URI="http://ftp.gnu.org/pub/gnu/make/make-3.82.tar.bz2"
 CHECKSUM_MD5="1a11100f3c63fcf5753818e59d63088f"
 REVISION="1"
-ARCHITECTURES="x86_gcc2 x86"
+ARCHITECTURES="x86_gcc2 x86 x86_64"
 
 PATCHES="make_bootstrap-3.82.patchset"
 

@@ -12,7 +12,7 @@ SRC_URI="
 	git+git://github.com/haiku/BuildtoolsPM.git#2d0a2c6404ffae1a46eb7e74daab08099b45af2c
 	"
 REVISION="1"
-ARCHITECTURES="x86"
+ARCHITECTURES="x86 x86_64"
 if [ $effectiveTargetArchitecture != x86_gcc2 ]; then
 	# x86_gcc2 is fine as primary target architecture as long as we're building
 	# for a different secondary architecture.
@@ -75,6 +75,11 @@ BUILD()
 		additionalConfigureFlags="\
 			--with-hybrid-secondary=${effectiveTargetArchitecture}"
 	fi
+	if [ $effectiveTargetArchitecture == x86_64 ]; then
+		# disable multilib support, as x86_64 by default tries to build the
+		# 32-bit libraries, too, which fails as no 32-bit libroot is available
+		additionalConfigureFlags+=" --disable-multilib"
+	fi
 
 	CFLAGS="-O2 -U_FORTIFY_SOURCE" CXXFLAGS="-O2" "$sourceDir/configure" \
 		--build=$buildMachineTriple --host=$effectiveTargetMachineTriple \
@@ -95,11 +100,11 @@ BUILD()
 INSTALL()
 {
 	cd $objectsDir
-	
+
 	make DESTDIR=$installDestDir install
 
 	### Strip #################################################
-	
+
 	echo "Strip debug info"
 
 	cd $installDestDir$installDir
@@ -109,7 +114,7 @@ INSTALL()
 			lib/gcc/$effectiveTargetMachineTriple/*/$f
 	done
 	$effectiveTargetMachineTriple-strip --strip-debug lib/*.a
-	
+
 	### Symlinks ##############################################
 
 	echo "Creating required symlinks"
@@ -136,7 +141,7 @@ INSTALL()
 	ln -sfn g++ $installDestDir$installDir/bin/c++
 
 	### Cleanup ###############################################
-	
+
 	echo "Cleanup"
 	rm -rf $installDestDir$installDir/info
 	rm -rf $installDestDir$installDir/share
