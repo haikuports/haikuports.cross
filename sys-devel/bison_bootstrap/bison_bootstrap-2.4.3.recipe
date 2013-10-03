@@ -30,6 +30,7 @@ PROVIDES="
 	"
 REQUIRES="
 	haiku >= $haikuVersion
+	cmd:m4
 	"
 BUILD_REQUIRES="
 	"
