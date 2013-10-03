@@ -1,0 +1,117 @@
+SUMMARY="Library for solving packages and reading repositories"
+DESCRIPTION="Library for solving packages and reading repositories."
+LICENSE="BSD (3-clause)"
+COPYRIGHT="2007-2013, Novell Inc."
+HOMEPAGE="http://github.com/openSUSE/libsolv"
+SRC_URI="git+git://github.com/weinhold/libsolv.git#01ed09a3e1f4637f72d4239fe3724fcafa39be94"
+REVISION="1"
+ARCHITECTURES="x86_gcc2 x86 x86_64"
+SECONDARY_ARCHITECTURES="x86_gcc2 x86"
+
+PATCHES="libsolv_bootstrap-0.3.0_haiku_2013_10_01.patchset"
+
+PROVIDES="
+	libsolv_bootstrap$secondaryArchSuffix = $portVersion
+	libsolv$secondaryArchSuffix = $portVersion
+	lib:libsolv$secondaryArchSuffix = $portVersion
+	lib:libsolvext$secondaryArchSuffix = $portVersion
+	"
+REQUIRES="
+	haiku >= $haikuVersion
+	lib:libz$secondaryArchSuffix
+	"
+BUILD_REQUIRES="
+	devel:libz$secondaryArchSuffix
+	"
+BUILD_PREREQUIRES="
+	haiku_devel >= $haikuVersion
+	binutils_cross_$effectiveTargetArchitecture
+	gcc_cross_$effectiveTargetArchitecture
+	cmd:cmake
+	cmd:gcc
+	cmd:ld
+	cmd:make
+	cmd:sed
+	"
+
+SOURCE_DIR="libsolv-$portVersion"
+
+PATCH()
+{
+	sed -i 's,${CMAKE_INSTALL_PREFIX}/bin',$binDir, CMakeLists.txt
+	sed -i 's,${CMAKE_INSTALL_PREFIX}/include',$includeDir, \
+		src/CMakeLists.txt ext/CMakeLists.txt
+}
+
+BUILD()
+{
+	rm -rf build
+	mkdir build
+	cd build
+
+	# prepare a toolchain file
+	cat > toolchain.cmake << EOF
+		SET(CMAKE_SYSTEM_NAME Haiku)
+		SET(CMAKE_SYSTEM_VERSION 1)
+		SET(CMAKE_C_COMPILER $effectiveTargetMachineTriple-gcc)
+		SET(CMAKE_CXX_COMPILER $effectiveTargetMachineTriple-g++)
+		SET(CMAKE_FIND_ROOT_PATH $crossSysrootDir)
+		SET(CMAKE_FIND_ROOT_PATH_MODE_PROGRAM NEVER)
+		SET(CMAKE_FIND_ROOT_PATH_MODE_LIBRARY ONLY)
+		SET(CMAKE_FIND_ROOT_PATH_MODE_INCLUDE ONLY)
+EOF
+
+	local systemDir=$crossSysrootDir/boot/system
+	local systemDevelLibDir=$systemDir/$relativeDevelopLibDir
+	local zlibInstallDir=$systemDir
+	cmake -DCMAKE_TOOLCHAIN_FILE=toolchain.cmake \
+		-DHAIKU=1 \
+		-DZLIB_LIBRARY=$zlibInstallDir/$relativeDevelopLibDir/libz.so \
+		-DZLIB_INCLUDE_DIR=$zlibInstallDir/$relativeIncludeDir \
+		-DHAIKU_BE_LIBRARY=$systemDevelLibDir/libbe.so \
+		-DHAIKU_NETWORK_LIBRARY=$systemDevelLibDir/libnetwork.so \
+		-DHAIKU_PACKAGE_LIBRARY=$systemDevelLibDir/libpackage.so \
+		-DCMAKE_INSTALL_PREFIX:PATH=$prefix \
+		-DLIB=$relativeLibDir \
+		..
+
+	# The build host might still sport a cmake which doesn't know Haiku's gcc 4
+	# doesn't support -nostart anymore. Hack the link script accordingly.
+	sed -i 's,-nostart,-shared,g' src/CMakeFiles/libsolv.dir/link.txt
+
+	make $jobArgs
+}
+
+INSTALL()
+{
+	cd build
+	make DESTDIR=$installDestDir install
+
+	# set up the develop directory correctly
+	prepareInstalledDevelLibs libsolv libsolvext
+
+	# move cmake files
+	mkdir -p $installDestDir$dataDir
+	mv $installDestDir$prefix/share/cmake $installDestDir$dataDir
+	rmdir $installDestDir$prefix/share
+
+	# We don't want the executables.
+	rm -r $installDestDir$prefix/bin
+
+	# devel package
+	packageEntries devel \
+		$installDestDir$dataDir \
+		$installDestDir$developDir
+}
+
+# ----- devel package -------------------------------------------------------
+
+PROVIDES_devel="
+	libsolv_bootstrap${secondaryArchSuffix}_devel = $portVersion
+	libsolv${secondaryArchSuffix}_devel = $portVersion
+	devel:libsolv${secondaryArchSuffix} = $portVersion
+	devel:libsolvext${secondaryArchSuffix} = $portVersion
+	"
+REQUIRES_devel="
+	libsolv_bootstrap${secondaryArchSuffix} == $portVersion base
+	"
