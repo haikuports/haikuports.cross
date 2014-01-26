@@ -3,7 +3,7 @@ HOMEPAGE="http://www.gnu.org/software/binutils"
 
 SRC_URI="
 	git+file://$portBaseDir/../binutils_cross_x86/download/BuildtoolsPM.git#db2a6d28f6c6a92cfb1c619b0828dfbf6b87ca30
-	git+git://github.com/haiku/BuildtoolsPM.git#db2a6d28f6c6a92cfb1c619b0828dfbf6b87ca30"
+	git+git://github.com/haiku/buildtools.git#9bfca2f40f0857932e8bc66b6d1fdae94acf8d9c"
 REVISION="3"
 LICENSE="
 	GNU GPL v2
@@ -11,7 +11,7 @@ LICENSE="
 	"
 COPYRIGHT="1988-2013 Free Software Foundation, Inc."
 
-ARCHITECTURES="x86 x86_64"
+ARCHITECTURES="x86 x86_64 ppc"
 if [ $effectiveTargetArchitecture != x86_gcc2 ]; then
 	# x86_gcc2 is fine as primary target architecture as long as we're building
 	# for a different secondary architecture.

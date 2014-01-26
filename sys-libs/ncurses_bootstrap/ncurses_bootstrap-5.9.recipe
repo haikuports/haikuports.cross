@@ -5,7 +5,7 @@ CHECKSUM_MD5="8cb9c412e5f2d96bc6f459aa8c6282a1"
 LICENSE="MIT"
 COPYRIGHT="1998-2011 Free Software Foundation, Inc."
 REVISION="1"
-ARCHITECTURES="x86_gcc2 x86 x86_64"
+ARCHITECTURES="x86_gcc2 x86 x86_64 ppc"
 SECONDARY_ARCHITECTURES="x86_gcc2 x86"
 
 PATCHES="ncurses_bootstrap-5.9.patchset"
