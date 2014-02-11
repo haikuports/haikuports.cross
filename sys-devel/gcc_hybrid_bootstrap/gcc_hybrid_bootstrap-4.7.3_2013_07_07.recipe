@@ -8,7 +8,7 @@ LICENSE="
 COPYRIGHT="1988-2013 Free Software Foundation, Inc."
 SRC_URI="
 	git+file://$portBaseDir/../gcc_cross_x86/download/BuildtoolsPM.git#db2a6d28f6c6a92cfb1c619b0828dfbf6b87ca30
-	git+git://github.com/haiku/BuildtoolsPM.git#db2a6d28f6c6a92cfb1c619b0828dfbf6b87ca30
+	git+https://github.com/haiku/BuildtoolsPM.git#db2a6d28f6c6a92cfb1c619b0828dfbf6b87ca30
 	"
 REVISION="1"
 ARCHITECTURES="x86"

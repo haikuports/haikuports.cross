@@ -11,7 +11,7 @@ binutilsVersion=2.17_2013_04_21
 COPYRIGHT="1988-2000 Free Software Foundation, Inc."
 SRC_URI="
 	git+file://$portBaseDir/../binutils_cross_x86_gcc2/download/BuildtoolsPM.git#b1ef802
-	git+git://github.com/haiku/BuildtoolsPM.git#b1ef802
+	git+https://github.com/haiku/BuildtoolsPM.git#b1ef802
 	"
 REVISION="1"
 ARCHITECTURES="x86_gcc2"

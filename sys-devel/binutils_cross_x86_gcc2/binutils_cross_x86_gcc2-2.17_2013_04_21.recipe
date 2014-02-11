@@ -1,6 +1,6 @@
 SUMMARY="Assembler, linker and binary tools for target ${targetMachineTriple}"
 HOMEPAGE="http://www.gnu.org/software/binutils"
-SRC_URI="git+git://github.com/haiku/BuildtoolsPM.git#ab0f66e"
+SRC_URI="git+https://github.com/haiku/BuildtoolsPM.git#ab0f66e"
 REVISION="1"
 ARCHITECTURES="x86_gcc2"
 LICENSE="

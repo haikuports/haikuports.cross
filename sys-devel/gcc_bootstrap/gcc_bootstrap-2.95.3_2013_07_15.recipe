@@ -10,7 +10,7 @@ COPYRIGHT="1988-2000 Free Software Foundation, Inc."
 SRC_URI="
 	git+file://$portBaseDir/../gcc_cross_x86_gcc2/download/BuildtoolsPM.git#b1ef802
 	git+file://$portBaseDir/../binutils_bootstrap/download/BuildtoolsPM.git#b1ef802
-	git+git://github.com/haiku/BuildtoolsPM.git#b1ef802
+	git+https://github.com/haiku/BuildtoolsPM.git#b1ef802
 	"
 REVISION="3"
 ARCHITECTURES="x86_gcc2"

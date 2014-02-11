@@ -2,7 +2,7 @@ SUMMARY="Assembler, linker and binary tools for target ${effectiveTargetMachineT
 HOMEPAGE="http://www.gnu.org/software/binutils"
 SRC_URI="
 	git+file://$portBaseDir/../binutils_cross_x86_gcc2/download/BuildtoolsPM.git#ab0f66e
-	git+git://github.com/haiku/BuildtoolsPM.git#ab0f66e
+	git+https://github.com/haiku/BuildtoolsPM.git#ab0f66e
 	"
 REVISION="3"
 LICENSE="
