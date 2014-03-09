@@ -11,7 +11,7 @@ SRC_URI="
 	git+file://$portBaseDir/../binutils_bootstrap/download/buildtools.git#02dff6efa8f90d23396406b5e2aaab14d4596f1b
 	git+https://github.com/haiku/buildtools.git#02dff6efa8f90d23396406b5e2aaab14d4596f1b
 	"
-REVISION="1"
+REVISION="2"
 ARCHITECTURES="x86 x86_64 ppc arm"
 if [ $effectiveTargetArchitecture != x86_gcc2 ]; then
 	# x86_gcc2 is fine as primary target architecture as long as we're building
@@ -107,6 +107,7 @@ BUILD()
 		--with-pkgversion=$(echo $portVersion | cut -c 7-) \
 		--with-sysroot=/ \
 		--with-build-sysroot=$installDestDir/ \
+		--with-threads=posix \
 		$additionalConfigureFlags
 		# Note: The --with-sysroot=/ is rather silly, but --with-build-sysroot
 		# only works when --with-sysroot has been given as well.
