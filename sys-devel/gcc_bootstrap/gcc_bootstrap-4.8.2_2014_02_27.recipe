@@ -102,7 +102,7 @@ BUILD()
 		--build=$buildMachineTriple --host=$effectiveTargetMachineTriple \
 		--target=$effectiveTargetMachineTriple --prefix=$installDir \
 		--libexecdir=$installDir/lib --mandir=$manDir --docdir=$docDir \
-		--disable-nls --enable-shared \
+		--disable-nls --enable-shared --disable-plugin \
 		--enable-languages=c,c++ --enable-lto --enable-frame-pointer \
 		--with-pkgversion=$(echo $portVersion | cut -c 7-) \
 		--with-sysroot=/ \
@@ -111,6 +111,10 @@ BUILD()
 		$additionalConfigureFlags
 		# Note: The --with-sysroot=/ is rather silly, but --with-build-sysroot
 		# only works when --with-sysroot has been given as well.
+		# Note: '--disable-plugin' circumvents what seems to be a gcc bug: 
+		# when building with plugin support, the build fails for gengtype.c,
+		# where build machine configuration (bconfig.h) and Haiku headers 
+		# (stdio.h) are getting mixed up.
 
 	make $jobArgs
 }
