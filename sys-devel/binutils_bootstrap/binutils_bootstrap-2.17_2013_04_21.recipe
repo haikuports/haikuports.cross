@@ -66,6 +66,9 @@ relativeInstallDir="develop/tools$secondaryArchSubDir"
 installDir="$prefix/$relativeInstallDir"
 objectsDir=$(pwd)/../${portVersionedName}-obj
 
+
+PATCHES="binutils_bootstrap-2.17_2013_04_21.patchset"
+
 BUILD()
 {
 	rm -rf $objectsDir
