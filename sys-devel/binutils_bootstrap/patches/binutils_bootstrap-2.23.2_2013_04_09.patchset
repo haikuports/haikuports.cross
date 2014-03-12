@@ -1,0 +1,42 @@
+From da3c95d84055bf11930ac216b10e959b9ac5618b Mon Sep 17 00:00:00 2001
+From: Alexander von Gluck IV <kallisti5@unixzen.com>
+Date: Tue, 11 Mar 2014 21:22:43 -0500
+Subject: [PATCH] binutils: fix missing stdint in binutils bdf
+
+* Fixes issue compiling PPC binutils
+* Missing a stdint.h in coff header for intptr_t usage
+* Upstream commit 3c865fca8 by Alan Modra:
+  https://sourceware.org/bugzilla/show_bug.cgi?id=16686
+* Fix pushed to buildtools in f131d0c3165
+---
+ bfd/coff-rs6000.c   |    1 +
+ bfd/coff64-rs6000.c |    1 +
+ 2 files changed, 2 insertions(+)
+
+diff --git a/bfd/coff-rs6000.c b/bfd/coff-rs6000.c
+index 9326b32..4d063a6 100644
+--- a/bfd/coff-rs6000.c
++++ b/bfd/coff-rs6000.c
+@@ -118,6 +118,7 @@ extern int rs6000coff_core_file_failing_signal (bfd *abfd);
+ #define bfd_pe_print_pdata	NULL
+ #endif
+ 
++#include <stdint.h>
+ #include "coffcode.h"
+ 
+ /* The main body of code is in coffcode.h.  */
+diff --git a/bfd/coff64-rs6000.c b/bfd/coff64-rs6000.c
+index 0821b6f..510a4d7 100644
+--- a/bfd/coff64-rs6000.c
++++ b/bfd/coff64-rs6000.c
+@@ -279,6 +279,7 @@ extern int rs6000coff_core_file_failing_signal
+ #define bfd_pe_print_pdata	NULL
+ #endif
+ 
++#include <stdint.h>
+ #include "coffcode.h"
+ 
+ /* For XCOFF64, the effective width of symndx changes depending on
+-- 
+1.7.9.5
+
