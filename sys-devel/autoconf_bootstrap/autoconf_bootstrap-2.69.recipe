@@ -59,8 +59,10 @@ BUILD()
 {
 	# fix path to perl in scripts using it
 	for file in autoheader autom4te autoreconf autoscan autoupdate ifnames; do
-		sed -i -e "s,@PERL@,/bin/perl,g" bin/${file}.in
+		sed -i -e "s,@PERL@,`which perl`,g" bin/${file}.in
 	done
+
+	touch man/*.1
 
 	autoreconf
 	PERL="perl" M4="m4" SED="sed" \
