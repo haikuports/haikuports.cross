@@ -63,7 +63,7 @@ BUILD_PREREQUIRES="
 	cmd:tar
 	"
 
-SOURCE_DIR="binutils-$portVersion/binutils"
+SOURCE_DIR="buildtools-$srcGitRev/binutils"
 BUILD_PACKAGE_ACTIVATION_PHASE=INSTALL
 
 sourceDir=$(pwd)
