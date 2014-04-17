@@ -66,14 +66,16 @@ BUILD()
 	aclocal
 	autoconf
 
-	runConfigure ./configure \
+	mkdir build
+	cd build
+	runConfigure ../configure \
 		--build=$buildMachineTriple --host=$targetMachineTriple \
 		--enable-shared \
 		--enable-unicode=ucs4 \
 		--with-libm=""
 
 	# prevent make from rebuilding stuff that requires python
-	touch Parser/asdl* Python/Python-ast.c Include/Python-ast.h
+	touch ../Parser/asdl* ../Python/Python-ast.c ../Include/Python-ast.h
 
 	make BUILDPYTHON=$(which python)
 		# multi-job builds don't work reliably
@@ -81,6 +83,7 @@ BUILD()
 
 INSTALL()
 {
+	cd build
 	make BUILDPYTHON=$(which python) DESTDIR=$installDestDir install
 
 	prepareInstalledDevelLibs libpython2.6
