@@ -1,7 +1,8 @@
 SUMMARY="Assembler, linker and binary tools for target ${targetMachineTriple}"
 HOMEPAGE="http://www.gnu.org/software/binutils"
-SRC_URI="
-	git+https://github.com/haiku/buildtools.git#c20a732df8f8b6d0f32c872817f3a0498a5c4761"
+srcGitRev="c20a732df8f8b6d0f32c872817f3a0498a5c4761"
+SRC_URI="https://github.com/haiku/buildtools/archive/$srcGitRev.tar.gz"
+SRC_FILENAME="binutils-$srcGitRev.tar.gz"
 REVISION="1"
 ARCHITECTURES="x86"
 LICENSE="
@@ -55,7 +56,7 @@ BUILD_PREREQUIRES="
 	zlib_devel
 	"
 
-SOURCE_DIR="$portVersionedName/binutils"
+SOURCE_DIR="buildtools-$srcGitRev/binutils"
 
 BUILD_PACKAGE_ACTIVATION_PHASE=INSTALL
 
