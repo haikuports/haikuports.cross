@@ -33,6 +33,7 @@ PROVIDES="
 	cmd:gcc$secondaryArchSuffix = $portVersion compat >= 4
 	cmd:gcc_4.7.3$secondaryArchSuffix = $portVersion compat >= 4
 	cmd:gcov$secondaryArchSuffix = $portVersion compat >= 4
+	lib:libstdc++ = $portVersion compat >= 4
 	"
 
 REQUIRES="
@@ -99,6 +100,12 @@ BUILD()
 		# disable multilib support, as x86_64 by default tries to build the
 		# 32-bit libraries, too, which fails as no 32-bit libroot is available
 		additionalConfigureFlags+=" --disable-multilib"
+	fi
+	if [ $effectiveTargetArchitecture == arm ]; then
+		# disable multilib support, as x86_64 by default tries to build the
+		# soft-float libraries, too, which fails as no soft float libroot is
+		# available
+		additionalConfigureFlags+=" --disable-multilib --with-float=hard"
 	fi
 
 	CFLAGS="-O2 -U_FORTIFY_SOURCE" CXXFLAGS="-O2" "$sourceDir/configure" \
