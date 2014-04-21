@@ -6,7 +6,7 @@ COPYRIGHT="1992-2012 Free Software Foundation, Inc."
 SRC_URI="http://ports-space.haiku-files.org/source/grep-2.14.tar.bz2"
 CHECKSUM_MD5="db55b9fc67d8c0895f3c73e94e2aebe3"
 REVISION="1"
-ARCHITECTURES="x86_gcc2 x86 x86_64 ppc"
+ARCHITECTURES="x86_gcc2 x86 x86_64 ppc arm"
 
 PATCHES="grep_bootstrap-2.14.patchset"
 
