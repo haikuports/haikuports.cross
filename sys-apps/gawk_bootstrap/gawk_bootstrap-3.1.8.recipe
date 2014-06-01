@@ -22,6 +22,10 @@ PROVIDES="
 	gawk = $portVersion compat >= 3
 	cmd:awk = $portVersion compat >= 3
 	cmd:gawk = $portVersion compat >= 3
+	cmd:igawk = $portVersion compat >= 3
+	cmd:pgawk = $portVersion compat >= 3
+	cmd:gawk_3.1.8 = $portVersion compat >= 3
+	cmd:pgawk_3.1.8 = $portVersion compat >= 3
 	"
 REQUIRES="
 	haiku >= $haikuVersion
