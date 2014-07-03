@@ -9,7 +9,7 @@ COPYRIGHT="1988-2013 Free Software Foundation, Inc."
 srcGitRev="3ad9ac2317f63b65937473c4fbe37c9e93e3a116"
 SRC_FILENAME="$portVersionedName.tar.gz"
 SRC_URI="https://github.com/haiku/buildtools/archive/$srcGitRev.tar.gz"
-REVISION="1"
+REVISION="2"
 CHECKSUM_SHA256="85499c650421b68f9830d3fb2ddfafb8789a3e1ffce75e8dd27aaed678135df0"
 
 ARCHITECTURES="x86 x86_64 ppc arm"
@@ -71,7 +71,7 @@ BUILD()
 			*** Using different compiler versions is likely to cause problems
 			*** when running the Haiku bootstrap image, especially with respect
 			*** to incompatibilities between different versions of libstdc++.
-			*** Please update the gcc_bootstrap recipe version to match the 
+			*** Please update the gcc_bootstrap recipe version to match the
 			*** cross-compiler!
 			EOF
 		exit 1
@@ -97,6 +97,9 @@ BUILD()
 		# disable multilib support, as x86_64 by default tries to build the
 		# 32-bit libraries, too, which fails as no 32-bit libroot is available
 		additionalConfigureFlags+=" --disable-multilib"
+
+		# disable TLS support, as it causes an ICE on x86_64
+		additionalConfigureFlags+=" --disable-tls"
 	fi
 	if [ $effectiveTargetArchitecture == arm ]; then
 		# disable multilib support, as x86_64 by default tries to build the
@@ -118,9 +121,9 @@ BUILD()
 		$additionalConfigureFlags
 		# Note: The --with-sysroot=/ is rather silly, but --with-build-sysroot
 		# only works when --with-sysroot has been given as well.
-		# Note: '--disable-plugin' circumvents what seems to be a gcc bug: 
+		# Note: '--disable-plugin' circumvents what seems to be a gcc bug:
 		# when building with plugin support, the build fails for gengtype.c,
-		# where build machine configuration (bconfig.h) and Haiku headers 
+		# where build machine configuration (bconfig.h) and Haiku headers
 		# (stdio.h) are getting mixed up.
 
 	make $jobArgs
