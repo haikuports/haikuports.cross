@@ -106,6 +106,9 @@ BUILD()
 		# soft-float libraries, too, which fails as no soft float libroot is
 		# available
 		additionalConfigureFlags+=" --disable-multilib --with-float=hard"
+
+		# TODO: Disable building wtih TLS support for ARM until implemented
+		additionalConfigureFlags+=" --disable-tls"
 	fi
 
 	CFLAGS="-O2 -U_FORTIFY_SOURCE" CXXFLAGS="-O2" "$sourceDir/configure" \
