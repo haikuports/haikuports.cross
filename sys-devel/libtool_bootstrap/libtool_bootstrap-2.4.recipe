@@ -80,7 +80,7 @@ INSTALL()
 
 	# libltdl package
 	packageEntries libltdl \
-		$installDestDir$libDir/libltdl*
+		$installDestDir$libDir
 }
 
 TEST()
