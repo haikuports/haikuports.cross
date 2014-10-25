@@ -86,6 +86,12 @@ doBuild()
 		--enable-hard-tabs \
 		$@
 	make $jobArgs
+
+	# make install assumes .libs/* for binaries, so make it happy
+	for i in tic toe infocmp clear tabs tput tset; do
+		[ ! -f progs/.libs/$i ] && ln progs/tic progs/.libs/$i
+	done
+
 	make install DESTDIR=$targetDir
 }
 
