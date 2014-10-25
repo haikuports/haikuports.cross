@@ -67,6 +67,7 @@ BUILD()
 	aclocal
 	autoconf
 
+	export MACHDEP=haiku1
 	runConfigure ./configure \
 		--build=$buildMachineTriple --host=$targetMachineTriple \
 		--enable-shared \

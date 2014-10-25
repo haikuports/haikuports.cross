@@ -1993,3 +1993,23 @@ index 677296c..a08fec9 100644
 -- 
 1.8.1.4
 
+commit d7a0d4061573f6f963f2bcc97c8427be7f57e03a
+Author: Jonathan Schleifer <js@webkeks.org>
+Date:   Sat Oct 25 18:47:55 2014 +0200
+
+    configure.in: Properly check for AR
+
+diff --git a/configure.in b/configure.in
+index dd384fa..5ec43b2 100644
+--- a/configure.in
++++ b/configure.in
+@@ -801,8 +801,8 @@ fi
+ AC_MSG_RESULT($LDLIBRARY)
+ 
+ AC_PROG_RANLIB
++AC_CHECK_TOOL(AR, ar)
+ AC_SUBST(AR)
+-AC_CHECK_PROGS(AR, ar aal, ar)
+ 
+ AC_SUBST(SVNVERSION)
+ AC_CHECK_PROG(SVNVERSION, svnversion, found, not-found)
