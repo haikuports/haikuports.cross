@@ -1,0 +1,66 @@
+SUMMARY="Less is a free, open-source file pager."
+DESCRIPTION="GNU less is a program similar to more, but which allows \
+backward movement in the file as well as forward movement. Also, less \
+does not have to read the entire input file before starting, so with \
+large input files it starts up faster than text editors like vi. Less uses \
+termcap (or terminfo on some systems), so it can run on a variety of \
+terminals. There is even limited support for hardcopy terminals.
+"
+HOMEPAGE="http://www.gnu.org/software/less/" 
+SRC_URI="http://ftp.gnu.org/gnu/less/less-$portVersion.tar.gz"
+CHECKSUM_SHA256="9fe8287c647afeafb4149c5dedaeacfd20971ed7c26c7553794bb750536b5f57"
+LICENSE="GNU GPL v3"
+COPYRIGHT="1984-2012 Mark Nudelman"
+REVISION="1"
+ARCHITECTURES="x86_gcc2 x86 x86_64"
+
+PROVIDES="
+	less_bootstrap = $portVersion
+	less = $portVersion
+	cmd:less
+	cmd:lessecho
+	cmd:lesskey
+	"
+
+REQUIRES="
+	haiku$secondaryArchSuffix >= $haikuVersion
+	lib:libncurses$secondaryArchSuffix
+	"
+
+BUILD_REQUIRES="
+	haiku${secondaryArchSuffix}_devel >= $haikuVersion
+	devel:libncurses$secondaryArchSuffix
+	"
+
+BUILD_PREREQUIRES="
+	cmd:gcc$secondaryArchSuffix
+	cmd:make
+	cmd:ld$secondaryArchSuffix
+	cmd:autoconf
+	cmd:aclocal
+	"
+
+PATCHES="less_bootstrap-451.patch"
+
+GLOBAL_WRITABLE_FILES="
+	settings/etc/sysless.src keep-old
+	settings/etc/sysless keep-old
+"
+
+SOURCE_DIR="less-451"
+
+BUILD()
+{
+	# permissions are fucked up in the tarball
+	chmod -R +w .
+
+	autoconf
+	runConfigure ./configure --host=$targetMachineTriple \
+		--with-editor=nano --sysconfdir=$settingsDir/etc
+	make
+}
+
+INSTALL()
+{
+	make DESTDIR=$installDestDir install
+}
