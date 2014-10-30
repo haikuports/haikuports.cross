@@ -80,7 +80,7 @@ BUILD()
 	mv Parser/pgen ../Parser/buildhost_pgen
 	cd ..
 
-	runConfigure ./configure \
+	runConfigure ./configure LDFLAGS="-L$sourceDir" \
 		--host=$targetMachineTriple \
 		--build=$buildMachineTriple \
 		--enable-shared \
