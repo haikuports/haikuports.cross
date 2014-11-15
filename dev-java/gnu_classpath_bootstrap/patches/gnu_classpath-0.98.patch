@@ -1,0 +1,22 @@
+--- classpath-0.98-original/native/jni/java-net/java_net_VMNetworkInterface.c	2011-02-26 16:07:22.805044224 +0000
++++ classpath-0.98/native/jni/java-net/java_net_VMNetworkInterface.c	2011-02-26 16:08:11.500957184 +0000
+@@ -315,7 +315,7 @@
+   }
+   else
+   {
+-    retval = (flags & (IFF_UP | IFF_RUNNING))
++    retval = (flags & (IFF_UP))
+              ? JNI_TRUE
+              : JNI_FALSE;
+   }
+--- classpath-0.98-original/native/jni/java-nio/Makefile.in  2011-03-01 22:29:33.298319872 +0000
++++ classpath-0.98/native/jni/java-nio/Makefile.in      2011-03-01 22:30:17.983826432 +0000
+@@ -310,7 +310,7 @@
+ 
+ libjavanio_la_LIBADD = $(top_builddir)/native/jni/classpath/jcl.lo \
+ 		       $(top_builddir)/native/jni/native-lib/libclasspathnative.la \
+-		       $(LTLIBICONV) 
++		       -Wl,$(LIBICONV) 
+ 
+ 
+ # Directly included through javanio.h
