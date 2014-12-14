@@ -30,14 +30,14 @@ PROVIDES="
 	"
 
 REQUIRES="
-	haiku >= $haikuVersion
-	haiku_cross_devel_${targetArchitecture} >= $haikuVersion
+	haiku
+	haiku_cross_devel_${targetArchitecture}
 	"
 BUILD_REQUIRES="
 	$REQUIRES
 	"
 BUILD_PREREQUIRES="
-	haiku_devel >= $haikuVersion
+	haiku_devel
 	binutils_cross_${targetArchitecture}
 	cmd:autoconf
 	cmd:flex

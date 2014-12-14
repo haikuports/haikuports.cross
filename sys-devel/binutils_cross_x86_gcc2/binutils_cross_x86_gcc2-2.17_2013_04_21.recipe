@@ -30,8 +30,8 @@ PROVIDES="
 	"
 
 REQUIRES="
-	haiku >= $haikuVersion
-	haiku_cross_devel_x86_gcc2 >= $haikuVersion
+	haiku
+	haiku_cross_devel_x86_gcc2
 	"
 
 BUILD_REQUIRES="
@@ -39,7 +39,7 @@ BUILD_REQUIRES="
 	"
 
 BUILD_PREREQUIRES="
-	haiku_devel >= $haikuVersion
+	haiku_devel
 	cmd:autoconf
 	cmd:flex
 	cmd:gcc

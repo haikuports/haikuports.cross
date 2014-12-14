@@ -22,13 +22,13 @@ PROVIDES="
 	lib:libfl_pic.a = $portVersion compat >= 2.5
 	"
 REQUIRES="
-	haiku >= $haikuVersion
+	haiku
 	cmd:m4
 	"
 BUILD_REQUIRES="
 	"
 BUILD_PREREQUIRES="
-	haiku_devel >= $haikuVersion
+	haiku_devel
 	binutils_cross_$targetArchitecture
 	gcc_cross_$targetArchitecture
 	cmd:aclocal

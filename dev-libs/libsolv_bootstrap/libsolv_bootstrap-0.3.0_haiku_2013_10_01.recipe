@@ -20,14 +20,14 @@ PROVIDES="
 	lib:libsolvext$secondaryArchSuffix = $portVersion
 	"
 REQUIRES="
-	haiku >= $haikuVersion
+	haiku
 	lib:libz$secondaryArchSuffix
 	"
 BUILD_REQUIRES="
 	devel:libz$secondaryArchSuffix
 	"
 BUILD_PREREQUIRES="
-	haiku_devel >= $haikuVersion
+	haiku_devel
 	binutils_cross_$effectiveTargetArchitecture
 	gcc_cross_$effectiveTargetArchitecture
 	cmd:cmake

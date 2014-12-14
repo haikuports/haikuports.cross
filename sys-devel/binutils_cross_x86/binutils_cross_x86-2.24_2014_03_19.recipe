@@ -36,16 +36,16 @@ PROVIDES="
 	"
 
 REQUIRES="
-	haiku >= $haikuVersion
-	haiku_cross_devel_${recipeArchitecture} >= $haikuVersion
+	haiku
+	haiku_cross_devel_${recipeArchitecture}
 	"
 
 BUILD_REQUIRES="
-	haiku_cross_devel_${recipeArchitecture} >= $haikuVersion
+	haiku_cross_devel_${recipeArchitecture}
 	"
 
 BUILD_PREREQUIRES="
-	haiku_devel >= $haikuVersion
+	haiku_devel
 	cmd:autoconf
 	cmd:flex
 	cmd:gcc

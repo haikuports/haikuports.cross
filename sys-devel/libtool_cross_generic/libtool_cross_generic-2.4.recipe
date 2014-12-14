@@ -34,7 +34,7 @@ REQUIRES="
 BUILD_REQUIRES="
 	"
 BUILD_PREREQUIRES="
-	haiku_devel >= $haikuVersion
+	haiku_devel
 	cmd:aclocal
 	cmd:autoconf >= 2.62
 	cmd:autoheader >= 2.62
