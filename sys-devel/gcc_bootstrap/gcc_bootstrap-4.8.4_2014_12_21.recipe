@@ -5,10 +5,10 @@ LICENSE="
 	GNU GPL v2
 	GNU LGPL v2
 	"
-COPYRIGHT="1988-2013 Free Software Foundation, Inc."
-srcGitRev="4947d64591fdd9764dad9ff6835ffbef1618e17f"
+COPYRIGHT="1988-2014 Free Software Foundation, Inc."
+srcGitRev="a05bd9155a41ad87382134678e93d67ceb959cfc"
 SRC_URI="https://github.com/haiku/buildtools/archive/$srcGitRev.tar.gz"
-CHECKSUM_SHA256="cb9261a3d3ab6e9c4ca5f2cd772a46439490ce525062c5fd2b2d04f50ad45619"
+CHECKSUM_SHA256="011e60e9ba3ce92af766adc222d55a6f7291991a85074e2b5b280b62317b201d"
 REVISION="1"
 
 ARCHITECTURES="x86 x86_64 ppc arm m68k"
@@ -33,7 +33,7 @@ PROVIDES="
 	cmd:cpp$secondaryArchSuffix = $portVersion compat >= 4
 	cmd:g++$secondaryArchSuffix = $portVersion compat >= 4
 	cmd:gcc$secondaryArchSuffix = $portVersion compat >= 4
-	cmd:gcc_4.8.3$secondaryArchSuffix = $portVersion compat >= 4
+	cmd:gcc_4.8.4$secondaryArchSuffix = $portVersion compat >= 4
 	cmd:gcov$secondaryArchSuffix = $portVersion compat >= 4
 	"
 
