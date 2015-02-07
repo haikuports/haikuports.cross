@@ -1,0 +1,26 @@
+From 46c2741547e8024411746615bdd14c92aa7e2ebf Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?J=C3=A9r=C3=B4me=20Duval?= <jerome.duval@gmail.com>
+Date: Sat, 7 Feb 2015 16:22:17 +0100
+Subject: [PATCH] man/dummyman: too many non-option arguments
+
+---
+ Makefile.in | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/Makefile.in b/Makefile.in
+index 3be1664..0ee1036 100644
+--- a/Makefile.in
++++ b/Makefile.in
+@@ -9976,8 +9976,8 @@ man/yes.1:       src/yes
+ 	  && $(run_help2man)						\
+ 		     --source='$(PACKAGE_STRING)'			\
+ 		     --include=$(srcdir)/man/$$name.x			\
+-		     --output=$$t/$$name.1 $$t/$$name			\
+ 		     --info-page='coreutils \(aq'$$name' invocation\(aq' \
++		     --output=$$t/$$name.1 $$t/$$name			\
+ 	  && sed \
+ 	       -e 's|$*\.td/||g' \
+ 	       -e '/For complete documentation/d' \
+-- 
+1.9.1
+
