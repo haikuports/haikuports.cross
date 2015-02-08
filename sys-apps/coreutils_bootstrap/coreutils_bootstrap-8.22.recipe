@@ -38,6 +38,7 @@ fi
 
 PROVIDES="
 	coreutils_bootstrap = $portVersion compat >= 8
+	coreutils = $portVersion compat >= 8
 	cmd:[ = $portVersion compat >= 8
 	cmd:base64 = $portVersion compat >= 8
 	cmd:basename = $portVersion compat >= 8
