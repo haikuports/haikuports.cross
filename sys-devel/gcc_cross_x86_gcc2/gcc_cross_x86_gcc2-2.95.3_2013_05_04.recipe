@@ -9,7 +9,7 @@ LICENSE="
 binutilsVersion=2.17_2013_04_21
 
 COPYRIGHT="1988-2000 Free Software Foundation, Inc."
-SRC_URI="
+SOURCE_URI="
 	git+file://$portBaseDir/../binutils_cross_x86_gcc2/download/buildtools.git#b1ef802
 	git+https://github.com/haiku/buildtools.git#b1ef802
 	"

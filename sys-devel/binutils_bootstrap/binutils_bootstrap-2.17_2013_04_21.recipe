@@ -1,7 +1,7 @@
 SUMMARY="Assembler, linker and binary tools for target ${effectiveTargetMachineTriple}"
 HOMEPAGE="http://www.gnu.org/software/binutils"
 srcGitRev="ab0f66e995971d3e7c6c123daaab860378c5bbb1"
-SRC_URI="https://github.com/haiku/buildtools/archive/$srcGitRev.tar.gz"
+SOURCE_URI="https://github.com/haiku/buildtools/archive/$srcGitRev.tar.gz"
 SRC_FILENAME="$portVersionedName.tar.gz"
 CHECKSUM_SHA256="aa27149677e4cfb54458c0d910a68cf32aa4aa6129a2a39ee57aca1c0584072b"
 REVISION="3"

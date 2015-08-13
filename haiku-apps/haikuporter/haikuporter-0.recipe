@@ -1,8 +1,11 @@
-SUMMARY="tool for building packages from build recipes"
-DESCRIPTION="haikuporter drives the process of building Haiku packages from recipe files."
-HOMEPAGE="http://ports.haiku-files.org/wiki/HaikuPorterForPM"
+SUMMARY="Build packages for the Haiku operating system"
+DESCRIPTION="
+Haikuporter allows you to build ports (and native) applications for the Haiku \
+operating system into installable packages.
+"
+HOMEPAGE="https://github.com/haikuports/haikuporter"
 srcRev="d21dd984e94b"
-SRC_URI="https://bitbucket.org/haikuports/haikuporter/get/$srcRev.tar.gz"
+SOURCE_URI="https://github.com/haikuports/haikuporter/archive/$srcRev.tar.gz"
 SRC_FILENAME="haikuporter-$srcRev.tar.gz"
 CHECKSUM_SHA256="ca05de1d076cf18911b9cff8ee256479a6eb8261907392f6e49aa543142bf100"
 LICENSE="MIT"
