@@ -3,7 +3,7 @@ HOMEPAGE="http://www.gnu.org/software/binutils"
 
 srcGitRev="a05bd9155a41ad87382134678e93d67ceb959cfc"
 SOURCE_URI="https://github.com/haiku/buildtools/archive/$srcGitRev.tar.gz"
-SRC_FILENAME="$portVersionedName.tar.gz"
+SOURCE_FILENAME="$portVersionedName.tar.gz"
 REVISION="1"
 LICENSE="
 	GNU GPL v2
@@ -13,12 +13,7 @@ COPYRIGHT="1988-2014 Free Software Foundation, Inc."
 
 CHECKSUM_SHA256="011e60e9ba3ce92af766adc222d55a6f7291991a85074e2b5b280b62317b201d"
 
-ARCHITECTURES="x86 x86_64 ppc arm"
-if [ $effectiveTargetArchitecture != x86_gcc2 ]; then
-	# x86_gcc2 is fine as primary target architecture as long as we're building
-	# for a different secondary architecture.
-	ARCHITECTURES="$ARCHITECTURES x86_gcc2"
-fi
+ARCHITECTURES="!x86_gcc2 x86 x86_64 ppc arm"
 SECONDARY_ARCHITECTURES="x86"
 
 PROVIDES="
