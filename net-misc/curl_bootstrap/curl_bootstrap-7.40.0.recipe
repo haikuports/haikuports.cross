@@ -1,6 +1,6 @@
 SUMMARY="A commandline-tool and library for downloading data from URLs"
 HOMEPAGE="http://curl.haxx.se"
-COPYRIGHT="1996-2014, Daniel Stenberg, <daniel@haxx.se>. All rights reserved."
+COPYRIGHT="1996-2014, Daniel Stenberg. All rights reserved."
 LICENSE="Curl"
 SOURCE_URI="http://curl.haxx.se/download/curl-$portVersion.tar.bz2"
 CHECKSUM_SHA256="899109eb3900fa6b8a2f995df7f449964292776a04763e94fae640700f883fba"
