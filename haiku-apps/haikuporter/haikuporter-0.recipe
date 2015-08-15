@@ -4,7 +4,7 @@ Haikuporter allows you to build ports (and native) applications for the Haiku \
 operating system into installable packages.
 "
 HOMEPAGE="https://github.com/haikuports/haikuporter"
-srcRev="d21dd984e94b"
+srcRev="d21dd984e94b435a3412f55d5116eafc1d2fec37"
 SOURCE_URI="https://github.com/haikuports/haikuporter/archive/$srcRev.tar.gz"
 SOURCE_FILENAME="haikuporter-$srcRev.tar.gz"
 CHECKSUM_SHA256="f004e18d043904a2e0a312c88715cb79f05c92ab3c705b8aa9ed1e27797d7c8f"
@@ -13,7 +13,7 @@ COPYRIGHT="2007-2013 Brecht Machiels et al"
 REVISION="1"
 ARCHITECTURES="any"
 
-SOURCE_DIR="haikuports-haikuporter-$srcRev"
+SOURCE_DIR="haikuporter-$srcRev"
 DISABLE_SOURCE_PACKAGE=yes
 
 PROVIDES="
