@@ -89,7 +89,7 @@ INSTALL()
 	# devel package
 	packageEntries devel \
 		$installDestDir$developDir \
-		$installDestDir$dataDir \
+		$installDestDir$dataDir/icu \
 		$installDestDir$libDir/icu \
 		$installDestDir$binDir/icu-config
 
