@@ -43,7 +43,6 @@ SOURCE_DIR="make-$portVersion"
 
 BUILD()
 {
-	autoreconf -i
 	runConfigure ./configure \
 		--build=$buildMachineTriple --host=$targetMachineTriple \
 		--disable-rpath --with-gnu-ld
