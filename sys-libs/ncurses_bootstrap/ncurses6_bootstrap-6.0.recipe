@@ -12,8 +12,8 @@ SECONDARY_ARCHITECTURES="x86_gcc2 x86"
 PATCHES="ncurses_bootstrap-$portVersion.patchset"
 
 PROVIDES="
-	ncurses_bootstrap$secondaryArchSuffix = $portVersion compat >= 6
-	ncurses$secondaryArchSuffix = $portVersion compat >= 6
+	ncurses6_bootstrap$secondaryArchSuffix = $portVersion compat >= 6
+	ncurses6$secondaryArchSuffix = $portVersion compat >= 6
 	lib:libform$secondaryArchSuffix = $portVersion compat >= 6
 	lib:libformw$secondaryArchSuffix = $portVersion compat >= 6
 	lib:libmenu$secondaryArchSuffix = $portVersion compat >= 6
@@ -147,8 +147,8 @@ The distribution includes the library and support utilities, including a terminf
 # ----- devel package -------------------------------------------------------
 
 PROVIDES_devel="
-	ncurses_bootstrap${secondaryArchSuffix}_devel = $portVersion compat >= 6
-	ncurses${secondaryArchSuffix}_devel = $portVersion compat >= 6
+	ncurses6_bootstrap${secondaryArchSuffix}_devel = $portVersion compat >= 6
+	ncurses6${secondaryArchSuffix}_devel = $portVersion compat >= 6
 	cmd:ncurses6_config$secondaryArchSuffix = $portVersion compat >= 6
 	cmd:ncursesw6_config$secondaryArchSuffix = $portVersion compat >= 6
 	devel:libform$secondaryArchSuffix = $portVersion compat >= 6
@@ -163,5 +163,5 @@ PROVIDES_devel="
 	devel:libpanelw$secondaryArchSuffix = $portVersion compat >= 6
 	"
 REQUIRES_devel="
-	ncurses_bootstrap$secondaryArchSuffix == $portVersion base
+	ncurses6_bootstrap$secondaryArchSuffix == $portVersion base
 	"
