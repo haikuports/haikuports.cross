@@ -1,42 +1,42 @@
 SUMMARY="New curses library"
 HOMEPAGE="http://www.gnu.org/software/ncurses/ncurses.html"
 SOURCE_FILENAME="$portVersionedName.tar.gz"
-SOURCE_URI="http://ftp.gnu.org/pub/gnu/ncurses/ncurses-5.9.tar.gz"
-CHECKSUM_SHA256="9046298fb440324c9d4135ecea7879ffed8546dd1b58e59430ea07a4633f563b"
+SOURCE_URI="http://ftp.gnu.org/pub/gnu/ncurses/ncurses-$portVersion.tar.gz"
+CHECKSUM_SHA256="f551c24b30ce8bfb6e96d9f59b42fbea30fa3a6123384172f9e7284bcf647260"
 LICENSE="MIT"
 COPYRIGHT="1998-2011 Free Software Foundation, Inc."
 REVISION="1"
 ARCHITECTURES="x86_gcc2 x86 x86_64 ppc arm"
 SECONDARY_ARCHITECTURES="x86_gcc2 x86"
 
-PATCHES="ncurses_bootstrap-5.9.patchset"
+PATCHES="ncurses_bootstrap-$portVersion.patchset"
 
 PROVIDES="
-	ncurses_bootstrap$secondaryArchSuffix = $portVersion compat >= 5
-	ncurses$secondaryArchSuffix = $portVersion compat >= 5
-	lib:libform$secondaryArchSuffix = $portVersion compat >= 5
-	lib:libformw$secondaryArchSuffix = $portVersion compat >= 5
-	lib:libmenu$secondaryArchSuffix = $portVersion compat >= 5
-	lib:libmenuw$secondaryArchSuffix = $portVersion compat >= 5
-	lib:libncurses$secondaryArchSuffix = $portVersion compat >= 5
-	lib:libncursesw$secondaryArchSuffix = $portVersion compat >= 5
-	lib:libncurses++$secondaryArchSuffix = $portVersion compat >= 5
-	lib:libncurses++w$secondaryArchSuffix = $portVersion compat >= 5
-	lib:libpanel$secondaryArchSuffix = $portVersion compat >= 5
-	lib:libpanelw$secondaryArchSuffix = $portVersion compat >= 5
+	ncurses_bootstrap$secondaryArchSuffix = $portVersion compat >= 6
+	ncurses$secondaryArchSuffix = $portVersion compat >= 6
+	lib:libform$secondaryArchSuffix = $portVersion compat >= 6
+	lib:libformw$secondaryArchSuffix = $portVersion compat >= 6
+	lib:libmenu$secondaryArchSuffix = $portVersion compat >= 6
+	lib:libmenuw$secondaryArchSuffix = $portVersion compat >= 6
+	lib:libncurses$secondaryArchSuffix = $portVersion compat >= 6
+	lib:libncursesw$secondaryArchSuffix = $portVersion compat >= 6
+	lib:libncurses++$secondaryArchSuffix = $portVersion compat >= 6
+	lib:libncurses++w$secondaryArchSuffix = $portVersion compat >= 6
+	lib:libpanel$secondaryArchSuffix = $portVersion compat >= 6
+	lib:libpanelw$secondaryArchSuffix = $portVersion compat >= 6
 	"
 if [ -z "$secondaryArchSuffix" ]; then
 	PROVIDES="$PROVIDES
-		cmd:captoinfo = $portVersion compat >= 5
-		cmd:clear = $portVersion compat >= 5
-		cmd:infocmp = $portVersion compat >= 5
-		cmd:infotocap = $portVersion compat >= 5
-		cmd:reset = $portVersion compat >= 5
-		cmd:tabs = $portVersion compat >= 5
-		cmd:tic = $portVersion compat >= 5
-		cmd:toe = $portVersion compat >= 5
-		cmd:tput = $portVersion compat >= 5
-		cmd:tset = $portVersion compat >= 5
+		cmd:captoinfo = $portVersion compat >= 6
+		cmd:clear = $portVersion compat >= 6
+		cmd:infocmp = $portVersion compat >= 6
+		cmd:infotocap = $portVersion compat >= 6
+		cmd:reset = $portVersion compat >= 6
+		cmd:tabs = $portVersion compat >= 6
+		cmd:tic = $portVersion compat >= 6
+		cmd:toe = $portVersion compat >= 6
+		cmd:tput = $portVersion compat >= 6
+		cmd:tset = $portVersion compat >= 6
 		"
 fi
 
@@ -118,14 +118,14 @@ INSTALL()
 		libform libmenu libncurses libncurses++ libpanel \
 		libformw libmenuw libncursesw libncurses++w libpanelw
 
-	# fix ncurses[w]5-config
-	fixDevelopLibDirReferences $installDestDir$binDir/ncurses5-config \
-		$installDestDir$binDir/ncursesw5-config
+	# fix ncurses[w]6-config
+	fixDevelopLibDirReferences $installDestDir$binDir/ncurses6-config \
+		$installDestDir$binDir/ncursesw6-config
 
 	# devel package
 	packageEntries devel \
-		$installDestDir$binDir/ncurses5-config \
-		$installDestDir$binDir/ncursesw5-config \
+		$installDestDir$binDir/ncurses6-config \
+		$installDestDir$binDir/ncursesw6-config \
 		$installDestDir$developDir \
 		$installDestDir$manDir/man3
 
@@ -147,20 +147,20 @@ The distribution includes the library and support utilities, including a terminf
 # ----- devel package -------------------------------------------------------
 
 PROVIDES_devel="
-	ncurses_bootstrap${secondaryArchSuffix}_devel = $portVersion compat >= 5
-	ncurses${secondaryArchSuffix}_devel = $portVersion compat >= 5
-	cmd:ncurses5_config$secondaryArchSuffix = $portVersion compat >= 5
-	cmd:ncursesw5_config$secondaryArchSuffix = $portVersion compat >= 5
-	devel:libform$secondaryArchSuffix = $portVersion compat >= 5
-	devel:libformw$secondaryArchSuffix = $portVersion compat >= 5
-	devel:libmenu$secondaryArchSuffix = $portVersion compat >= 5
-	devel:libmenuw$secondaryArchSuffix = $portVersion compat >= 5
-	devel:libncurses$secondaryArchSuffix = $portVersion compat >= 5
-	devel:libncursesw$secondaryArchSuffix = $portVersion compat >= 5
-	devel:libncurses++$secondaryArchSuffix = $portVersion compat >= 5
-	devel:libncurses++w$secondaryArchSuffix = $portVersion compat >= 5
-	devel:libpanel$secondaryArchSuffix = $portVersion compat >= 5
-	devel:libpanelw$secondaryArchSuffix = $portVersion compat >= 5
+	ncurses_bootstrap${secondaryArchSuffix}_devel = $portVersion compat >= 6
+	ncurses${secondaryArchSuffix}_devel = $portVersion compat >= 6
+	cmd:ncurses6_config$secondaryArchSuffix = $portVersion compat >= 6
+	cmd:ncursesw6_config$secondaryArchSuffix = $portVersion compat >= 6
+	devel:libform$secondaryArchSuffix = $portVersion compat >= 6
+	devel:libformw$secondaryArchSuffix = $portVersion compat >= 6
+	devel:libmenu$secondaryArchSuffix = $portVersion compat >= 6
+	devel:libmenuw$secondaryArchSuffix = $portVersion compat >= 6
+	devel:libncurses$secondaryArchSuffix = $portVersion compat >= 6
+	devel:libncursesw$secondaryArchSuffix = $portVersion compat >= 6
+	devel:libncurses++$secondaryArchSuffix = $portVersion compat >= 6
+	devel:libncurses++w$secondaryArchSuffix = $portVersion compat >= 6
+	devel:libpanel$secondaryArchSuffix = $portVersion compat >= 6
+	devel:libpanelw$secondaryArchSuffix = $portVersion compat >= 6
 	"
 REQUIRES_devel="
 	ncurses_bootstrap$secondaryArchSuffix == $portVersion base
