@@ -73,6 +73,7 @@ BUILD()
 	aclocal
 	autoconf
 
+	rm -Rf buildhost
 	mkdir buildhost
 	cd buildhost
 	../configure

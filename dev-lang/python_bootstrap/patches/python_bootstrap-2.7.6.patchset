@@ -1,8 +1,26 @@
-From bd2ce0285f6664a5fb6d1c7fdc590561bebf500f Mon Sep 17 00:00:00 2001
+From d612ea4f8c4a9a285dd9c489db818e9ff78adb1c Mon Sep 17 00:00:00 2001
 From: Jerome Duval <jerome.duval@gmail.com>
 Date: Wed, 12 Mar 2014 21:17:06 +0000
-Subject: initial Haiku patch
+Subject: [PATCH 1/8] initial Haiku patch
 
+---
+ Lib/distutils/command/install.py |  47 +++++-
+ Lib/distutils/sysconfig.py       |  21 ++-
+ Lib/plat-haiku1/IN.py            | 327 +++++++++++++++++++++++++++++++++++++++
+ Lib/plat-haiku1/regen            |   7 +
+ Lib/test/test_fileio.py          |   1 +
+ Modules/resource.c               |   2 +
+ Modules/socketmodule.c           |   2 +
+ Modules/socketmodule.h           |   4 +
+ Modules/spwdmodule.c             |   2 +
+ Modules/timemodule.c             |   4 +-
+ Python/bltinmodule.c             |   2 +-
+ Tools/scripts/h2py.py            |   2 +-
+ configure.ac                     |  25 +--
+ setup.py                         |  31 ++--
+ 14 files changed, 445 insertions(+), 32 deletions(-)
+ create mode 100644 Lib/plat-haiku1/IN.py
+ create mode 100644 Lib/plat-haiku1/regen
 
 diff --git a/Lib/distutils/command/install.py b/Lib/distutils/command/install.py
 index b9f1c6c..7be61d3 100644
@@ -756,14 +774,17 @@ index 40ad843..24621ef 100644
                  if (self.compiler.find_library_file(lib_dirs, 'nsl')):
                      libs = ['nsl']
 -- 
-1.8.3.4
+2.1.4
 
 
-From 0a4292a9f64ebbb69ec9863b3397b1d2e9b30538 Mon Sep 17 00:00:00 2001
+From 5d48b4d42d8941618415501075ef9e1d35122529 Mon Sep 17 00:00:00 2001
 From: Jerome Duval <jerome.duval@gmail.com>
 Date: Sat, 5 Apr 2014 21:16:40 +0000
-Subject: fix pyconfig.h path
+Subject: [PATCH 2/8] fix pyconfig.h path
 
+---
+ Makefile.pre.in | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/Makefile.pre.in b/Makefile.pre.in
 index cf75650..bb54b6f 100644
@@ -779,18 +800,21 @@ index cf75650..bb54b6f 100644
  
  # Detailed destination directories
 -- 
-1.8.3.4
+2.1.4
 
 
-From 4c3a87e1bf6ec0a7bb5ae2e8da3620ab17268697 Mon Sep 17 00:00:00 2001
+From 4cdb0b71f7a1f24949b1dc096faa6744c060943d Mon Sep 17 00:00:00 2001
 From: Adrien Destugues <pulkomandy@pulkomandy.tk>
 Date: Wed, 18 Jun 2014 12:19:13 +0000
-Subject: Import missed change from the 2.6.9 patches
+Subject: [PATCH 3/8] Import missed change from the 2.6.9 patches
 
 This makes our site- and vendor- packages work properly again.
 It's sill missing the changes to addusersitepackages. This method was apparently refactored, and I don't have enough Python knowledge to redo our changes in the new code. User packages will not workas
 expected  with
 this version of Python.
+---
+ Lib/site.py | 7 +++++++
+ 1 file changed, 7 insertions(+)
 
 diff --git a/Lib/site.py b/Lib/site.py
 index f1b0ae8..c18a7dd 100644
@@ -811,14 +835,17 @@ index f1b0ae8..c18a7dd 100644
              sitepackages.append(os.path.join(prefix, "lib",
                                          "python" + sys.version[:3],
 -- 
-1.8.3.4
+2.1.4
 
 
-From 818b7cffe7fa08b66a1e395db39f7d85ae42fb67 Mon Sep 17 00:00:00 2001
+From 6d7dfb983139edb4468eedea87b0b3ffb65d1a3c Mon Sep 17 00:00:00 2001
 From: Adrien Destugues <pulkomandy@pulkomandy.tk>
 Date: Sun, 21 Sep 2014 18:59:44 +0200
-Subject: gcc2 fix.
+Subject: [PATCH 4/8] gcc2 fix.
 
+---
+ Modules/_ctypes/libffi/include/ffi_common.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/Modules/_ctypes/libffi/include/ffi_common.h b/Modules/_ctypes/libffi/include/ffi_common.h
 index 650ca69..02a1913 100644
@@ -834,18 +861,20 @@ index 650ca69..02a1913 100644
  #endif
  #define LIKELY(x)    __builtin_expect(!!(x),1)
 -- 
-1.8.3.4
-From d3179e6b35d7b3eb3e013505cc53a7405df52e17 Mon Sep 17 00:00:00 2001
+2.1.4
+
+
+From 05f864414d9ca09c273c5464b1bff07f867bc790 Mon Sep 17 00:00:00 2001
 From: Jonathan Schleifer <js@webkeks.org>
 Date: Tue, 28 Oct 2014 14:53:07 +0100
-Subject: [PATCH 1/3] Add Haiku triple to configure.ac
+Subject: [PATCH 5/8] Add Haiku triple to configure.ac
 
 ---
  configure.ac | 8 ++++++--
  1 file changed, 6 insertions(+), 2 deletions(-)
 
 diff --git a/configure.ac b/configure.ac
-index 24959b3..0c217eb 100644
+index 24959b3..8bca2b0 100644
 --- a/configure.ac
 +++ b/configure.ac
 @@ -319,6 +319,9 @@ then
@@ -878,13 +907,13 @@ index 24959b3..0c217eb 100644
  		;;
  	*)
 -- 
-Jonathan
+2.1.4
 
 
-From b5f29594d4cb75782777e5eca6c4190ef192ef56 Mon Sep 17 00:00:00 2001
+From 0a9107084b4e9069be92fbf792de59034d4d9ff3 Mon Sep 17 00:00:00 2001
 From: Jonathan Schleifer <js@webkeks.org>
 Date: Tue, 28 Oct 2014 14:54:05 +0100
-Subject: [PATCH 2/3] Use the build pgen instead of the host pgen
+Subject: [PATCH 6/8] Use the build pgen instead of the host pgen
 
 ---
  Makefile.pre.in | 3 +--
@@ -905,106 +934,80 @@ index bb54b6f..db704b8 100644
  		$(MAKE) $(GRAMMAR_H)
  		touch $(GRAMMAR_C)
 -- 
-Jonathan
+2.1.4
 
 
-From 570ab6322377e4ac77ba85f04c21b23b3d015e9f Mon Sep 17 00:00:00 2001
-From: Jonathan Schleifer <js@webkeks.org>
-Date: Tue, 28 Oct 2014 14:57:42 +0100
-Subject: [PATCH 3/3] Don't run compileall.py
+From f0482b76e8e6e47fbc7ecffa9a90d9b781d00279 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?J=C3=A9r=C3=B4me=20Duval?= <jerome.duval@gmail.com>
+Date: Mon, 26 Oct 2015 16:43:02 +0100
+Subject: [PATCH 7/8] multi arch is only for host
 
-It tries to do so with the build Python but then tries to load .so files
-from the host Python.
 ---
- Makefile.pre.in | 12 ++++++------
- 1 file changed, 6 insertions(+), 6 deletions(-)
+ setup.py | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/setup.py b/setup.py
+index 24621ef..aa2687a 100644
+--- a/setup.py
++++ b/setup.py
+@@ -442,7 +442,8 @@ class PyBuildExt(build_ext):
+             add_dir_to_list(self.compiler.include_dirs, '/usr/local/include')
+         if cross_compiling:
+             self.add_gcc_paths()
+-        self.add_multiarch_paths()
++        else:
++            self.add_multiarch_paths()
+ 
+         # Add paths specified in the environment variables LDFLAGS and
+         # CPPFLAGS for header and library files.
+-- 
+2.1.4
+
+
+From ee5dc093d4907c9d0878dff6c010728f3c80e624 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?J=C3=A9r=C3=B4me=20Duval?= <jerome.duval@gmail.com>
+Date: Wed, 28 Oct 2015 17:05:37 +0100
+Subject: [PATCH 8/8] setup.py: don't remove modules found except pwd
+
+* we should build a host python, instead of using the platform install.
+* don't fail on error on compileall
+---
+ Makefile.pre.in | 4 ++--
+ setup.py        | 2 +-
+ 2 files changed, 3 insertions(+), 3 deletions(-)
 
 diff --git a/Makefile.pre.in b/Makefile.pre.in
-index db704b8..43197dd 100644
+index db704b8..9aaef00 100644
 --- a/Makefile.pre.in
 +++ b/Makefile.pre.in
-@@ -1004,27 +1004,27 @@ libinstall:	build_all $(srcdir)/Lib/$(PLATDIR) $(srcdir)/Modules/xxmodule.c
+@@ -1004,12 +1004,12 @@ libinstall:	build_all $(srcdir)/Lib/$(PLATDIR) $(srcdir)/Modules/xxmodule.c
  		$(INSTALL_DATA) $(srcdir)/Modules/xxmodule.c \
  			$(DESTDIR)$(LIBDEST)/distutils/tests ; \
  	fi
 -	PYTHONPATH=$(DESTDIR)$(LIBDEST)  $(RUNSHARED) \
-+	#PYTHONPATH=$(DESTDIR)$(LIBDEST)  $(RUNSHARED) \
++	-PYTHONPATH=$(DESTDIR)$(LIBDEST)  $(RUNSHARED) \
  		$(PYTHON_FOR_BUILD) -Wi -tt $(DESTDIR)$(LIBDEST)/compileall.py \
  		-d $(LIBDEST) -f \
  		-x 'bad_coding|badsyntax|site-packages|lib2to3/tests/data' \
  		$(DESTDIR)$(LIBDEST)
 -	PYTHONPATH=$(DESTDIR)$(LIBDEST) $(RUNSHARED) \
-+	#PYTHONPATH=$(DESTDIR)$(LIBDEST) $(RUNSHARED) \
++	-PYTHONPATH=$(DESTDIR)$(LIBDEST) $(RUNSHARED) \
  		$(PYTHON_FOR_BUILD) -Wi -tt -O $(DESTDIR)$(LIBDEST)/compileall.py \
  		-d $(LIBDEST) -f \
  		-x 'bad_coding|badsyntax|site-packages|lib2to3/tests/data' \
- 		$(DESTDIR)$(LIBDEST)
--	-PYTHONPATH=$(DESTDIR)$(LIBDEST)  $(RUNSHARED) \
-+	#-PYTHONPATH=$(DESTDIR)$(LIBDEST)  $(RUNSHARED) \
- 		$(PYTHON_FOR_BUILD) -Wi -t $(DESTDIR)$(LIBDEST)/compileall.py \
- 		-d $(LIBDEST)/site-packages -f \
- 		-x badsyntax $(DESTDIR)$(LIBDEST)/site-packages
--	-PYTHONPATH=$(DESTDIR)$(LIBDEST) $(RUNSHARED) \
-+	#-PYTHONPATH=$(DESTDIR)$(LIBDEST) $(RUNSHARED) \
- 		$(PYTHON_FOR_BUILD) -Wi -t -O $(DESTDIR)$(LIBDEST)/compileall.py \
- 		-d $(LIBDEST)/site-packages -f \
- 		-x badsyntax $(DESTDIR)$(LIBDEST)/site-packages
--	-PYTHONPATH=$(DESTDIR)$(LIBDEST) $(RUNSHARED) \
-+	#-PYTHONPATH=$(DESTDIR)$(LIBDEST) $(RUNSHARED) \
- 		$(PYTHON_FOR_BUILD) -m lib2to3.pgen2.driver $(DESTDIR)$(LIBDEST)/lib2to3/Grammar.txt
--	-PYTHONPATH=$(DESTDIR)$(LIBDEST) $(RUNSHARED) \
-+	#-PYTHONPATH=$(DESTDIR)$(LIBDEST) $(RUNSHARED) \
- 		$(PYTHON_FOR_BUILD) -m lib2to3.pgen2.driver $(DESTDIR)$(LIBDEST)/lib2to3/PatternGrammar.txt
+diff --git a/setup.py b/setup.py
+index aa2687a..f3ca3b8 100644
+--- a/setup.py
++++ b/setup.py
+@@ -217,7 +217,7 @@ class PyBuildExt(build_ext):
  
- # Create the PLATDIR source directory, if one wasn't distributed..
--- 
-Jonathan
-
-From 3ce8666851a0db7497b5bd5b4b39f9641e2e1ba5 Mon Sep 17 00:00:00 2001
-From: Oliver Tappe <zooey@hirschkaefer.de>
-Date: Thu, 30 Oct 2014 20:57:40 +0100
-Subject: [PATCH] Remove compilall.py completely.
-
-* Strangely enough, the commented lines still got executed,
-  dunno what causes this, but removing the lines gets rid of
-  the problem
----
- Makefile.pre.in | 22 ----------------------
- 1 file changed, 22 deletions(-)
-
-diff --git a/Makefile.pre.in b/Makefile.pre.in
-index 43197dd..7e2f9e8 100644
---- a/Makefile.pre.in
-+++ b/Makefile.pre.in
-@@ -1004,28 +1004,6 @@ libinstall:	build_all $(srcdir)/Lib/$(PLATDIR) $(srcdir)/Modules/xxmodule.c
- 		$(INSTALL_DATA) $(srcdir)/Modules/xxmodule.c \
- 			$(DESTDIR)$(LIBDEST)/distutils/tests ; \
- 	fi
--	#PYTHONPATH=$(DESTDIR)$(LIBDEST)  $(RUNSHARED) \
--		$(PYTHON_FOR_BUILD) -Wi -tt $(DESTDIR)$(LIBDEST)/compileall.py \
--		-d $(LIBDEST) -f \
--		-x 'bad_coding|badsyntax|site-packages|lib2to3/tests/data' \
--		$(DESTDIR)$(LIBDEST)
--	#PYTHONPATH=$(DESTDIR)$(LIBDEST) $(RUNSHARED) \
--		$(PYTHON_FOR_BUILD) -Wi -tt -O $(DESTDIR)$(LIBDEST)/compileall.py \
--		-d $(LIBDEST) -f \
--		-x 'bad_coding|badsyntax|site-packages|lib2to3/tests/data' \
--		$(DESTDIR)$(LIBDEST)
--	#-PYTHONPATH=$(DESTDIR)$(LIBDEST)  $(RUNSHARED) \
--		$(PYTHON_FOR_BUILD) -Wi -t $(DESTDIR)$(LIBDEST)/compileall.py \
--		-d $(LIBDEST)/site-packages -f \
--		-x badsyntax $(DESTDIR)$(LIBDEST)/site-packages
--	#-PYTHONPATH=$(DESTDIR)$(LIBDEST) $(RUNSHARED) \
--		$(PYTHON_FOR_BUILD) -Wi -t -O $(DESTDIR)$(LIBDEST)/compileall.py \
--		-d $(LIBDEST)/site-packages -f \
--		-x badsyntax $(DESTDIR)$(LIBDEST)/site-packages
--	#-PYTHONPATH=$(DESTDIR)$(LIBDEST) $(RUNSHARED) \
--		$(PYTHON_FOR_BUILD) -m lib2to3.pgen2.driver $(DESTDIR)$(LIBDEST)/lib2to3/Grammar.txt
--	#-PYTHONPATH=$(DESTDIR)$(LIBDEST) $(RUNSHARED) \
--		$(PYTHON_FOR_BUILD) -m lib2to3.pgen2.driver $(DESTDIR)$(LIBDEST)/lib2to3/PatternGrammar.txt
+             # If a module has already been built statically,
+             # don't build it here
+-            if ext.name in sys.builtin_module_names:
++            if ext.name in sys.builtin_module_names and ext.name == "pwd":
+                 self.extensions.remove(ext)
  
- # Create the PLATDIR source directory, if one wasn't distributed..
- $(srcdir)/Lib/$(PLATDIR):
+         # Parse Modules/Setup and Modules/Setup.local to figure out which
 -- 
-1.8.4.5
+2.1.4
 
