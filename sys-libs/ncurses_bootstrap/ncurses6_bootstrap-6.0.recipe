@@ -9,7 +9,8 @@ REVISION="1"
 ARCHITECTURES="x86_gcc2 x86 x86_64 ppc arm"
 SECONDARY_ARCHITECTURES="x86_gcc2 x86"
 
-PATCHES="ncurses_bootstrap-$portVersion.patchset"
+PATCHES="ncurses_bootstrap-$portVersion.patchset
+	ncurses-5.9-gcc-5.patch"
 
 PROVIDES="
 	ncurses6_bootstrap$secondaryArchSuffix = $portVersion compat >= 6
