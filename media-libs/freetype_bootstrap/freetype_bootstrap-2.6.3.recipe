@@ -1,11 +1,13 @@
-SUMMARY="A Free, High-Quality, and Portable Font Engine"
-DESCRIPTION="FreeType is written in C, designed to be small, efficient, highly customizable, and portable while capable of producing high-quality output (glyph images) of most vector and bitmap font formats."
+SUMMARY="A free, high-quality, and portable font engine"
+DESCRIPTION="FreeType is written in C, designed to be small, efficient, \
+highly customizable, and portable while capable of producing high-quality \
+output (glyph images) of most vector and bitmap font formats."
 HOMEPAGE="http://www.freetype.org"
 LICENSE="FreeType"
-COPYRIGHT="1996-2012 David Turner, Robert Wilhelm, Werner Lemberg, et al."
+COPYRIGHT="1996-2013 David Turner, Robert Wilhelm, Werner Lemberg, et al."
 SOURCE_FILENAME="$portVersionedName.tar.gz"
-SOURCE_URI="http://download.savannah.gnu.org/releases/freetype/freetype-2.4.9.tar.bz2"
-CHECKSUM_SHA256="c4204ac1d48e99d4375a2f32bf4f3f92780a9d9f015e64e57e852f6c004859b9"
+SOURCE_URI="http://download.savannah.gnu.org/releases/freetype/freetype-$portVersion.tar.bz2"
+CHECKSUM_SHA256="371e707aa522acf5b15ce93f11183c725b8ed1ee8546d7b3af549863045863a2"
 REVISION="1"
 ARCHITECTURES="x86_gcc2 x86 x86_64 ppc arm"
 SECONDARY_ARCHITECTURES="x86_gcc2 x86"
@@ -13,7 +15,7 @@ SECONDARY_ARCHITECTURES="x86_gcc2 x86"
 PROVIDES="
 	freetype_bootstrap$secondaryArchSuffix = $portVersion
 	freetype$secondaryArchSuffix = $portVersion
-	lib:libfreetype$secondaryArchSuffix = 6.8.1 compat >= 6
+	lib:libfreetype$secondaryArchSuffix = 6.12.3 compat >= 6
 	"
 REQUIRES="
 	haiku
@@ -39,7 +41,8 @@ BUILD()
 {
 	./autogen.sh
 	runConfigure ./configure \
-		--build=$buildMachineTriple --host=$effectiveTargetMachineTriple
+		--build=$buildMachineTriple --host=$effectiveTargetMachineTriple \
+		--with-harfbuzz=no  --with-png=no --with-zlib=no
 	make $jobArgs
 }
 
@@ -63,7 +66,7 @@ PROVIDES_devel="
 	freetype_bootstrap${secondaryArchSuffix}_devel = $portVersion
 	freetype${secondaryArchSuffix}_devel = $portVersion
 	cmd:freetype_config${secondaryArchSuffix} = $portVersion
-	devel:libfreetype${secondaryArchSuffix} = 6.8.1 compat >= 6
+	devel:libfreetype${secondaryArchSuffix} = 6.12.3 compat >= 6
 	"
 REQUIRES_devel="
 	freetype_bootstrap${secondaryArchSuffix} == $portVersion base
