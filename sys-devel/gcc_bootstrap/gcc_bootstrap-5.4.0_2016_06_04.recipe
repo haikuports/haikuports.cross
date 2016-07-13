@@ -1,35 +1,35 @@
 SUMMARY="C/C++ cross-compiler for target ${effectiveTargetMachineTriple}"
 DESCRIPTION="Standard compiler for x86 platform."
-HOMEPAGE="http://gcc.gnu.org"
+HOMEPAGE="https://gcc.gnu.org"
 LICENSE="
-	GNU GPL v2
-	GNU LGPL v2
+	GNU GPL v3
+	GNU LGPL v3
 	"
-COPYRIGHT="1988-2014 Free Software Foundation, Inc."
-srcGitRev="a05bd9155a41ad87382134678e93d67ceb959cfc"
+COPYRIGHT="1988-2015 Free Software Foundation, Inc."
+srcGitRev="97e06d2ad65fa33e402a6d25b0035d0eb35d7dae"
 SOURCE_URI="https://github.com/haiku/buildtools/archive/$srcGitRev.tar.gz"
-CHECKSUM_SHA256="011e60e9ba3ce92af766adc222d55a6f7291991a85074e2b5b280b62317b201d"
+CHECKSUM_SHA256="4cdc2593f060ca5f784cb94c4e55b808e71e2bd5ba8e1cf6f722313dd15f73f5"
 REVISION="1"
 
 ARCHITECTURES="!x86_gcc2 x86 x86_64 ppc arm m68k"
 SECONDARY_ARCHITECTURES="x86"
 
 libstdcxxSoVersion="6"
-libstdcxxLibVersion="6.0.19"
+libstdcxxLibVersion="6.0.21"
 
 libgccSoVersion="1"
 libgccLibVersion="1"
 
 PROVIDES="
-	gcc_bootstrap$secondaryArchSuffix = $portVersion compat >= 4
-	gcc$secondaryArchSuffix = $portVersion compat >= 4
-	cmd:c++$secondaryArchSuffix = $portVersion compat >= 4
-	cmd:cc$secondaryArchSuffix = $portVersion compat >= 4
-	cmd:cpp$secondaryArchSuffix = $portVersion compat >= 4
-	cmd:g++$secondaryArchSuffix = $portVersion compat >= 4
-	cmd:gcc$secondaryArchSuffix = $portVersion compat >= 4
-	cmd:gcc_4.8.4$secondaryArchSuffix = $portVersion compat >= 4
-	cmd:gcov$secondaryArchSuffix = $portVersion compat >= 4
+	gcc_bootstrap$secondaryArchSuffix = $portVersion compat >= 5
+	gcc$secondaryArchSuffix = $portVersion compat >= 5
+	cmd:c++$secondaryArchSuffix = $portVersion compat >= 5
+	cmd:cc$secondaryArchSuffix = $portVersion compat >= 5
+	cmd:cpp$secondaryArchSuffix = $portVersion compat >= 5
+	cmd:g++$secondaryArchSuffix = $portVersion compat >= 5
+	cmd:gcc$secondaryArchSuffix = $portVersion compat >= 5
+	cmd:gcc_5.4.0$secondaryArchSuffix = $portVersion compat >= 5
+	cmd:gcov$secondaryArchSuffix = $portVersion compat >= 5
 	"
 
 REQUIRES="
@@ -108,6 +108,7 @@ BUILD()
 		--with-sysroot=/ \
 		--with-build-sysroot=$installDestDir/ \
 		--with-threads=posix \
+		--with-default-libstdcxx-abi=gcc4-compatible \
 		$additionalConfigureFlags
 		# Note: The --with-sysroot=/ is rather silly, but --with-build-sysroot
 		# only works when --with-sysroot has been given as well.
@@ -129,14 +130,7 @@ BUILD()
 	mv libgcc_eh.a libgcc_eh-kernel.a
 	mv saved/* .
 	rmdir saved
-	# Build a shared libsupc++ from libsupc++.a (hacking the gcc build system
-	# to build a shared libsupc++ yields pretty much the same result, so we
-	# use this simpler approach).
 	cd $objectsDir/$effectiveTargetMachineTriple/libstdc++-v3/libsupc++
-	$effectiveTargetMachineTriple-gcc -v -nodefaultlibs \
-		--sysroot=$installDestDir/ \
-		-shared -o .libs/libsupc++.so \
-		-Xlinker --whole-archive .libs/libsupc++.a
 	# build kernel version of libsupc++.a (without threads or TLS)
 	mkdir -p saved
 	mv .libs/libsupc++* saved/
@@ -185,10 +179,8 @@ INSTALL()
 	# libsupc++
 	libstdcxxDir=$objectsDir/$effectiveTargetMachineTriple/libstdc++-v3
 	cp $libstdcxxDir/libsupc++/.libs/libsupc++-kernel.a \
-		$libstdcxxDir/libsupc++/.libs/libsupc++.so \
 		$gccLibDir/
-	$effectiveTargetMachineTriple-strip --strip-debug $gccLibDir/libsupc++.so
-	cp $gccLibDir/libsupc++.so $installDestDir$libDir/
+	ln -s libstdc++.so $installDestDir$libDir/libsupc++.so
 	cp $gccLibDir/libsupc++*.a $installDestDir$developLibDir/
 
 	# libgcc
@@ -214,11 +206,10 @@ INSTALL()
 
 	cd $installDestDir$installDir
 	$effectiveTargetMachineTriple-strip --strip-debug bin/*
-	for f in cc1 cc1plus collect2 lto1; do
+	for f in cc1 cc1plus collect2 lto1 lto-wrapper; do
 		$effectiveTargetMachineTriple-strip --strip-debug \
 			lib/gcc/$effectiveTargetMachineTriple/*/$f
 	done
-	$effectiveTargetMachineTriple-strip --strip-debug lib/*.a
 
 	### Symlinks ##############################################
 
@@ -284,11 +275,11 @@ distribution. This package contains the shared libraries for the runtime \
 loader, so it is required for executing most c/c++ programs."
 
 PROVIDES_syslibs="
-	gcc_bootstrap_syslibs$secondaryArchSuffix = $portVersion compat >= 4
-	gcc_syslibs$secondaryArchSuffix = $portVersion compat >= 4
-	lib:libgcc_s$secondaryArchSuffix = $portVersion compat >= 4
-	lib:libstdc++$secondaryArchSuffix = $portVersion compat >= 4
-	lib:libsupc++$secondaryArchSuffix = $portVersion compat >= 4
+	gcc_bootstrap${secondaryArchSuffix}_syslibs = $portVersion compat >= 5
+	gcc${secondaryArchSuffix}_syslibs = $portVersion compat >= 5
+	lib:libgcc_s$secondaryArchSuffix = $portVersion compat >= 5
+	lib:libstdc++$secondaryArchSuffix = $portVersion compat >= 5
+	lib:libsupc++$secondaryArchSuffix = $portVersion compat >= 5
 	"
 
 REQUIRES_syslibs="
@@ -305,8 +296,8 @@ runtime libraries and headers that is required by Haiku's build system when \
 building Haiku."
 
 PROVIDES_syslibs_devel="
-	gcc_bootstrap_syslibs_devel$secondaryArchSuffix = $portVersion compat >= 4
-	gcc_syslibs_devel$secondaryArchSuffix = $portVersion compat >= 4
+	gcc_bootstrap${secondaryArchSuffix}_syslibs_devel = $portVersion compat >= 5
+	gcc${secondaryArchSuffix}_syslibs_devel = $portVersion compat >= 5
 	"
 
 REQUIRES_syslibs_devel=""
