@@ -54,7 +54,6 @@ BUILD_PREREQUIRES="
 
 SOURCE_DIR="buildtools-$srcGitRev/gcc"
 
-sourceDir=$(pwd)
 relativeInstallDir="develop/tools$secondaryArchSubDir"
 installDir="$prefix/$relativeInstallDir"
 objectsDir=$(pwd)/../${portVersionedName}-obj
@@ -82,9 +81,6 @@ BUILD()
 		# disable multilib support, as x86_64 by default tries to build the
 		# 32-bit libraries, too, which fails as no 32-bit libroot is available
 		additionalConfigureFlags+=" --disable-multilib"
-
-		# disable TLS support, as it causes an ICE on x86_64
-		additionalConfigureFlags+=" --disable-tls"
 	fi
 	if [ $effectiveTargetArchitecture == arm ]; then
 		# disable multilib support, as x86_64 by default tries to build the
