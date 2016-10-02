@@ -1,17 +1,34 @@
 SUMMARY="Assembler, linker and binary tools for target ${targetMachineTriple}"
-HOMEPAGE="http://www.gnu.org/software/binutils"
+DESCRIPTION="The GNU Binutils are a collection of binary tools.
 
-srcGitRev="661fb7cf18b38506538acdb9288c71dbf1e50ea4"
+The main ones are:
+- ld - the GNU linker.
+- as - the GNU assembler.
+
+But they also include:
+- addr2line - Converts addresses into filenames and line numbers.
+- ar - A utility for creating, modifying and extracting from archives.
+- c++filt - Filter to demangle encoded C++ symbols.
+- nm - Lists symbols from object files.
+- objcopy - Copys and translates object files.
+- objdump - Displays information from object files.
+- ranlib - Generates an index to the contents of an archive.
+- readelf - Displays information from any ELF format object file.
+- size - Lists the section sizes of an object or archive file.
+- strings - Lists printable strings from files.
+- strip - Discards symbols.
+
+The tools of this package can be used for cross-builds to \
+$effectiveTargetMachineTriple."
+HOMEPAGE="http://www.gnu.org/software/binutils"
+COPYRIGHT="1988-2016 Free Software Foundation, Inc."
+LICENSE="GNU GPL v3
+	GNU LGPL v3"
+REVISION="1"
+srcGitRev="68e96393c7be88bc0e577404869a07ad3c0b48b3"
 SOURCE_URI="https://github.com/haiku/buildtools/archive/$srcGitRev.tar.gz"
 SOURCE_FILENAME="$portVersionedName.tar.gz"
-REVISION="1"
-LICENSE="
-	GNU GPL v2
-	GNU LGPL v2
-	"
-COPYRIGHT="1988-2014 Free Software Foundation, Inc."
-
-CHECKSUM_SHA256="ad585db93e6c6d782368625dba2c8f8dc9e95629a27f9656d246f0bcc64e1a03"
+CHECKSUM_SHA256="5f14f68a76035a04d15b1a3e9ba5bbd990b1b380b110b93cb33355142dca8f9c"
 
 ARCHITECTURES="!x86_gcc2 x86 x86_64 ppc arm"
 SECONDARY_ARCHITECTURES="x86"
@@ -36,7 +53,6 @@ PROVIDES="
 	cmd:strings$secondaryArchSuffix = $portVersion compat >= 2.26
 	cmd:strip$secondaryArchSuffix = $portVersion compat >= 2.26
 	"
-
 REQUIRES="
 	haiku$secondaryArchSuffix
 	"
@@ -135,25 +151,3 @@ INSTALL()
 	done
 }
 
-DESCRIPTION="
-	The GNU Binutils are a collection of binary tools. The main ones are:
-
-	    ld - the GNU linker.
-	    as - the GNU assembler.
-
-	But they also include:
-
-	    addr2line - Converts addresses into filenames and line numbers.
-	    ar - A utility for creating, modifying and extracting from archives.
-	    c++filt - Filter to demangle encoded C++ symbols.
-	    nm - Lists symbols from object files.
-	    objcopy - Copys and translates object files.
-	    objdump - Displays information from object files.
-	    ranlib - Generates an index to the contents of an archive.
-	    readelf - Displays information from any ELF format object file.
-	    size - Lists the section sizes of an object or archive file.
-	    strings - Lists printable strings from files.
-	    strip - Discards symbols.
-
-	The tools of this package can be used for cross-builds to $effectiveTargetMachineTriple.
-	"
