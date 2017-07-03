@@ -116,6 +116,6 @@ BUILD()
 
 INSTALL()
 {
-	make DESTDIR=$installDestDir install-strip
+	make DESTDIR=$installDestDir install
 	ln -s bash $installDestDir$binDir/sh
 }
