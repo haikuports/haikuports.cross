@@ -1,168 +1,123 @@
-From 4ba13d037a73e2c830af1e657c7df94134a3f8ff Mon Sep 17 00:00:00 2001
-From: Adrien Destugues <pulkomandy@pulkomandy.tk>
-Date: Mon, 29 Sep 2014 11:19:28 +0200
-Subject: gcc2 fixes.
+From 62fd52642dfd0e4bbdf1af17c7e0b7f9568ecb55 Mon Sep 17 00:00:00 2001
+From: Adrien Destugues <pulkomandy@gmail.com>
+Date: Sun, 19 Apr 2015 13:35:11 +0200
+Subject: [PATCH 1/6] gcc2 fixes for tools, tests, layout.
+
+---
+ source/layout/LETableReference.h   |  4 ++++
+ source/test/intltest/apicoll.cpp   | 15 +++++++++++++++
+ source/test/iotest/stream.cpp      |  2 +-
+ source/tools/toolutil/udbgutil.cpp |  2 ++
+ 4 files changed, 22 insertions(+), 1 deletion(-)
+
+diff --git a/source/layout/LETableReference.h b/source/layout/LETableReference.h
+index ccbe65d..27233b9 100644
+--- a/source/layout/LETableReference.h
++++ b/source/layout/LETableReference.h
+@@ -316,7 +316,11 @@ LE_TRACE_TR("INFO: new RTAO")
+ 
+   le_uint32 getCount() const { return fCount; }
+ 
++#if __GNUC__ == 2
++  const T *getAlias() const { return LETableReference::getAlias(); }
++#else
+   using LETableReference::getAlias;
++#endif
+ 
+   const T *getAlias(le_uint32 i, LEErrorCode &success) const {
+     return ((const T*)(((const char*)getAlias())+getOffsetFor(i, success)));
+diff --git a/source/test/intltest/apicoll.cpp b/source/test/intltest/apicoll.cpp
+index c1e9d5b..8046c04 100644
+--- a/source/test/intltest/apicoll.cpp
++++ b/source/test/intltest/apicoll.cpp
+@@ -1971,7 +1971,22 @@ class TestCollator  : public Collator
+ public:
+     virtual Collator* clone(void) const;
+ 
++#if __GNUC__ == 2
++	EComparisonResult compare (const UnicodeString& s1, const UnicodeString& s2)
++		const {
++		return Collator::compare(s1, s2);
++	}
++	EComparisonResult compare (const UnicodeString& s1, const UnicodeString& s2,
++			int32_t i) const {
++		return Collator::compare(s1, s2, i);
++	}
++	EComparisonResult compare (const UChar* s1, int32_t l1, const UChar* s2,
++		int32_t l2) const {
++		return Collator::compare(s1, l1, s2, l2);
++	}
++#else
+     using Collator::compare;
++#endif
+ 
+     virtual UCollationResult compare(const UnicodeString& source, 
+                                       const UnicodeString& target,
+diff --git a/source/test/iotest/stream.cpp b/source/test/iotest/stream.cpp
+index e54e8b6..dd719c6 100644
+--- a/source/test/iotest/stream.cpp
++++ b/source/test/iotest/stream.cpp
+@@ -132,7 +132,7 @@ static void U_CALLCONV TestStream(void)
+ #endif
+     UnicodeString ustr("string");
+ 
+-    outFormatStream << "1234567890" << setw(10) << left << ustr << " " << "0123456789";
++    outFormatStream << "1234567890" << setw(10) << ios::left << ustr << " " << "0123456789";
+ 
+ #ifdef USE_SSTREAM
+     tempStr = outFormatStream.str();
+diff --git a/source/tools/toolutil/udbgutil.cpp b/source/tools/toolutil/udbgutil.cpp
+index 819cbd9..d3db9d1 100644
+--- a/source/tools/toolutil/udbgutil.cpp
++++ b/source/tools/toolutil/udbgutil.cpp
+@@ -647,7 +647,9 @@ U_CAPI void udbg_knownIssue_close(void *ptr) {
+ #include <set>
+ #include <map>
+ #include <string>
++#if __GNUC__ > 2
+ #include <ostream>
++#endif
+ #include <iostream>
+ 
+ class KnownIssues {
+-- 
+2.7.0
 
 
-diff --git a/source/acinclude.m4 b/source/acinclude.m4
-index 179c1c8..51f131f 100644
---- a/source/acinclude.m4
-+++ b/source/acinclude.m4
-@@ -470,6 +470,9 @@ AC_DEFUN([AC_CHECK_STRICT_COMPILE],
-         if test "$GCC" = yes
-         then
-             case "${host}" in
-+            *-*-haiku*)
-+                CFLAGS="$CFLAGS -std=c9x"
-+                ;;
-             *)
-                 # Do not use -ansi. It limits us to C90, and it breaks some platforms.
-                 # We use -std=c99 to disable the gnu99 defaults and its associated warnings
-diff --git a/source/common/unicode/bytestrie.h b/source/common/unicode/bytestrie.h
-index 9c77827..367a0ae 100644
---- a/source/common/unicode/bytestrie.h
-+++ b/source/common/unicode/bytestrie.h
-@@ -338,6 +338,9 @@ public:
-         // but the code looks more confusing that way.)
-         UVector32 *stack_;
-     };
-+#if __GNUC__ == 2
-+	friend class Iterator;
-+#endif
- 
- private:
-     friend class BytesTrieBuilder;
-diff --git a/source/common/unicode/bytestriebuilder.h b/source/common/unicode/bytestriebuilder.h
-index d00ab9b..afbf59b 100644
---- a/source/common/unicode/bytestriebuilder.h
-+++ b/source/common/unicode/bytestriebuilder.h
-@@ -152,6 +152,9 @@ private:
-     private:
-         const char *s;
-     };
-+#if __GNUC__ == 2
-+	friend class BTLinearMatchNode;
-+#endif
- 
-     virtual Node *createLinearMatchNode(int32_t i, int32_t byteIndex, int32_t length,
-                                         Node *nextNode) const;
-diff --git a/source/common/unicode/platform.h b/source/common/unicode/platform.h
-index 07dce8a..fbb4ae1 100644
---- a/source/common/unicode/platform.h
-+++ b/source/common/unicode/platform.h
-@@ -698,7 +698,7 @@
-     /* Use the predefined value. */
- #elif defined(U_STATIC_IMPLEMENTATION)
- #   define U_EXPORT
--#elif defined(__GNUC__)
-+#elif defined(__GNUC__) && __GNUC__ > 2
- #   define U_EXPORT __attribute__((visibility("default")))
- #elif (defined(__SUNPRO_CC) && __SUNPRO_CC >= 0x550) \
-    || (defined(__SUNPRO_C) && __SUNPRO_C >= 0x550) 
-diff --git a/source/common/unicode/stringtriebuilder.h b/source/common/unicode/stringtriebuilder.h
-index 04447e5..b0ad961 100644
---- a/source/common/unicode/stringtriebuilder.h
-+++ b/source/common/unicode/stringtriebuilder.h
-@@ -258,6 +258,9 @@ protected:
-     protected:
-         int32_t value;
-     };
-+#if __GNUC__ == 2
-+	friend class FinalValueNode;
-+#endif
- 
-     /**
-      * @internal 
-@@ -289,6 +292,9 @@ protected:
-     protected:
-         Node *next;
-     };
-+#if __GNUC__ == 2
-+	friend class IntermediateValueNode;
-+#endif
- 
-     /**
-      * @internal 
-@@ -346,6 +352,9 @@ protected:
-         int32_t values[kMaxBranchLinearSubNodeLength];
-         UChar units[kMaxBranchLinearSubNodeLength];
-     };
-+#if __GNUC__ == 2
-+	friend class ListBranchNode;
-+#endif
- 
-     /**
-      * @internal 
-@@ -364,6 +373,9 @@ protected:
-         Node *lessThan;
-         Node *greaterOrEqual;
-     };
-+#if __GNUC__ == 2
-+	friend class SplitBranchNode;
-+#endif
- 
-     // Branch head node, for writing the actual node lead unit.
-     /** @internal */
-@@ -379,6 +391,9 @@ protected:
-         int32_t length;
-         Node *next;  // A branch sub-node.
-     };
-+#if __GNUC__ == 2
-+	friend class BranchHeadNode;
-+#endif
- #endif  /* U_HIDE_INTERNAL_API */
- 
-     /** @internal */
-diff --git a/source/common/unicode/ucharstrie.h b/source/common/unicode/ucharstrie.h
-index 0575a97..ec54589 100644
---- a/source/common/unicode/ucharstrie.h
-+++ b/source/common/unicode/ucharstrie.h
-@@ -356,9 +356,12 @@ public:
-         // but the code looks more confusing that way.)
-         UVector32 *stack_;
-     };
-+#if __GNUC__ == 2
-+	friend class Iterator;
-+#endif
- 
--private:
-     friend class UCharsTrieBuilder;
-+private:
- 
-     /**
-      * Constructs a UCharsTrie reader instance.
-diff --git a/source/common/unicode/ucharstriebuilder.h b/source/common/unicode/ucharstriebuilder.h
-index 35e353d..b128745 100644
---- a/source/common/unicode/ucharstriebuilder.h
-+++ b/source/common/unicode/ucharstriebuilder.h
-@@ -156,6 +156,9 @@ private:
-     private:
-         const UChar *s;
-     };
-+#if __GNUC__ == 2
-+    friend class UCTLinearMatchNode;
-+#endif
- 
-     virtual Node *createLinearMatchNode(int32_t i, int32_t unitIndex, int32_t length,
-                                         Node *nextNode) const;
-diff --git a/source/config/mh-haiku b/source/config/mh-haiku
-index ccf956e..55a3ed2 100644
---- a/source/config/mh-haiku
-+++ b/source/config/mh-haiku
-@@ -18,7 +18,7 @@ LIBCPPFLAGS =
- THREADSCPPFLAGS =
- 
- #
--CPPFLAGS += -D__STDC_ISO_10646__ -DU_CHARSET_IS_UTF8=1
-+CPPFLAGS += -DU_CHARSET_IS_UTF8=1
- 
- ## Compiler switch to embed a runtime search path
- LD_RPATH=
+From 0a67a931e4f0f502d36c743aefbb005776df96f7 Mon Sep 17 00:00:00 2001
+From: Adrien Destugues <pulkomandy@gmail.com>
+Date: Sun, 19 Apr 2015 13:35:47 +0200
+Subject: [PATCH 2/6] gcc2 fixes for sources/i18n
+
+---
+ source/i18n/alphaindex.cpp                 |  8 +++----
+ source/i18n/currfmt.h                      |  2 ++
+ source/i18n/digitlst.cpp                   |  6 +++++
+ source/i18n/digitlst.h                     |  2 +-
+ source/i18n/msgfmt.cpp                     |  1 +
+ source/i18n/reldtfmt.h                     |  2 ++
+ source/i18n/sortkey.cpp                    |  2 +-
+ source/i18n/unicode/choicfmt.h             | 21 +++++++++++++++++
+ source/i18n/unicode/compactdecimalformat.h |  6 +++++
+ source/i18n/unicode/datefmt.h              |  6 +++++
+ source/i18n/unicode/decimfmt.h             | 36 ++++++++++++++++++++++++++++++
+ source/i18n/unicode/dtitvfmt.h             |  2 ++
+ source/i18n/unicode/measfmt.h              | 17 ++++++++++++++
+ source/i18n/unicode/msgfmt.h               | 13 +++++++++++
+ source/i18n/unicode/numfmt.h               |  8 +++++++
+ source/i18n/unicode/plurfmt.h              |  7 ++++++
+ source/i18n/unicode/rbnf.h                 | 22 ++++++++++++++++++
+ source/i18n/unicode/selfmt.h               |  4 +++-
+ source/i18n/unicode/smpdtfmt.h             | 29 ++++++++++++++++++++++++
+ source/i18n/unicode/tblcoll.h              | 15 +++++++++++++
+ source/i18n/unicode/tzfmt.h                |  7 ++++++
+ 21 files changed, 209 insertions(+), 7 deletions(-)
+
 diff --git a/source/i18n/alphaindex.cpp b/source/i18n/alphaindex.cpp
-index 0bea1dc..ca6c388 100644
+index 9fa98b8..5535be2 100644
 --- a/source/i18n/alphaindex.cpp
 +++ b/source/i18n/alphaindex.cpp
-@@ -954,8 +954,8 @@ static int32_t U_CALLCONV
+@@ -952,8 +952,8 @@ static int32_t U_CALLCONV
  collatorComparator(const void *context, const void *left, const void *right) {
      const UElement *leftElement = static_cast<const UElement *>(left);
      const UElement *rightElement = static_cast<const UElement *>(right);
@@ -173,7 +128,7 @@ index 0bea1dc..ca6c388 100644
  
      if (leftString == rightString) {
          // Catches case where both are NULL
-@@ -979,8 +979,8 @@ static int32_t U_CALLCONV
+@@ -977,8 +977,8 @@ static int32_t U_CALLCONV
  recordCompareFn(const void *context, const void *left, const void *right) {
      const UElement *leftElement = static_cast<const UElement *>(left);
      const UElement *rightElement = static_cast<const UElement *>(right);
@@ -185,39 +140,39 @@ index 0bea1dc..ca6c388 100644
      UErrorCode errorCode = U_ZERO_ERROR;
      return col->compare(leftRec->name_, rightRec->name_, errorCode);
 diff --git a/source/i18n/currfmt.h b/source/i18n/currfmt.h
-index b3f23e5..7763215 100644
+index b3f23e5..1495316 100644
 --- a/source/i18n/currfmt.h
 +++ b/source/i18n/currfmt.h
 @@ -58,7 +58,9 @@ class CurrencyFormat : public MeasureFormat {
      virtual Format* clone() const;
  
  
-+#if __GNUC__ != 2
++#if __GNUC__ > 2
      using MeasureFormat::format;
 +#endif
  
      /**
       * Override Format API.
 diff --git a/source/i18n/digitlst.cpp b/source/i18n/digitlst.cpp
-index b0e6010..d10a976 100644
+index 16b9dc3..1fd4dea 100644
 --- a/source/i18n/digitlst.cpp
 +++ b/source/i18n/digitlst.cpp
-@@ -38,7 +38,9 @@
+@@ -39,7 +39,9 @@
  #include <limits.h>
  #include <string.h>
  #include <stdio.h>
-+#if __GNUC__ != 2
++#if __GNUC__ > 2
  #include <limits>
 +#endif
  
  // ***************************************************************************
  // class DigitList
-@@ -437,11 +439,15 @@ DigitList::getDouble() const
+@@ -455,11 +457,15 @@ DigitList::getDouble() const
              tDouble /= -1;
          }
      } else if (isInfinite()) {
-+#if __GNUC__ == 2
-+        tDouble = DBL_MAX;
++#if __GNUC__ <= 2
++		tDouble = DBL_MAX;
 +#else
          if (std::numeric_limits<double>::has_infinity) {
              tDouble = std::numeric_limits<double>::infinity();
@@ -229,27 +184,39 @@ index b0e6010..d10a976 100644
              tDouble = -tDouble; //this was incorrectly "-fDouble" originally.
          } 
 diff --git a/source/i18n/digitlst.h b/source/i18n/digitlst.h
-index 7e98d2b..2698367 100644
+index 1715e2c..c430203 100644
 --- a/source/i18n/digitlst.h
 +++ b/source/i18n/digitlst.h
-@@ -413,7 +413,7 @@ private:
+@@ -486,7 +486,7 @@ private:
  
   public:
  
 -#if U_OVERRIDE_CXX_ALLOCATION
-+#if U_OVERRIDE_CXX_ALLOCATION && __GNUC__ != 2
++#if U_OVERRIDE_CXX_ALLOCATION && __GNUC__ > 2
      using UMemory::operator new;
      using UMemory::operator delete;
  #else
+diff --git a/source/i18n/msgfmt.cpp b/source/i18n/msgfmt.cpp
+index 1fe2c8d..66e3121 100644
+--- a/source/i18n/msgfmt.cpp
++++ b/source/i18n/msgfmt.cpp
+@@ -1485,6 +1485,7 @@ MessageFormat::parse(int32_t msgStart,
+         prevIndex=msgPattern.getPart(argLimit).getLimit();
+         i=argLimit;
+     }
++	return NULL;
+ }
+ // -------------------------------------
+ // Parses the source pattern and returns the Formattable objects array,
 diff --git a/source/i18n/reldtfmt.h b/source/i18n/reldtfmt.h
-index 67539e0..2227096 100644
+index dcc3ca8..707b593 100644
 --- a/source/i18n/reldtfmt.h
 +++ b/source/i18n/reldtfmt.h
 @@ -81,7 +81,9 @@ public:
      virtual UBool operator==(const Format& other) const;
  
  
-+#if __GNUC__ != 2
++#if __GNUC__ > 2
      using DateFormat::format;
 +#endif
  
@@ -310,7 +277,7 @@ index cfd5206..d2b7f66 100644
     /**
      * Looks for the longest match of any message string on the input text and,
 diff --git a/source/i18n/unicode/compactdecimalformat.h b/source/i18n/unicode/compactdecimalformat.h
-index bd8fdba..be2e580 100644
+index ced6bee..87209fa 100644
 --- a/source/i18n/unicode/compactdecimalformat.h
 +++ b/source/i18n/unicode/compactdecimalformat.h
 @@ -104,7 +104,13 @@ public:
@@ -328,7 +295,7 @@ index bd8fdba..be2e580 100644
      /**
       * Format a double or long number using base-10 representation.
 diff --git a/source/i18n/unicode/datefmt.h b/source/i18n/unicode/datefmt.h
-index ce967a5..59d735d 100644
+index e98617a..196b603 100644
 --- a/source/i18n/unicode/datefmt.h
 +++ b/source/i18n/unicode/datefmt.h
 @@ -221,7 +221,13 @@ public:
@@ -346,10 +313,10 @@ index ce967a5..59d735d 100644
      /**
       * Format an object to produce a string. This method handles Formattable
 diff --git a/source/i18n/unicode/decimfmt.h b/source/i18n/unicode/decimfmt.h
-index 75249a4..bc046b9 100644
+index e7f8ea5..bcbdeca 100644
 --- a/source/i18n/unicode/decimfmt.h
 +++ b/source/i18n/unicode/decimfmt.h
-@@ -919,7 +919,35 @@ public:
+@@ -922,7 +922,35 @@ public:
      virtual UBool operator==(const Format& other) const;
  
  
@@ -385,7 +352,7 @@ index 75249a4..bc046b9 100644
  
      /**
       * Format a double or long number using base-10 representation.
-@@ -1132,7 +1160,15 @@ public:
+@@ -1169,7 +1197,15 @@ public:
                                    FieldPosition& pos,
                                    UErrorCode& status) const;
  
@@ -402,24 +369,24 @@ index 75249a4..bc046b9 100644
     /**
      * Parse the given string using this object's choices. The method
 diff --git a/source/i18n/unicode/dtitvfmt.h b/source/i18n/unicode/dtitvfmt.h
-index fb27eec..07ae7cd 100644
+index 181d46c..8996c2d 100644
 --- a/source/i18n/unicode/dtitvfmt.h
 +++ b/source/i18n/unicode/dtitvfmt.h
-@@ -373,7 +373,9 @@ public:
+@@ -375,7 +375,9 @@ public:
      UBool operator!=(const Format& other) const;
  
  
-+#if __GNUC__ != 2
++#if __GNUC__ > 2
      using Format::format;
 +#endif
  
      /**
       * Format an object to produce a string. This method handles Formattable
 diff --git a/source/i18n/unicode/measfmt.h b/source/i18n/unicode/measfmt.h
-index 91e08ef..6d480f0 100644
+index 57debd9..e7d3583 100644
 --- a/source/i18n/unicode/measfmt.h
 +++ b/source/i18n/unicode/measfmt.h
-@@ -94,8 +94,25 @@ class DateFormat;
+@@ -92,8 +92,25 @@ class DateFormat;
   */
  class U_I18N_API MeasureFormat : public Format {
   public:
@@ -443,8 +410,8 @@ index 91e08ef..6d480f0 100644
      using Format::format;
 +#endif
  
- #ifndef U_HIDE_DRAFT_API
      /**
+      * Constructor.
 diff --git a/source/i18n/unicode/msgfmt.h b/source/i18n/unicode/msgfmt.h
 index 5de91e4..8f9f995 100644
 --- a/source/i18n/unicode/msgfmt.h
@@ -478,10 +445,10 @@ index 5de91e4..8f9f995 100644
      /**
       * A MessageFormat formats an array of arguments.  Each argument
 diff --git a/source/i18n/unicode/numfmt.h b/source/i18n/unicode/numfmt.h
-index e7dc33e..9b989ca 100644
+index 1d16131..e05d4c0 100644
 --- a/source/i18n/unicode/numfmt.h
 +++ b/source/i18n/unicode/numfmt.h
-@@ -235,7 +235,15 @@ public:
+@@ -230,7 +230,15 @@ public:
      virtual UBool operator==(const Format& other) const;
  
  
@@ -517,10 +484,10 @@ index f7099d8..bedaf01 100644
      /**
       * Formats a plural message for a given number.
 diff --git a/source/i18n/unicode/rbnf.h b/source/i18n/unicode/rbnf.h
-index 398454b..5c7bb00 100644
+index 8d61986..daf223c 100644
 --- a/source/i18n/unicode/rbnf.h
 +++ b/source/i18n/unicode/rbnf.h
-@@ -741,7 +741,23 @@ public:
+@@ -772,7 +772,23 @@ public:
                            const Locale& locale = Locale::getDefault());
  
  
@@ -544,7 +511,7 @@ index 398454b..5c7bb00 100644
  
    /**
     * Formats the specified 32-bit number using the default ruleset.
-@@ -827,7 +843,13 @@ public:
+@@ -858,7 +874,13 @@ public:
                                  FieldPosition& pos,
                                  UErrorCode& status) const;
  
@@ -559,24 +526,35 @@ index 398454b..5c7bb00 100644
    /**
     * Parses the specfied string, beginning at the specified position, according
 diff --git a/source/i18n/unicode/selfmt.h b/source/i18n/unicode/selfmt.h
-index 635144b..fbc89f6 100644
+index 635144b..7247839 100644
 --- a/source/i18n/unicode/selfmt.h
 +++ b/source/i18n/unicode/selfmt.h
 @@ -219,7 +219,9 @@ public:
      void applyPattern(const UnicodeString& pattern, UErrorCode& status);
  
  
-+#if __GNUC__ != 2
++#if __GNUC__ > 2
      using Format::format;
 +#endif
  
      /**
       * Selects the phrase for  the given keyword
+@@ -340,9 +342,9 @@ public:
+      */
+     virtual UClassID getDynamicClassID() const;
+ 
+-private:
+     friend class MessageFormat;
+ 
++private:
+     SelectFormat();   // default constructor not implemented.
+ 
+     /**
 diff --git a/source/i18n/unicode/smpdtfmt.h b/source/i18n/unicode/smpdtfmt.h
-index d41fb59..34ea328 100644
+index b7fa420..d17c501 100644
 --- a/source/i18n/unicode/smpdtfmt.h
 +++ b/source/i18n/unicode/smpdtfmt.h
-@@ -868,7 +868,27 @@ public:
+@@ -870,7 +870,27 @@ public:
      virtual UBool operator==(const Format& other) const;
  
  
@@ -604,7 +582,7 @@ index d41fb59..34ea328 100644
  
      /**
       * Format a date or time, which is the standard millis since 24:00 GMT, Jan
-@@ -913,7 +933,16 @@ public:
+@@ -915,7 +935,16 @@ public:
                                      FieldPositionIterator* posIter,
                                      UErrorCode& status) const;
  
@@ -622,7 +600,7 @@ index d41fb59..34ea328 100644
      /**
       * Parse a date/time string beginning at the given parse position. For
 diff --git a/source/i18n/unicode/tblcoll.h b/source/i18n/unicode/tblcoll.h
-index 6d6e4b9..b044c9c 100644
+index 020c4b9..a749968 100644
 --- a/source/i18n/unicode/tblcoll.h
 +++ b/source/i18n/unicode/tblcoll.h
 @@ -254,7 +254,22 @@ public:
@@ -649,10 +627,10 @@ index 6d6e4b9..b044c9c 100644
      /**
      * The comparison function compares the character data stored in two
 diff --git a/source/i18n/unicode/tzfmt.h b/source/i18n/unicode/tzfmt.h
-index 24f0e49..969e08a 100644
+index 5ec6c44..aee5067 100644
 --- a/source/i18n/unicode/tzfmt.h
 +++ b/source/i18n/unicode/tzfmt.h
-@@ -520,7 +520,14 @@ public:
+@@ -517,7 +517,14 @@ public:
       */
      UnicodeString& formatOffsetShortLocalizedGMT(int32_t offset, UnicodeString& result, UErrorCode& status) const;
  
@@ -667,216 +645,147 @@ index 24f0e49..969e08a 100644
  
      /**
       * Returns the display name of the time zone at the given date for the style.
-diff --git a/source/layout/LETableReference.h b/source/layout/LETableReference.h
-index f7eb79b..8ea8700 100644
---- a/source/layout/LETableReference.h
-+++ b/source/layout/LETableReference.h
-@@ -304,7 +304,11 @@ LE_TRACE_TR("INFO: new RTAO")
- 
-   le_uint32 getCount() const { return fCount; }
- 
-+#if __GNUC__ == 2
-+  const T *getAlias() const { return LETableReference::getAlias(); }
-+#else
-   using LETableReference::getAlias;
-+#endif
- 
-   const T *getAlias(le_uint32 i, LEErrorCode &success) const {
-     return ((const T*)(((const char*)getAlias())+getOffsetFor(i, success)));
-diff --git a/source/test/intltest/apicoll.cpp b/source/test/intltest/apicoll.cpp
-index 9d87bf0..4798867 100644
---- a/source/test/intltest/apicoll.cpp
-+++ b/source/test/intltest/apicoll.cpp
-@@ -1987,7 +1987,22 @@ class TestCollator  : public Collator
- public:
-     virtual Collator* clone(void) const;
- 
-+#if __GNUC__ == 2
-+	EComparisonResult compare (const UnicodeString& s1, const UnicodeString& s2)
-+		const {
-+		return Collator::compare(s1, s2);
-+	}
-+	EComparisonResult compare (const UnicodeString& s1, const UnicodeString& s2,
-+			int32_t i) const {
-+		return Collator::compare(s1, s2, i);
-+	}
-+	EComparisonResult compare (const UChar* s1, int32_t l1, const UChar* s2,
-+		int32_t l2) const {
-+		return Collator::compare(s1, l1, s2, l2);
-+	}
-+#else
-     using Collator::compare;
-+#endif
- 
-     virtual UCollationResult compare(const UnicodeString& source, 
-                                       const UnicodeString& target,
-diff --git a/source/test/iotest/stream.cpp b/source/test/iotest/stream.cpp
-index a821636..083b4ab 100644
---- a/source/test/iotest/stream.cpp
-+++ b/source/test/iotest/stream.cpp
-@@ -131,7 +131,7 @@ static void U_CALLCONV TestStream(void)
- #endif
-     UnicodeString ustr("string");
- 
--    outFormatStream << "1234567890" << setw(10) << left << ustr << " " << "0123456789";
-+    outFormatStream << "1234567890" << setw(10) << ios::left << ustr << " " << "0123456789";
- 
- #ifdef USE_SSTREAM
-     tempStr = outFormatStream.str();
-diff --git a/source/tools/toolutil/udbgutil.cpp b/source/tools/toolutil/udbgutil.cpp
-index efad363..5676e6d 100644
---- a/source/tools/toolutil/udbgutil.cpp
-+++ b/source/tools/toolutil/udbgutil.cpp
-@@ -639,7 +639,9 @@ U_CAPI void udbg_knownIssue_close(void *ptr) {
- #include <set>
- #include <map>
- #include <string>
-+#if __GNUC__ != 2
- #include <ostream>
-+#endif
- #include <iostream>
- 
- class KnownIssues {
 -- 
-1.8.3.4
+2.7.0
 
 
-From a5f3b7368062f04d77119aa9638eb72834bea858 Mon Sep 17 00:00:00 2001
-From: Adrien Destugues <pulkomandy@pulkomandy.tk>
-Date: Thu, 2 Oct 2014 14:54:39 +0200
-Subject: Force definition of U_DISABLE_RENAMING
-
-We build ICU with this flag disabled, but somehow this isn't added tothe
-header, and later on trying to build haiku without the flag would fail.
-So we just change the default value to keep things simpler.
-
-diff --git a/source/common/unicode/uconfig.h b/source/common/unicode/uconfig.h
-index ed073b6..4950c5e 100644
---- a/source/common/unicode/uconfig.h
-+++ b/source/common/unicode/uconfig.h
-@@ -87,7 +87,7 @@
-  * @internal
-  */
- #ifndef U_DISABLE_RENAMING
--#define U_DISABLE_RENAMING 0
-+#define U_DISABLE_RENAMING 1
- #endif
- 
- /**
--- 
-1.8.3.4
-
-
-From 6086513b52712a83b29636f1df723416dccab4e6 Mon Sep 17 00:00:00 2001
+From 140f1a145e008b8a0b10d0e353063069ed2e363a Mon Sep 17 00:00:00 2001
 From: Adrien Destugues <pulkomandy@gmail.com>
-Date: Fri, 3 Oct 2014 11:07:01 +0200
-Subject: Don't call tzset and tzname on Haiku
+Date: Sun, 19 Apr 2015 13:36:37 +0200
+Subject: [PATCH 3/6] gcc2 fixes in source/common
 
-While they exist, they are implemented using ICU, and trying to use them
-within ICU results in a deadlock.
+---
+ source/common/unicode/bytestrie.h         | 3 +++
+ source/common/unicode/bytestriebuilder.h  | 3 +++
+ source/common/unicode/platform.h          | 2 +-
+ source/common/unicode/stringtriebuilder.h | 9 +++++++++
+ source/common/unicode/ucharstrie.h        | 3 +++
+ source/common/unicode/ucharstriebuilder.h | 3 +++
+ 6 files changed, 22 insertions(+), 1 deletion(-)
 
-diff --git a/source/common/putilimp.h b/source/common/putilimp.h
-index d2c1c66..a3e361f 100644
---- a/source/common/putilimp.h
-+++ b/source/common/putilimp.h
-@@ -105,7 +105,7 @@ typedef size_t uintptr_t;
+diff --git a/source/common/unicode/bytestrie.h b/source/common/unicode/bytestrie.h
+index 9c77827..367a0ae 100644
+--- a/source/common/unicode/bytestrie.h
++++ b/source/common/unicode/bytestrie.h
+@@ -338,6 +338,9 @@ public:
+         // but the code looks more confusing that way.)
+         UVector32 *stack_;
+     };
++#if __GNUC__ == 2
++	friend class Iterator;
++#endif
+ 
+ private:
+     friend class BytesTrieBuilder;
+diff --git a/source/common/unicode/bytestriebuilder.h b/source/common/unicode/bytestriebuilder.h
+index e7fbd6b..001233f 100644
+--- a/source/common/unicode/bytestriebuilder.h
++++ b/source/common/unicode/bytestriebuilder.h
+@@ -153,6 +153,9 @@ private:
+     private:
+         const char *s;
+     };
++#if __GNUC__ == 2
++	friend class BTLinearMatchNode;
++#endif
+ 
+     // don't use #ifndef U_HIDE_INTERNAL_API with private class members or virtual methods.
+     virtual Node *createLinearMatchNode(int32_t i, int32_t byteIndex, int32_t length,
+diff --git a/source/common/unicode/platform.h b/source/common/unicode/platform.h
+index 1320bd3..3c385c1 100644
+--- a/source/common/unicode/platform.h
++++ b/source/common/unicode/platform.h
+@@ -801,7 +801,7 @@
      /* Use the predefined value. */
- #elif U_PLATFORM_USES_ONLY_WIN32_API
- #   define U_TZSET _tzset
--#elif U_PLATFORM == U_PF_OS400
-+#elif U_PLATFORM == U_PF_OS400 || defined(__HAIKU__)
-    /* not defined */
- #else
- #   define U_TZSET tzset
-@@ -140,7 +140,7 @@ typedef size_t uintptr_t;
-     /* Use the predefined value. */
- #elif U_PLATFORM_USES_ONLY_WIN32_API
- #   define U_TZNAME _tzname
--#elif U_PLATFORM == U_PF_OS400
-+#elif U_PLATFORM == U_PF_OS400 || defined(__HAIKU__)
-    /* not defined */
- #else
- #   define U_TZNAME tzname
-diff --git a/source/configure.ac b/source/configure.ac
-index b30c8d0..89902b4 100644
---- a/source/configure.ac
-+++ b/source/configure.ac
-@@ -790,50 +790,26 @@ else
- fi
- AC_SUBST(U_HAVE_POPEN)
+ #elif defined(U_STATIC_IMPLEMENTATION)
+ #   define U_EXPORT
+-#elif defined(__GNUC__)
++#elif defined(__GNUC__) && __GNUC__ > 2
+ #   define U_EXPORT __attribute__((visibility("default")))
+ #elif (defined(__SUNPRO_CC) && __SUNPRO_CC >= 0x550) \
+    || (defined(__SUNPRO_C) && __SUNPRO_C >= 0x550) 
+diff --git a/source/common/unicode/stringtriebuilder.h b/source/common/unicode/stringtriebuilder.h
+index 04447e5..21bab82 100644
+--- a/source/common/unicode/stringtriebuilder.h
++++ b/source/common/unicode/stringtriebuilder.h
+@@ -379,6 +379,15 @@ protected:
+         int32_t length;
+         Node *next;  // A branch sub-node.
+     };
++#if __GNUC__ >= 2
++	friend class FinalValueNode;
++	friend class ValueNode;
++	friend class IntermediateValueNode;
++	friend class BranchNode;
++	friend class ListBranchNode;
++	friend class SplitBranchNode;
++	friend class BranchHeadNode;
++#endif
+ #endif  /* U_HIDE_INTERNAL_API */
  
--AC_CHECK_FUNC(tzset)
-+#AC_CHECK_FUNC(tzset)
- U_HAVE_TZSET=0
--if test x$ac_cv_func_tzset = xyes
--then
--    U_TZSET=tzset
--    U_HAVE_TZSET=1
--else
--    AC_CHECK_FUNC(_tzset)
--    if test x$ac_cv_func__tzset = xyes
--    then
--        U_TZSET=_tzset
--        U_HAVE_TZSET=1
--    else
--      CONFIG_CPPFLAGS="${CONFIG_CPPFLAGS} -DU_HAVE_TZSET=0"
--    fi
--fi
-+#if test x$ac_cv_func_tzset = xyes
-+#then
-+#    U_TZSET=tzset
-+#    U_HAVE_TZSET=1
-+#else
-+#    AC_CHECK_FUNC(_tzset)
-+#    if test x$ac_cv_func__tzset = xyes
-+#    then
-+#        U_TZSET=_tzset
-+#        U_HAVE_TZSET=1
-+#    else
-+#      CONFIG_CPPFLAGS="${CONFIG_CPPFLAGS} -DU_HAVE_TZSET=0"
-+#    fi
-+#fi
- AC_SUBST(U_HAVE_TZSET)
- AC_SUBST(U_TZSET)
+     /** @internal */
+diff --git a/source/common/unicode/ucharstrie.h b/source/common/unicode/ucharstrie.h
+index 0575a97..9fe81c1 100644
+--- a/source/common/unicode/ucharstrie.h
++++ b/source/common/unicode/ucharstrie.h
+@@ -356,6 +356,9 @@ public:
+         // but the code looks more confusing that way.)
+         UVector32 *stack_;
+     };
++#if __GNUC__ == 2
++	friend class Iterator;
++#endif
  
- U_HAVE_TZNAME=0
--AC_CACHE_CHECK(for tzname,ac_cv_var_tzname,
--[AC_LINK_IFELSE([AC_LANG_PROGRAM([[#ifndef __USE_POSIX
--#define __USE_POSIX
--#endif
--#include <stdlib.h>
--#include <time.h>
--#ifndef tzname /* For SGI.  */
--extern char *tzname[]; /* RS6000 and others reject char **tzname.  */
--#endif]], [atoi(*tzname);])],[ac_cv_var_tzname=yes],[ac_cv_var_tzname=no])])
--if test $ac_cv_var_tzname = yes; then
--  U_TZNAME=tzname
--  U_HAVE_TZNAME=1
--else
--  AC_CACHE_CHECK(for _tzname,ac_cv_var__tzname,
--  [AC_LINK_IFELSE([AC_LANG_PROGRAM([[#include <stdlib.h>
--  #include <time.h>
--  extern char *_tzname[];]], [atoi(*_tzname);])],[ac_cv_var__tzname=yes],[ac_cv_var__tzname=no])])
--    if test $ac_cv_var__tzname = yes; then
--      U_TZNAME=_tzname
--      U_HAVE_TZNAME=1
--    else
--     CONFIG_CPPFLAGS="${CONFIG_CPPFLAGS} -DU_HAVE_TZNAME=0"
--    fi
--fi
- AC_SUBST(U_HAVE_TZNAME)
- AC_SUBST(U_TZNAME)
+ private:
+     friend class UCharsTrieBuilder;
+diff --git a/source/common/unicode/ucharstriebuilder.h b/source/common/unicode/ucharstriebuilder.h
+index f7a8039..8b136d6 100644
+--- a/source/common/unicode/ucharstriebuilder.h
++++ b/source/common/unicode/ucharstriebuilder.h
+@@ -156,6 +156,9 @@ private:
+     private:
+         const UChar *s;
+     };
++#if __GNUC__ == 2
++	friend class UCTLinearMatchNode;
++#endif
  
+     virtual Node *createLinearMatchNode(int32_t i, int32_t unitIndex, int32_t length,
+                                         Node *nextNode) const;
 -- 
-1.8.3.4
+2.7.0
 
 
-From df3c615d0101774ffdf9bdbd5c2867e4e4609886 Mon Sep 17 00:00:00 2001
+From 977dcd090b434c1ca15740f30caf8e9d05bbea5a Mon Sep 17 00:00:00 2001
 From: Adrien Destugues <pulkomandy@gmail.com>
 Date: Mon, 6 Oct 2014 13:28:09 +0200
-Subject: more gcc2 fixes for ICU 54.
+Subject: [PATCH 4/6] more gcc2 fixes for ICU 54.
 
+---
+ source/common/filteredbrk.cpp    |  6 ++++++
+ source/common/norm2allmodes.h    | 12 ++++++++++++
+ source/common/putilimp.h         |  2 +-
+ source/common/unicode/platform.h |  2 +-
+ 4 files changed, 20 insertions(+), 2 deletions(-)
 
+diff --git a/source/common/filteredbrk.cpp b/source/common/filteredbrk.cpp
+index 5a8f0b0..e141654 100644
+--- a/source/common/filteredbrk.cpp
++++ b/source/common/filteredbrk.cpp
+@@ -68,7 +68,13 @@ class U_COMMON_API UStringSet : public UVector {
+   inline UBool contains(const UnicodeString& s) {
+     return contains((void*) &s);
+   }
++#if __GNUC__ == 2
++  UBool contains(void* s) {
++       return UVector::contains(s);
++  }
++#else
+   using UVector::contains;
++#endif
+   /**
+    * Return the ith UnicodeString alias
+    */
 diff --git a/source/common/norm2allmodes.h b/source/common/norm2allmodes.h
 index 64c84a2..aca1e08 100644
 --- a/source/common/norm2allmodes.h
@@ -942,7 +851,7 @@ index 64c84a2..aca1e08 100644
      virtual UBool hasBoundaryAfter(UChar32 c) const { return impl.hasFCDBoundaryAfter(c); }
      virtual UBool isInert(UChar32 c) const { return impl.isFCDInert(c); }
 diff --git a/source/common/putilimp.h b/source/common/putilimp.h
-index a3e361f..affb1a8 100644
+index c7b33ee..4891eed 100644
 --- a/source/common/putilimp.h
 +++ b/source/common/putilimp.h
 @@ -113,7 +113,7 @@ typedef size_t uintptr_t;
@@ -955,72 +864,276 @@ index a3e361f..affb1a8 100644
  #elif U_PLATFORM_IS_LINUX_BASED
  #   if defined(__UCLIBC__)
 diff --git a/source/common/unicode/platform.h b/source/common/unicode/platform.h
-index fbb4ae1..6e7c62f 100644
+index 3c385c1..b0cd48a 100644
 --- a/source/common/unicode/platform.h
 +++ b/source/common/unicode/platform.h
-@@ -149,7 +149,7 @@
+@@ -159,7 +159,7 @@
  #   else
  #       define U_PLATFORM U_PF_DARWIN
  #   endif
 -#elif defined(BSD) || defined(__FreeBSD__) || defined(__FreeBSD_kernel__) || defined(__NetBSD__) || defined(__OpenBSD__) || defined(__MirBSD__)
 +#elif defined(BSD) || defined(__FreeBSD__) || defined(__FreeBSD_kernel__) || defined(__NetBSD__) || defined(__OpenBSD__) || defined(__MirBSD__) || defined(__HAIKU__)
- #   define U_PLATFORM U_PF_BSD
- #elif defined(sun) || defined(__sun)
-     /* Check defined(__SVR4) || defined(__svr4__) to distinguish Solaris from SunOS? */
-diff --git a/source/i18n/filteredbrk.cpp b/source/i18n/filteredbrk.cpp
-index 43b2d53..70802e4 100644
---- a/source/i18n/filteredbrk.cpp
-+++ b/source/i18n/filteredbrk.cpp
-@@ -65,7 +65,13 @@ class U_I18N_API UStringSet : public UVector {
-   inline UBool contains(const UnicodeString& s) {
-     return contains((void*) &s);
-   }
-+#if __GNUC__ == 2
-+  UBool contains(void* s) {
-+	  return UVector::contains(s);
-+  }
-+#else
-   using UVector::contains;
-+#endif
-   /**
-    * Return the ith UnicodeString alias
-    */
+ #   if defined(__FreeBSD__)
+ #       include <sys/endian.h>
+ #   endif
 -- 
-1.8.3.4
+2.7.0
 
 
-From 18b95209cbdd8145d4d6b5fd89527b39d55f7012 Mon Sep 17 00:00:00 2001
-From: Oliver Tappe <zooey@hirschkaefer.de>
-Date: Fri, 14 Nov 2014 23:56:19 +0100
-Subject: [PATCH] Restore missing parts for proper Haiku port.
+From 1bea021df8dd7b340b8e9bac1ca4beea40d642cc Mon Sep 17 00:00:00 2001
+From: Jerome Duval <jerome.duval@gmail.com>
+Date: Thu, 26 Mar 2015 18:39:42 +0000
+Subject: [PATCH 5/6] gcc2 fixes for tztools.
 
-* Actually set the platform to U_HAIKU for Haiku target.
-* Use gcc to build icudt54l_dat.o for Haiku target.
 ---
- source/configure.ac | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+ source/tools/tzcode/private.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/source/configure.ac b/source/configure.ac
-index b30c8d0..b676bed 100644
---- a/source/configure.ac
-+++ b/source/configure.ac
-@@ -626,7 +626,7 @@ AC_MSG_CHECKING([for genccode assembly])
- # Check to see if genccode can generate simple assembly.
- GENCCODE_ASSEMBLY=
- case "${host}" in
--*-linux*|*-kfreebsd*-gnu*|i*86-*-*bsd*|i*86-pc-gnu)
-+*-linux*|*-kfreebsd*-gnu*|i*86-*-*bsd*|i*86-pc-gnu|*-haiku*)
-     if test "$GCC" = yes; then
-         # We're using gcc, and the simple -a gcc command line works for genccode
-         GENCCODE_ASSEMBLY="-a gcc"
-@@ -1251,6 +1251,7 @@ case "${host}" in
- 	*-*-nto*)	platform=U_QNX ;;
- 	*-dec-osf*) 	platform=U_OSF ;;
- 	*-*-beos)		platform=U_BEOS ;;
-+	*-*-haiku*)		platform=U_HAIKU ;;
- 	*-*-irix*)		platform=U_IRIX ;;
- 	*-ncr-*)		platform=U_MPRAS ;;
- 	*) 		platform=U_UNKNOWN_PLATFORM ;;
+diff --git a/source/tools/tzcode/private.h b/source/tools/tzcode/private.h
+index 1a85c88..0ee3329 100644
+--- a/source/tools/tzcode/private.h
++++ b/source/tools/tzcode/private.h
+@@ -120,7 +120,7 @@
+ */
+ #ifndef HAVE_STDINT_H
+ #define HAVE_STDINT_H \
+-	(199901 <= __STDC_VERSION__ || \
++	(defined(__HAIKU__) || 199901 <= __STDC_VERSION__ || \
+ 	2 < (__GLIBC__ + (0 < __GLIBC_MINOR__)))
+ #endif /* !defined HAVE_STDINT_H */
+ 
 -- 
-1.8.1.4
+2.7.0
+
+
+From a04e19e395f20ad567f8467ac0783e25e2b37c11 Mon Sep 17 00:00:00 2001
+From: Jerome Duval <jerome.duval@gmail.com>
+Date: Mon, 11 Jan 2016 21:56:11 +0000
+Subject: [PATCH 6/6] gcc2 fixes for icu 56.
+
+---
+ source/tools/genrb/reslist.cpp |  6 +++---
+ source/tools/genrb/reslist.h   | 10 +++++-----
+ 2 files changed, 8 insertions(+), 8 deletions(-)
+
+diff --git a/source/tools/genrb/reslist.cpp b/source/tools/genrb/reslist.cpp
+index 9f8365d..7158961 100644
+--- a/source/tools/genrb/reslist.cpp
++++ b/source/tools/genrb/reslist.cpp
+@@ -303,14 +303,14 @@ StringBaseResource::~StringBaseResource() {}
+ 
+ static int32_t U_CALLCONV
+ string_hash(const UElement key) {
+-    const StringResource *res = static_cast<const StringResource *>(key.pointer);
++    const StringResource *res = reinterpret_cast<const StringResource *>(key.pointer);
+     return res->fString.hashCode();
+ }
+ 
+ static UBool U_CALLCONV
+ string_comp(const UElement key1, const UElement key2) {
+-    const StringResource *res1 = static_cast<const StringResource *>(key1.pointer);
+-    const StringResource *res2 = static_cast<const StringResource *>(key2.pointer);
++    const StringResource *res1 = reinterpret_cast<const StringResource *>(key1.pointer);
++    const StringResource *res2 = reinterpret_cast<const StringResource *>(key2.pointer);
+     return res1->fString == res2->fString;
+ }
+ 
+diff --git a/source/tools/genrb/reslist.h b/source/tools/genrb/reslist.h
+index 032c0c2..1017b91 100644
+--- a/source/tools/genrb/reslist.h
++++ b/source/tools/genrb/reslist.h
+@@ -65,7 +65,7 @@ typedef struct KeyMapEntry {
+ } KeyMapEntry;
+ 
+ /* Resource bundle root table */
+-struct SRBRoot {
++typedef struct SRBRoot {
+     SRBRoot(const UString *comment, UBool isPoolBundle, UErrorCode &errorCode);
+     ~SRBRoot();
+ 
+@@ -113,8 +113,8 @@ public:
+   int32_t fPoolStringIndexLimit;
+   int32_t fPoolStringIndex16Limit;
+   int32_t fLocalStringIndexLimit;
+-  SRBRoot *fWritePoolBundle;
+-};
++  struct SRBRoot *fWritePoolBundle;
++} SRBRoot;
+ 
+ /* write a java resource file */
+ // TODO: C++ify
+@@ -217,7 +217,7 @@ struct SResource {
+     int32_t  fKey;      /* Index into bundle->fKeys; -1 if no key. */
+     int32_t  fKey16;    /* Key16 version of fKey for Table & Table16; -1 if no key or it does not fit. */
+     int      line;      /* used internally to report duplicate keys in tables */
+-    SResource *fNext;   /* This is for internal chaining while building */
++    struct SResource *fNext;   /* This is for internal chaining while building */
+     struct UString fComment;
+ };
+ 
+@@ -344,7 +344,7 @@ public:
+ 
+     void writeUTF16v2(int32_t base, icu::UnicodeString &dest);
+ 
+-    StringResource *fSame;  // used for duplicates
++    class StringResource *fSame;  // used for duplicates
+     int32_t fSuffixOffset;  // this string is a suffix of fSame at this offset
+     int32_t fNumCopies;     // number of equal strings represented by one stringSet element
+     int32_t fNumUnitsSaved;  // from not writing duplicates and suffixes
+-- 
+2.7.0
+
+From e5747c5e89e2a3703daa81b2c085ce2f90639584 Mon Sep 17 00:00:00 2001
+From: Jerome Duval <jerome.duval@gmail.com>
+Date: Mon, 11 Jul 2016 21:32:25 +0000
+Subject: [PATCH] gcc2 fix for i18n 57.1
+
+---
+ source/i18n/dayperiodrules.h   | 12 ++++++++++++
+ source/i18n/dtptngen.cpp       |  3 ++-
+ source/i18n/smpdtfmt.cpp       |  3 ++-
+ source/i18n/unicode/dtitvinf.h | 23 +++++++++++++++++++++--
+ 4 files changed, 37 insertions(+), 4 deletions(-)
+
+diff --git a/source/i18n/dayperiodrules.h b/source/i18n/dayperiodrules.h
+index 5491f7c..a3d641a 100644
+--- a/source/i18n/dayperiodrules.h
++++ b/source/i18n/dayperiodrules.h
+@@ -56,17 +56,29 @@ public:
+ private:
+     DayPeriodRules();
+ 
++#if __GNUC__ == 2
++public:
++#endif
+     // Translates "morning1" to DAYPERIOD_MORNING1, for example.
+     static DayPeriod getDayPeriodFromString(const char *type_str);
++#if __GNUC__ == 2
++private:
++#endif
+ 
+     static void load(UErrorCode &errorCode);
+ 
+     // Sets period type for all hours in [startHour, limitHour).
+     void add(int32_t startHour, int32_t limitHour, DayPeriod period);
+ 
++#if __GNUC__ == 2
++public:
++#endif
+     // Returns TRUE if for all i, DayPeriodForHour[i] has a type other than UNKNOWN.
+     // Values of HasNoon and HasMidnight do not affect the return value.
+     UBool allHoursAreSet();
++#if __GNUC__ == 2
++private:
++#endif
+ 
+     // Returns the hour that starts dayPeriod. Returns 0 for MIDNIGHT and 12 for NOON.
+     int32_t getStartHourForDayPeriod(DayPeriod dayPeriod, UErrorCode &errorCode) const;
+diff --git a/source/i18n/dtptngen.cpp b/source/i18n/dtptngen.cpp
+index 2a6b35b..beb6a5c 100644
+--- a/source/i18n/dtptngen.cpp
++++ b/source/i18n/dtptngen.cpp
+@@ -1420,7 +1420,8 @@ DateTimePatternGenerator::getBestAppending(int32_t missingFields, int32_t flags,
+                 &tempPattern,
+                 &appendName
+             };
+-            SimpleFormatter(appendItemFormats[topField], 2, 3, err).
++            UnicodeString tempus = appendItemFormats[topField];
++            SimpleFormatter(tempus, 2, 3, err).
+                     formatAndReplace(values, 3, resultPattern, NULL, 0, err);
+             lastMissingFieldMask = distanceInfo->missingFieldMask;
+         }
+diff --git a/source/i18n/smpdtfmt.cpp b/source/i18n/smpdtfmt.cpp
+index 145587f..b8793e0 100644
+--- a/source/i18n/smpdtfmt.cpp
++++ b/source/i18n/smpdtfmt.cpp
+@@ -796,7 +796,8 @@ void SimpleDateFormat::construct(EStyle timeStyle,
+         }
+ 
+         resStr = ures_getStringByIndex(dateTimePatterns, glueIndex, &resStrLen, &status);
+-        SimpleFormatter(UnicodeString(TRUE, resStr, resStrLen), 2, 2, status).
++        UnicodeString tempus3(TRUE, resStr, resStrLen);
++        SimpleFormatter(tempus3, 2, 2, status).
+                 format(tempus1, tempus2, fPattern, status);
+     }
+     // if the pattern includes just time data or just date date, load the appropriate
+diff --git a/source/i18n/unicode/dtitvinf.h b/source/i18n/unicode/dtitvinf.h
+index 2b23dfe..09a4908 100644
+--- a/source/i18n/unicode/dtitvinf.h
++++ b/source/i18n/unicode/dtitvinf.h
+@@ -327,8 +327,11 @@ public:
+      */
+     static UClassID U_EXPORT2 getStaticClassID();
+ 
+-
++#if __GNUC__ == 2
++public:
++#else
+ private:
++#endif
+     /**
+      * DateIntervalFormat will need access to
+      * getBestSkeleton(), parseSkeleton(), enum IntervalPatternIndex,
+@@ -340,7 +343,7 @@ private:
+     friend class DateIntervalFormat;
+ 
+     friend struct DateIntervalSink;
+-
++    
+     /**
+      * Following is for saving the interval patterns.
+      * We only support interval patterns on
+@@ -378,6 +381,9 @@ private:
+      */
+     void initializeData(const Locale& locale, UErrorCode& status);
+ 
++#if __GNUC__ == 2
++public:
++#endif
+ 
+     /* Set Interval pattern.
+      *
+@@ -416,6 +422,9 @@ private:
+     const UnicodeString* getBestSkeleton(const UnicodeString& skeleton,
+                                          int8_t& bestMatchDistanceInfo) const;
+ 
++#if __GNUC__ == 2
++private:
++#endif
+ 
+     /**
+      * Parse skeleton, save each field's width.
+@@ -443,6 +452,9 @@ private:
+                                          int32_t anotherFieldWidth,
+                                          char patternLetter);
+ 
++#if __GNUC__ == 2
++public:
++#endif
+ 
+     /**
+      * Convert calendar field to the interval pattern index in
+@@ -460,6 +472,9 @@ private:
+     static IntervalPatternIndex U_EXPORT2 calendarFieldToIntervalIndex(
+                                                       UCalendarDateFields field,
+                                                       UErrorCode& status);
++#if __GNUC__ == 2
++private:
++#endif
+ 
+ 
+     /**
+@@ -496,6 +511,10 @@ private:
+     // default order
+     UBool fFirstDateInPtnIsLaterDate;
+ 
++#if __GNUC__ == 2
++public:
++#endif
++
+     // HashMap<UnicodeString, UnicodeString[kIPI_MAX_INDEX]>
+     // HashMap( skeleton, pattern[largest_different_field] )
+     Hashtable* fIntervalPatterns;
+-- 
+2.7.0
 
