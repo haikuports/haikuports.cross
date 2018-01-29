@@ -64,6 +64,14 @@ BUILD_PREREQUIRES="
 
 SOURCE_DIR="ncurses-$portVersion"
 
+PATCH()
+{
+        if [ "$effectiveTargetArchitecture" = x86_gcc2 ]; then
+                sed -i 's/=stdc++/=stdc++.r4/' aclocal.m4 configure
+        fi
+}
+
+
 doBuild()
 {
 	if [ $# -lt 1 ]; then
