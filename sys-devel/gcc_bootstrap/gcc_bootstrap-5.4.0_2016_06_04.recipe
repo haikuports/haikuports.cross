@@ -8,7 +8,7 @@ LICENSE="
 COPYRIGHT="1988-2015 Free Software Foundation, Inc."
 srcGitRev="97e06d2ad65fa33e402a6d25b0035d0eb35d7dae"
 SOURCE_URI="https://github.com/haiku/buildtools/archive/$srcGitRev.tar.gz"
-CHECKSUM_SHA256="4cdc2593f060ca5f784cb94c4e55b808e71e2bd5ba8e1cf6f722313dd15f73f5"
+CHECKSUM_SHA256="535376dc64d2247b5cb8c70af9c7b952d4391a1485acca80d2779ab431f1a222"
 REVISION="1"
 
 ARCHITECTURES="!x86_gcc2 x86 x86_64 ppc arm m68k"
