@@ -46,7 +46,7 @@ REQUIRES="
 	"
 if [ -n "$secondaryArchSuffix" ]; then
 	REQUIRES="$REQUIRES
-		ncurses_bootstrap == $portVersion base
+		ncurses6_bootstrap == $portVersion base
 		"
 fi
 
@@ -82,6 +82,27 @@ doBuild()
 	targetDir=$(pwd)/$1
 	shift 1
 
+	# Parse additional arguments. "--libs-only" means we only want the
+	# libraries, nothing else. "--without-progs" means no programs and no
+	# terminfo DB (requires tic).
+	local noData
+	local libsOnly
+	local configureArgs
+	local arg
+	for arg in $@; do
+		case "$arg" in
+			--libs-only)
+				noData=1
+				libsOnly=1
+				arg="--without-progs"
+				;;
+			--without-progs)
+				noData=1
+				;;
+		esac
+		configureArgs="$configureArgs $arg"
+	done
+
 	rm -rf $targetDir
 	mkdir $targetDir
 
@@ -93,28 +114,44 @@ doBuild()
 		--with-libtool=$libtool \
 		--enable-termcap \
 		--enable-hard-tabs \
-		$@
+		$configureArgs
 	make $jobArgs
 
-	# make install assumes .libs/* for binaries, so make it happy
-	for i in tic toe infocmp clear tabs tput tset; do
-		[ ! -f progs/.libs/$i ] && ln progs/tic progs/.libs/$i
-	done
+	if [ -z "$noData" ]; then
+		# We need LIBRARY_PATH to include the library installation directory,
+		# since the installation process for the terminfo database will run tic
+		# and the built-in rpath doesn't consider the DESTDIR we're using.
+		LIBRARY_PATH="$targetDir/$prefix/lib:$LIBRARY_PATH" \
+		make install DESTDIR=$targetDir
+	else
+		make install.libs DESTDIR=$targetDir
+		if [ -z "$libsOnly" ]; then
+			make install.includes DESTDIR=$targetDir
+			make install.man DESTDIR=$targetDir
+		fi
+	fi
 
-	make install DESTDIR=$targetDir
+	# clean up for the next build
+	make clean
 }
 
 BUILD()
 {
 	# Unfortunately building only works in the source directory. So we build
-	# two times, installing in temporary directories from which we copy to the
-	# actual installation directory in INSTALL().
-	if [ -z "$secondaryArchSuffix" ]; then
-		doBuild build-nowidec
-	else
-		doBuild build-nowidec --without-progs
+	# two times -- once without and once with wide-char support -- installing in
+	# temporary directories from which we copy to the actual installation
+	# directory in INSTALL().
+
+	# For the secondary architecture we don't want the programs nor the
+	# terminfo DB. The main package will depend on the primary package which
+	# provides all this.
+	local withoutProgramArgs
+	if [ -n "$secondaryArchSuffix" ]; then
+		withoutProgramArgs="--without-progs"
 	fi
-	doBuild build-widec --enable-widec --without-progs
+
+	doBuild build-nowidec $withoutProgramArgs
+	doBuild build-widec --enable-widec --libs-only
 }
 
 INSTALL()
@@ -142,7 +179,6 @@ INSTALL()
 	# we make it depend on the primary architecture package.
 	if [ -n "$secondaryArchSuffix" ]; then
 		rm -rf $installDestDir$binDir
-		rm -rf $installDestDir$dataDir
 		rm -rf $installDestDir$documentationDir
 	fi
 }
