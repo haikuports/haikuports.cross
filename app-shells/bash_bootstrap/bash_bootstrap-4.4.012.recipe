@@ -69,6 +69,7 @@ PATCH()
 
 BUILD()
 {
+	touch lib/intl/plural.h lib/intl/plural.c configure
 	bash_cv_getcwd_malloc=yes \
 		bash_cv_job_control_missing=present \
 		ac_cv_func_mmap_fixed_mapped=yes \
