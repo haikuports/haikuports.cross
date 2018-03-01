@@ -91,6 +91,10 @@ BUILD()
 		# TODO: Disable building wtih TLS support for ARM until implemented
 		additionalConfigureFlags+=" --disable-tls"
 	fi
+	if [ $effectiveTargetArchitecture == powerpc ]; then
+		# TODO: Disable building wtih TLS support for ARM until implemented
+		additionalConfigureFlags+=" --disable-tls"
+	fi
 
 	CFLAGS="-O2 -U_FORTIFY_SOURCE" CXXFLAGS="-O2" "$sourceDir/configure" \
 		--build=$buildMachineTriple --host=$effectiveTargetMachineTriple \
