@@ -42,7 +42,7 @@ BUILD()
 	./autogen.sh
 	runConfigure ./configure \
 		--build=$buildMachineTriple --host=$effectiveTargetMachineTriple \
-		--with-harfbuzz=no  --with-png=no --with-zlib=no
+		--with-harfbuzz=no  --with-png=no --with-zlib=no --with-bzip2=no
 	make $jobArgs
 }
 
