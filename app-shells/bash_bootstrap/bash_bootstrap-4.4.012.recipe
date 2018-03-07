@@ -69,7 +69,9 @@ PATCH()
 
 BUILD()
 {
-	touch lib/intl/plural.h lib/intl/plural.c configure
+	# plural needs a later timestamp per http://savannah.gnu.org/support/?109469
+	# since it doesn't work with bison 3.0
+	touch lib/intl/plural.h lib/intl/plural.c
 	bash_cv_getcwd_malloc=yes \
 		bash_cv_job_control_missing=present \
 		ac_cv_func_mmap_fixed_mapped=yes \
