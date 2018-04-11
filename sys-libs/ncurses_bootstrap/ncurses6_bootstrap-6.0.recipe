@@ -1,6 +1,5 @@
 SUMMARY="New curses library"
 HOMEPAGE="http://www.gnu.org/software/ncurses/ncurses.html"
-SOURCE_FILENAME="$portVersionedName.tar.gz"
 SOURCE_URI="http://ftp.gnu.org/pub/gnu/ncurses/ncurses-$portVersion.tar.gz"
 CHECKSUM_SHA256="f551c24b30ce8bfb6e96d9f59b42fbea30fa3a6123384172f9e7284bcf647260"
 LICENSE="MIT"
