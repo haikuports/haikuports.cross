@@ -12,7 +12,6 @@ DESCRIPTION="
 	few lines of code.
 	"
 HOMEPAGE="http://www.gnu.org/software/coreutils"
-SOURCE_FILENAME="$portVersionedName.tar.gz"
 SOURCE_URI="http://ftp.gnu.org/gnu/gawk/gawk-3.1.8.tar.bz2"
 CHECKSUM_SHA256="5dbc7b2c4c328711337c2aacd09a122c7313122262e3ff034590f014067412b4"
 REVISION="2"
