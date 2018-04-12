@@ -17,7 +17,6 @@ DESCRIPTION="
 	One of the biggest users of M4 is the GNU Autoconf project.
 	"
 HOMEPAGE="http://www.gnu.org/software/m4/"
-SOURCE_FILENAME="$portVersionedName.tar.gz"
 SOURCE_URI="http://ftp.gnu.org/gnu/m4/m4-1.4.16.tar.gz"
 LICENSE="GNU GPL v3"
 COPYRIGHT="2000, 2005-2011 Free Software Foundation, Inc."
