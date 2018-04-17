@@ -65,7 +65,7 @@ CHECKSUM_SHA256_048="5b8215451c5d096ca1e115307ffe6613553551a70369525a0778f216c3a
 SOURCE_DIR="bash-4.3"
 PATCHES="bash-kill_by_name.patch"
 
-ARCHITECTURES="x86_gcc2 x86 x86_64"
+ARCHITECTURES="x86_gcc2 x86 x86_64 arm"
 
 PROVIDES="
 	bash_bootstrap = $portVersion
@@ -119,6 +119,7 @@ BUILD()
 		bash_cv_dev_stdin=absent \
 		bash_cv_unusable_rtsigs=no \
 		runConfigure ./configure --without-bash-malloc \
+		--disable-nls --without-libintl-prefix \
 		--build=$buildMachineTriple --host=$targetMachineTriple
 	make $jobArgs
 }
