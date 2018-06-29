@@ -6,13 +6,13 @@ LICENSE="
 	GNU LGPL v3
 	"
 COPYRIGHT="1988-2015 Free Software Foundation, Inc."
-srcGitRev="ac9c3b70052ef259d3c2d16f61f098467eee4c5d"
+srcGitRev="13dd3f531fc30b6e144034ddce1ea1c9b224dbfd"
 SOURCE_URI="https://github.com/haiku/buildtools/archive/$srcGitRev.tar.gz"
-CHECKSUM_SHA256="4beefd1f19bfa32293cedc33e0f8439817bae4ae9f83fdcf361315d255a426e8"
+CHECKSUM_SHA256="65e97d4551cd3c4ef03108520a56765cdd2a670c0fd672e000858f2845eb6e4f"
 REVISION="1"
 
 ARCHITECTURES="!x86_gcc2 ?x86 x86_64 ?ppc ?arm ?m68k"
-SECONDARY_ARCHITECTURES="?x86"
+SECONDARY_ARCHITECTURES="x86"
 
 libstdcxxSoVersion="6"
 libstdcxxLibVersion="6.0.24"
