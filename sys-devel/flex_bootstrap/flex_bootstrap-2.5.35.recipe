@@ -7,7 +7,7 @@ HOMEPAGE="http://flex.sourceforge.net/"
 LICENSE="Flex"
 COPYRIGHT="2001-2007 The Flex Project; 1990, 1997 The Regents of the University of California"
 SOURCE_URI="http://sourceforge.net/projects/flex/files/flex/flex-2.5.35/flex-2.5.35.tar.bz2
-	https://www.mirrorservice.org/pub/slackware/slackware-14.0/source/d/flex-2.5.35.tar.bz2"
+	https://www.mirrorservice.org/pub/slackware/slackware-14.0/source/d/flex/flex-2.5.35.tar.bz2"
 CHECKSUM_SHA256="0becbd4b2b36b99c67f8c22ab98f7f80c9860aec70f0350a0018f29a88704e7b"
 REVISION="1"
 ARCHITECTURES="x86_gcc2 x86 x86_64 ppc arm"
