@@ -171,8 +171,8 @@ runtime libraries that is required by Haiku's build system when building \
 Haiku."
 
 PROVIDES_syslibs_devel="
-	gcc_bootstrap_syslibs_devel$secondaryArchSuffix = $portVersion compat >= 2.95.3
-	gcc_syslibs_devel$secondaryArchSuffix = $portVersion compat >= 2.95.3
+	gcc_bootstrap${secondaryArchSuffix}_syslibs_devel = $portVersion compat >= 2.95.3
+	gcc${secondaryArchSuffix}_syslibs_devel = $portVersion compat >= 2.95.3
 	"
 
 REQUIRES_syslibs_devel=""
