@@ -14,7 +14,7 @@ CHECKSUM_SHA256="0bc7613389650ee6a24554b52572a272f7356164fd2c4132b0bcf13123e4fca
 SOURCE_DIR="make-$portVersion"
 PATCHES="make-$portVersion.patchset"
 
-ARCHITECTURES="x86_gcc2 x86 x86_64 arm ppc"
+ARCHITECTURES="x86_gcc2 x86 x86_64 ppc arm riscv64"
 
 PROVIDES="
 	make_bootstrap = $portVersion compat >= 3.82

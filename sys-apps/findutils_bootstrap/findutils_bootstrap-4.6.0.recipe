@@ -17,7 +17,7 @@ CHECKSUM_SHA256="ded4c9f73731cd48fec3b6bdaccce896473b6d8e337e9612e16cf1431bb1169
 REVISION="1"
 PATCHES="findutils-$portVersion.patchset"
 
-ARCHITECTURES="x86_gcc2 x86 x86_64 ppc arm"
+ARCHITECTURES="x86_gcc2 x86 x86_64 ppc arm riscv64"
 
 SOURCE_DIR="findutils-$portVersion"
 

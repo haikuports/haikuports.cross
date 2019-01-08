@@ -20,7 +20,7 @@ SOURCE_FILENAME="mawk-$portVersion.tar.gz"
 REVISION="1"
 LICENSE="GNU GPL v2"
 COPYRIGHT="2009-2013,2014 by Thomas E. Dickey"
-ARCHITECTURES="x86_gcc2 x86 x86_64 arm ppc"
+ARCHITECTURES="x86_gcc2 x86 x86_64 ppc arm riscv64"
 
 PROVIDES="
 	mawk_bootstrap = $portVersion compat >= 1
