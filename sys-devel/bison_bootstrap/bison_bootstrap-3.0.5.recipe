@@ -18,7 +18,7 @@ SOURCE_URI="https://ftpmirror.gnu.org/bison/bison-$portVersion.tar.xz
 CHECKSUM_SHA256="075cef2e814642e30e10e8155e93022e4a91ca38a65aa1d5467d4e969f97f338"
 PATCHES="bison_bootstrap-${portVersion}.patchset"
 
-ARCHITECTURES="x86_gcc2 x86 x86_64 ppc arm riscv64"
+ARCHITECTURES="x86_gcc2 x86 x86_64 ppc arm riscv64 sparc"
 SECONDARY_ARCHITECTURES="x86 x86_gcc2"
 
 
