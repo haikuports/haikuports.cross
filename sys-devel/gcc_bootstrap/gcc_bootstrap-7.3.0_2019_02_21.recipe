@@ -11,7 +11,7 @@ SOURCE_URI="https://github.com/haiku/buildtools/archive/$srcGitRev.tar.gz"
 CHECKSUM_SHA256="fe5470dbc849f7d6d8c5c9c879f6ea2a64ba107ad65b2f5055738beec8744542"
 REVISION="1"
 
-ARCHITECTURES="!x86_gcc2 sparc"
+ARCHITECTURES="!x86_gcc2 sparc riscv64"
 SECONDARY_ARCHITECTURES="?x86"
 
 libstdcxxSoVersion="6"
