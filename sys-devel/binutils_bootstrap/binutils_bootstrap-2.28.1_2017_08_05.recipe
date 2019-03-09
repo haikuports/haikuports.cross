@@ -31,7 +31,7 @@ CHECKSUM_SHA256="16328a906e55a3c633854beec8e9e255a639b366436470b4f6245eb0d2fde94
 SOURCE_DIR="binutils-$binutilsVersion"
 PATCHES="binutils_bootstrap-$portVersion.patchset"
 
-ARCHITECTURES="!x86_gcc2 x86 x86_64 ppc arm"
+ARCHITECTURES="!x86_gcc2 x86 x86_64 ppc arm sparc"
 SECONDARY_ARCHITECTURES="x86"
 
 PROVIDES="

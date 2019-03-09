@@ -700,3 +700,55 @@ index a1c7cd0..aec2bac 100755
 -- 
 2.13.1
 
+From ad2b5ef31ff8af63533e72f3aa65c5cd1942b7e2 Mon Sep 17 00:00:00 2001
+From: PulkoMandy <pulkomandy@pulkomandy.tk>
+Date: Sat, 9 Mar 2019 14:13:33 +0100
+Subject: [PATCH] Add sparc support.
+
+---
+ bfd/config.bfd    | 2 +-
+ gas/configure.tgt | 2 ++
+ ld/configure.tgt  | 1 +
+ 3 files changed, 4 insertions(+), 1 deletion(-)
+
+diff --git a/bfd/config.bfd b/bfd/config.bfd
+index ee202b2..f301f0d 100644
+--- a/bfd/config.bfd
++++ b/bfd/config.bfd
+@@ -1724,7 +1724,7 @@ case "${targ}" in
+     targ_selvecs="sparc_elf32_vec sparc_aout_linux_vec sparc_aout_sunos_be_vec"
+     want64=true
+     ;;
+-  sparc64-*-elf* | sparc64-*-rtems* )
++  sparc64-*-elf* | sparc64-*-rtems* | sparc64-*-haiku* )
+     targ_defvec=sparc_elf64_vec
+     targ_selvecs=sparc_elf32_vec
+     want64=true
+diff --git a/gas/configure.tgt b/gas/configure.tgt
+index cfa330e..621aed7 100644
+--- a/gas/configure.tgt
++++ b/gas/configure.tgt
+@@ -432,6 +432,8 @@ case ${generic_target} in
+   shle*-*-kaos*)			fmt=elf ;;
+   sh64-*-elf*)				fmt=elf ;;
+ 
++  sparc64-*-haiku*)			fmt=elf em=haiku ;;
++  sparc-*-haiku*)			fmt=elf em=haiku ;;
+   sparc64-*-rtems*)			fmt=elf ;;
+   sparc-*-rtems*)			fmt=elf ;;
+   sparc-*-sunos4*)			fmt=aout em=sun3 ;;
+diff --git a/ld/configure.tgt b/ld/configure.tgt
+index 30b35af..e6783b7 100644
+--- a/ld/configure.tgt
++++ b/ld/configure.tgt
+@@ -769,6 +769,7 @@ sh64-*-elf*)		targ_emul=shelf
+ sparc64-*-aout*)	targ_emul=sparcaout ;;
+ sparc64-*-elf*)		targ_emul=elf64_sparc ;;
+ sparc64-*-rtems*)	targ_emul=elf64_sparc ;;
++sparc64-*-haiku*)	targ_emul=elf64_sparc ;;
+ sparc-sun-sunos4*) 	targ_emul=sun4 ;;
+ sparclite*-*-elf)	targ_emul=elf32_sparc ;;
+ sparclite*-*-coff)	targ_emul=coff_sparc ;;
+-- 
+2.18.0
+
