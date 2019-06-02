@@ -6,9 +6,9 @@ LICENSE="
 	GNU LGPL v3
 	"
 COPYRIGHT="1988-2018 Free Software Foundation, Inc."
-srcGitRev="e649c97b4a2f7ec38efde476163e1bcd4d231afa"
+srcGitRev="9d7404d60499d0b215836fae0c2a11e9be744548"
 SOURCE_URI="https://github.com/haiku/buildtools/archive/$srcGitRev.tar.gz"
-CHECKSUM_SHA256="349322d80ca745c468f487c114b82efe43850663b05803afd99098b30b69f6ae"
+CHECKSUM_SHA256="21b2344d5a44ea938b7ada0c038e933634a75c469ced76c8f3ad8de61cfaef33"
 REVISION="1"
 
 ARCHITECTURES="!x86_gcc2 x86_64 sparc riscv64 arm ppc"
