@@ -97,6 +97,7 @@ REQUIRES_devel="
 	"
 
 BUILD_REQUIRES="
+	gcc${secondaryArchSuffix}_syslibs_devel
 	"
 BUILD_PREREQUIRES="
 	haiku${secondaryArchSuffix}_devel
