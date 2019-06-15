@@ -31,10 +31,48 @@ PROVIDES="
 	cmd:gcc_8.3.0$secondaryArchSuffix = $portVersion compat >= 5
 	cmd:gcov$secondaryArchSuffix = $portVersion compat >= 5
 	"
-
 REQUIRES="
 	haiku$secondaryArchSuffix
 	"
+
+SUMMARY_syslibs="\
+GCC c/c++-runtime shared libraries, needed to execute c/c++ programs"
+DESCRIPTION_syslibs="The c/c++-runtime libraries that are part of the gcc \
+distribution. This package contains the shared libraries for the runtime \
+loader, so it is required for executing most c/c++ programs."
+PROVIDES_syslibs="
+	gcc_bootstrap${secondaryArchSuffix}_syslibs = $portVersion compat >= 5
+	gcc${secondaryArchSuffix}_syslibs = $portVersion compat >= 5
+	lib:libgcc_s$secondaryArchSuffix = $portVersion compat >= 5
+	lib:libstdc++$secondaryArchSuffix = $portVersion compat >= 5
+	lib:libsupc++$secondaryArchSuffix = $portVersion compat >= 5
+	"
+REQUIRES_syslibs="
+	haiku$secondaryArchSuffix
+	"
+
+SUMMARY_syslibs_devel="\
+GCC c/c++-runtime static libraries and c++ headers, needed to build Haiku"
+DESCRIPTION_syslibs_devel="\
+This package is not of general interest - it contains the set of gcc's c/c++-\
+runtime libraries and headers that is required by Haiku's build system when \
+building Haiku."
+PROVIDES_syslibs_devel="
+	gcc_bootstrap${secondaryArchSuffix}_syslibs_devel = $portVersion compat >= 5
+	gcc${secondaryArchSuffix}_syslibs_devel = $portVersion compat >= 5
+	devel:libgcc_s$secondaryArchSuffix = $portVersion compat >= 5
+	devel:libgcc_kernel$secondaryArchSuffix
+	devel:libgcc$secondaryArchSuffix
+	devel:libgcc_eh_kernel$secondaryArchSuffix
+	devel:libgcc_eh$secondaryArchSuffix
+	devel:libstdc++$secondaryArchSuffix
+	devel:libsupc++_kernel$secondaryArchSuffix
+	devel:libsupc++$secondaryArchSuffix
+	"
+REQUIRES_syslibs_devel="
+	gcc${secondaryArchSuffix}_syslibs
+	"
+
 BUILD_REQUIRES="
 	"
 BUILD_PREREQUIRES="
@@ -83,7 +121,7 @@ BUILD()
 		additionalConfigureFlags+=" --disable-multilib"
 	fi
 	if [ $effectiveTargetArchitecture == arm ]; then
-		# disable multilib support, as x86_64 by default tries to build the
+		# disable multilib support, as arm by default tries to build the
 		# soft-float libraries, too, which fails as no soft float libroot is
 		# available
 		additionalConfigureFlags+=" --disable-multilib --with-float=hard"
@@ -179,7 +217,7 @@ INSTALL()
 		$gccLibDir/libstdc++.so.$libstdcxxSoVersion \
 		$gccLibDir/libstdc++.so.$libstdcxxLibVersion \
 		$installDestDir$libDir/
-	cp $gccLibDir/libstdc++*.a $installDestDir$developLibDir/
+	rm $gccLibDir/libstdc++*.a
 
 	# libsupc++
 	libstdcxxDir=$objectsDir/$effectiveTargetMachineTriple/libstdc++-v3
@@ -241,6 +279,14 @@ INSTALL()
 		$installDestDir$installDir/bin/${effectiveTargetMachineTriple}-gcc-$mainVersion
 	ln -sfn g++ $installDestDir$installDir/bin/c++
 
+	# symlink all libraries from libDir -> developLibDir
+	mkdir -p $installDestDir$developLibDir
+	for l in libgcc_s libstdc++ libsupc++; do
+		for f in $installDestDir$libDir/$l*; do
+			symlinkRelative -sfn $f $installDestDir$developLibDir/
+		done
+	done
+
 	### Cleanup ###############################################
 
 	echo "Cleanup"
@@ -258,58 +304,9 @@ INSTALL()
 		$relativeLibDir/libsupc++.so
 
 	packageEntries "syslibs_devel" \
-		$relativeDevelopLibDir/libgcc.a \
-		$relativeDevelopLibDir/libgcc-kernel.a \
-		$relativeDevelopLibDir/libgcc_eh.a \
-		$relativeDevelopLibDir/libgcc_eh-kernel.a \
-		$relativeDevelopLibDir/libstdc++.a \
-		$relativeDevelopLibDir/libsupc++.a \
-		$relativeDevelopLibDir/libsupc++-kernel.a \
+		$relativeDevelopLibDir \
 		$relativeIncludeDir
 
 	rm -rf $installDestDir$includeDir
 	rm -rf $installDestDir$developLibDir
 }
-
-# ----- syslibs package -----------------------------------------------------
-
-SUMMARY_syslibs="\
-GCC c/c++-runtime shared libraries, needed to execute c/c++ programs"
-DESCRIPTION_syslibs="The c/c++-runtime libraries that are part of the gcc \
-distribution. This package contains the shared libraries for the runtime \
-loader, so it is required for executing most c/c++ programs."
-
-PROVIDES_syslibs="
-	gcc_bootstrap${secondaryArchSuffix}_syslibs = $portVersion compat >= 5
-	gcc${secondaryArchSuffix}_syslibs = $portVersion compat >= 5
-	lib:libgcc_s$secondaryArchSuffix = $portVersion compat >= 5
-	lib:libstdc++$secondaryArchSuffix = $portVersion compat >= 5
-	lib:libsupc++$secondaryArchSuffix = $portVersion compat >= 5
-	"
-
-REQUIRES_syslibs="
-	haiku$secondaryArchSuffix
-	"
-
-# ----- syslibs_devel package -----------------------------------------------
-
-SUMMARY_syslibs_devel="\
-GCC c/c++-runtime static libraries and c++ headers, needed to build Haiku"
-DESCRIPTION_syslibs_devel="\
-This package is not of general interest - it contains the set of gcc's c/c++-\
-runtime libraries and headers that is required by Haiku's build system when \
-building Haiku."
-
-PROVIDES_syslibs_devel="
-	gcc_bootstrap${secondaryArchSuffix}_syslibs_devel = $portVersion compat >= 5
-	gcc${secondaryArchSuffix}_syslibs_devel = $portVersion compat >= 5
-	devel:libgcc_kernel$secondaryArchSuffix
-	devel:libgcc$secondaryArchSuffix
-	devel:libgcc_eh_kernel$secondaryArchSuffix
-	devel:libgcc_eh$secondaryArchSuffix
-	devel:libstdc++$secondaryArchSuffix
-	devel:libsupc++_kernel$secondaryArchSuffix
-	devel:libsupc++$secondaryArchSuffix
-	"
-
-REQUIRES_syslibs_devel=""
