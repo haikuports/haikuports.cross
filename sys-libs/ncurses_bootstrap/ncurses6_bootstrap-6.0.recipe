@@ -50,6 +50,7 @@ if [ -n "$secondaryArchSuffix" ]; then
 fi
 
 BUILD_REQUIRES="
+	gcc${secondaryArchSuffix}_syslibs_devel
 	"
 BUILD_PREREQUIRES="
 	haiku${secondaryArchSuffix}_devel
