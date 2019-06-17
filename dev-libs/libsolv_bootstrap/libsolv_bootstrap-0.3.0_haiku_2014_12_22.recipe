@@ -24,6 +24,7 @@ REQUIRES="
 	lib:libz$secondaryArchSuffix
 	"
 BUILD_REQUIRES="
+	gcc${secondaryArchSuffix}_syslibs_devel
 	devel:libexpat$secondaryArchSuffix
 	devel:libz$secondaryArchSuffix
 	"
