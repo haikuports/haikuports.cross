@@ -99,10 +99,10 @@ gccVersion=$(echo $portVersion | cut -d_ -f1)
 
 BUILD()
 {
-	# we need the static libstdc++ to build GCC, so rename it for this build
+	# we need the static libstdc++ to build GCC, so use it for this build
 	# (and we will rename it back immediately after we are done.)
 	crossGccLibDir=$(dirname $($effectiveTargetMachineTriple-gcc -print-sysroot))/$effectiveTargetMachineTriple/lib/
-	mv $crossGccLibDir/libstdc++-static.a $crossGccLibDir/libstdc++.a
+	cp -f $crossGccLibDir/libstdc++-static.a $crossGccLibDir/libstdc++.a
 
 	rm -rf $objectsDir
 
@@ -202,10 +202,9 @@ INSTALL()
 
 	make DESTDIR=$installDestDir install
 
-	# now that we are done with "make", move libstdc++ back
+	# now that we are done with "make", remove stdlibc++
 	crossGccLibDir=$(dirname $($effectiveTargetMachineTriple-gcc -print-sysroot))/$effectiveTargetMachineTriple/lib/
-	mv $crossGccLibDir/libstdc++.a $crossGccLibDir/libstdc++-static.a
-
+	rm -f $crossGccLibDir/libstdc++.a
 
 	### Libraries #############################################
 
