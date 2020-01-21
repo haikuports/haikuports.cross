@@ -9,7 +9,7 @@ COPYRIGHT="1988-2018 Free Software Foundation, Inc."
 srcGitRev="e4426fc38a49e3b9f8ef350663717a8caef4d6c8"
 SOURCE_URI="https://github.com/haiku/buildtools/archive/$srcGitRev.tar.gz"
 CHECKSUM_SHA256="c2a74d47c9f1f89f6bd01ddab349ddd7bcc3f842753b6b953c2e3be1e09efa9f"
-REVISION="1"
+REVISION="2"
 
 ARCHITECTURES="!x86_gcc2 x86_64 sparc riscv64 arm arm64 ppc"
 SECONDARY_ARCHITECTURES="?x86"
