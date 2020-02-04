@@ -8,7 +8,7 @@ COPYRIGHT="1996-2013 David Turner, Robert Wilhelm, Werner Lemberg, et al."
 SOURCE_URI="http://download.savannah.gnu.org/releases/freetype/freetype-$portVersion.tar.bz2"
 CHECKSUM_SHA256="371e707aa522acf5b15ce93f11183c725b8ed1ee8546d7b3af549863045863a2"
 REVISION="1"
-ARCHITECTURES="x86_gcc2 x86 x86_64 ppc arm riscv64 sparc"
+ARCHITECTURES="x86_gcc2 x86 x86_64 ppc arm riscv64 sparc m68k"
 SECONDARY_ARCHITECTURES="x86_gcc2 x86"
 
 PROVIDES="
