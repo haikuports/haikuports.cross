@@ -19,7 +19,7 @@ COPYRIGHT="1998-1999, 2001-2008 Free Software Foundation
 	2005 Caolan McNamara
 	2005 Daniel Richard G."
 	
-ARCHITECTURES="x86 x86_64 ppc arm riscv64 sparc m68k"
+ARCHITECTURES="x86 x86_64 ppc arm arm64 riscv64 sparc m68k"
 
 PROVIDES="
 	gnu_classpath_bootstrap = $portVersion

@@ -23,7 +23,7 @@ SOURCE_URI="http://ftp.gnu.org/gnu/coreutils/coreutils-$portVersion.tar.xz"
 SOURCE_DIR="coreutils-$portVersion"
 CHECKSUM_SHA256="5b3e94998152c017e6c75d56b9b994188eb71bf46d4038a642cb9141f6ff1212"
 REVISION="1"
-ARCHITECTURES="x86_gcc2 x86 x86_64 ppc arm riscv64 sparc m68k"
+ARCHITECTURES="x86_gcc2 x86 x86_64 ppc arm arm64 riscv64 sparc m68k"
 
 PATCHES="
 	coreutils-$portVersion.patchset
