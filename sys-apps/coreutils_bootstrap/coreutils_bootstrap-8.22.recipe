@@ -84,6 +84,7 @@ PROVIDES="
 	cmd:mknod = $portVersion compat >= 8
 	cmd:mktemp = $portVersion compat >= 8
 	cmd:mv = $portVersion compat >= 8
+	cmd:nice = $portVersion compat >= 8
 	cmd:nl = $portVersion compat >= 8
 	cmd:nohup = $portVersion compat >= 8
 	cmd:nproc = $portVersion compat >= 8
