@@ -9,7 +9,7 @@ COPYRIGHT="1988-2018 Free Software Foundation, Inc."
 srcGitRev="32f9366f9eac1c2ea7d41f067432e636bb735806"
 SOURCE_URI="https://github.com/haiku/buildtools/archive/$srcGitRev.tar.gz"
 CHECKSUM_SHA256="7ad7cfbcb6292a0be3c5634e30335a0c37af01d0649f2a3e03d603d3e3744242"
-REVISION="3"
+REVISION="4"
 
 ARCHITECTURES="!x86_gcc2 x86_64 sparc riscv64 arm arm64 ppc m68k"
 SECONDARY_ARCHITECTURES="?x86"
@@ -62,6 +62,7 @@ PROVIDES_syslibs_devel="
 	gcc${secondaryArchSuffix}_syslibs_devel = $portVersion compat >= 5
 	devel:libgcc_s$secondaryArchSuffix = $portVersion compat >= 5
 	devel:libgcc_kernel$secondaryArchSuffix
+	devel:libgcc_boot$secondaryArchSuffix
 	devel:libgcc$secondaryArchSuffix
 	devel:libgcc_eh_kernel$secondaryArchSuffix
 	devel:libgcc_eh$secondaryArchSuffix
@@ -134,8 +135,12 @@ BUILD()
 		# TODO: Disable building wtih TLS support for ARM until implemented
 		additionalConfigureFlags+=" --disable-tls"
 	fi
+	if [ $effectiveTargetArchitecture == arm64 ]; then
+		additionalConfigureFlags+=" --disable-multilib --disable-tls"
+	fi
 	if [ $effectiveTargetArchitecture == riscv64 ]; then
 		additionalConfigureFlags+=" --disable-multilib"
+		additionalConfigureFlags+=" --with-arch=rv64gc"
 	fi
 	if [ $effectiveTargetArchitecture == powerpc ]; then
 		# TODO: Disable building wtih TLS support for ARM until implemented
@@ -167,6 +172,8 @@ BUILD()
 
 	make $jobArgs
 
+	## KERNEL libgcc + libsupc++
+
 	# build kernel versions of libgcc.a and libgcc_eh.a (no threads or TLS)
 	cd $objectsDir/$effectiveTargetMachineTriple/libgcc
 	mkdir -p saved
@@ -178,8 +185,9 @@ BUILD()
 	mv libgcc_eh.a libgcc_eh-kernel.a
 	mv saved/* .
 	rmdir saved
-	cd $objectsDir/$effectiveTargetMachineTriple/libstdc++-v3/libsupc++
+
 	# build kernel version of libsupc++.a (without threads or TLS)
+	cd $objectsDir/$effectiveTargetMachineTriple/libstdc++-v3/libsupc++
 	mkdir -p saved
 	mv .libs/libsupc++* saved/
 	make clean
@@ -192,6 +200,43 @@ BUILD()
 		"../config.h"
 	make CFLAGS="-O2 $kernelCcFlags" CXXFLAGS="-O2 $kernelCcFlags"
 	mv .libs/libsupc++.a .libs/libsupc++-kernel.a
+	mv saved/* .libs/
+	rmdir saved
+
+
+	## BOOTLOADER libgcc + libsupc++
+	local bootCcFlags
+	if [ $effectiveTargetArchitecture == arm ]; then
+		# EFI arm (32-bit) requires software fp
+		bootCcFlags+="-mfloat-abi=soft";
+	fi
+
+	# build bootloader version of libgcc and libgcc_eh.a (no threads, TLS)
+	cd $objectsDir/$effectiveTargetMachineTriple/libgcc
+	mkdir -p saved
+	mv libgcc.a libgcc_eh.a libgcc_s* libgcov* libgcc-kernel.a libgcc_eh-kernel.a saved/
+	make clean
+	ln -sfn "$sourceDir/libgcc/gthr-single.h" gthr-default.h
+	make CFLAGS="-O2 $bootCcFlags" CXXFLAGS="-O2 $bootCcFlags"
+	mv libgcc.a libgcc-boot.a
+	mv libgcc_eh.a libgcc_eh-boot.a
+	mv saved/* .
+	rmdir saved
+
+	# build bootloader version of libsupc++.a (without threads or TLS)
+	cd $objectsDir/$effectiveTargetMachineTriple/libstdc++-v3/libsupc++
+	mkdir -p saved
+	mv .libs/libsupc++* saved/
+	make clean
+	# deactivate threads and tls support
+	cp "../include/$effectiveTargetMachineTriple/bits/gthr-single.h" \
+		"../include/$effectiveTargetMachineTriple/bits/gthr-default.h"
+	sed -i -e 's,#define _GLIBCXX_HAVE_TLS 1,/* #undef _GLIBCXX_HAVE_TLS */,' \
+		"../include/$effectiveTargetMachineTriple/bits/c++config.h"
+	sed -i -e 's,#define _GLIBCXX_HAS_GTHREADS 1,/* #undef _GLIBCXX_HAS_GTHREADS */,' \
+		"../config.h"
+	make CFLAGS="-O2 $bootCcFlags" CXXFLAGS="-O2 $bootCcFlags"
+	mv .libs/libsupc++.a .libs/libsupc++-boot.a
 	mv saved/* .libs/
 	rmdir saved
 }
