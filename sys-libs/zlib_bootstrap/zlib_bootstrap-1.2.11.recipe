@@ -18,6 +18,7 @@ REQUIRES="
 	haiku$secondaryArchSuffix
 	"
 BUILD_REQUIRES="
+	gcc${secondaryArchSuffix}_syslibs
 	"
 BUILD_PREREQUIRES="
 	haiku_devel
@@ -55,7 +56,8 @@ BUILD()
 		SET(CMAKE_SYSTEM_VERSION 1)
 		SET(CMAKE_C_COMPILER $effectiveTargetMachineTriple-gcc)
 		SET(CMAKE_CXX_COMPILER $effectiveTargetMachineTriple-g++)
-		SET(CMAKE_FIND_ROOT_PATH $crossSysrootDir)
+                SET(CMAKE_SYSROOT $crossSysrootDir)
+                SET(CMAKE_BUILD_RPATH /boot/system/lib)
 		SET(CMAKE_FIND_ROOT_PATH_MODE_PROGRAM NEVER)
 		SET(CMAKE_FIND_ROOT_PATH_MODE_LIBRARY ONLY)
 		SET(CMAKE_FIND_ROOT_PATH_MODE_INCLUDE ONLY)
