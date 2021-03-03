@@ -1,0 +1,102 @@
+SUMMARY="An interpreted, interactive, object-oriented programming language"
+DESCRIPTION="
+Python is a programming language that lets you work more quickly and integrate \
+your systems more effectively. You can learn to use Python and see almost \
+immediate gains in productivity and lower maintenance costs.
+Python runs on Windows, Linux/Unix, Mac OS X, and has been ported to the Java \
+and .NET virtual machines.
+Python is free to use, even for commercial products, because of its \
+OSI-approved open source license.
+"
+HOMEPAGE="https://www.python.org/"
+COPYRIGHT="1990-2018 Python Software Foundation"
+LICENSE="Python"
+REVISION="1"
+SOURCE_URI="https://www.python.org/ftp/python/$portVersion/Python-$portVersion.tar.xz"
+CHECKSUM_SHA256="4d43f033cdbd0aa7b7023c81b0e986fd11e653b5248dac9144d508f11812ba41"
+SOURCE_DIR="Python-$portVersion"
+PATCHES="python_bootstrap-$portVersion.patchset"
+
+ARCHITECTURES="x86_gcc2 x86 x86_64 ppc arm arm64 riscv64 sparc m68k"
+
+GLOBAL_WRITABLE_FILES="
+	non-packaged/lib/python2.7/site-packages directory keep-old
+	"
+
+PROVIDES="
+	python_bootstrap = $portVersion compat >= 2.7
+	python = $portVersion compat >= 2.7
+	cmd:2to3 = $portVersion compat >= 2.7
+	cmd:idle = $portVersion compat >= 2.7
+	cmd:pydoc = $portVersion compat >= 2.7
+	cmd:python = $portVersion compat >= 2.7
+	cmd:python2 = $portVersion compat >= 2.7
+	cmd:python2.7 = $portVersion compat >= 2.7
+	cmd:python2.7_config = $portVersion compat >= 2.7
+	cmd:python2_config = $portVersion compat >= 2.7
+	cmd:python_config = $portVersion compat >= 2.7
+	cmd:smtpd.py = $portVersion compat >= 2.7
+	devel:libpython2.7 = 1.0
+	lib:libpython2.7 = 1.0
+	"
+REQUIRES="
+	haiku
+	lib:libncurses
+	lib:libz
+	"
+
+BUILD_REQUIRES="
+	devel:libncurses
+	devel:libz
+	"
+BUILD_PREREQUIRES="
+	haiku_devel
+	gcc_cross_$targetArchitecture
+	binutils_cross_$targetArchitecture
+	cmd:aclocal
+	cmd:autoconf
+	cmd:find
+	cmd:gcc
+	cmd:ld
+	cmd:${targetMachineTripleAsName}_libtoolize
+	cmd:make
+	cmd:sed
+	"
+
+BUILD()
+{
+	cd Modules/_ctypes/libffi
+	${targetMachineTriple}-libtoolize --force --copy --install
+	cd ../../..
+
+	${targetMachineTriple}-libtoolize --force --copy --install
+	aclocal
+	autoconf
+
+	rm -Rf buildhost
+	mkdir buildhost
+	cd buildhost
+	../configure
+	make Parser/pgen
+	mv Parser/pgen ../Parser/buildhost_pgen
+	cd ..
+
+	runConfigure ./configure LDFLAGS="-L$sourceDir" \
+		--host=$targetMachineTriple \
+		--build=$buildMachineTriple \
+		--enable-shared \
+		--enable-unicode=ucs4 \
+		--with-libm=no \
+		ac_cv_file__dev_ptmx=yes \
+		ac_cv_file__dev_ptc=no \
+		ac_cv_buggy_getaddrinfo=no
+
+	make BUILDHOST_PGEN=Parser/buildhost_pgen $jobArgs
+}
+
+INSTALL()
+{
+	make DESTDIR=$installDestDir install
+
+	prepareInstalledDevelLibs libpython2.7
+}
