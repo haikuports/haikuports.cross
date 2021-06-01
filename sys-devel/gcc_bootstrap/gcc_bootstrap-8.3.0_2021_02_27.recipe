@@ -1,5 +1,5 @@
 SUMMARY="C/C++ cross-compiler for target ${effectiveTargetMachineTriple}"
-DESCRIPTION="Standard compiler for most platform."
+DESCRIPTION="Standard compiler for most platforms."
 HOMEPAGE="https://gcc.gnu.org"
 LICENSE="
 	GNU GPL v3
