@@ -100,7 +100,6 @@ gccVersion=$(echo $portVersion | cut -d_ -f1)
 
 BUILD()
 {
-#	cp $portBaseDir/buildtools/gcc/gcc/config/aarch64/aarch64-haiku.h $sourceDir/gcc/config/aarch64/aarch64-haiku.h
 	# we need the static libstdc++ to build GCC, so use it for this build
 	# (and we will rename it back immediately after we are done.)
 	crossGccLibDir=$(dirname $($effectiveTargetMachineTriple-gcc -print-sysroot))/$effectiveTargetMachineTriple/lib/
