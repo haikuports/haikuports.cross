@@ -1,0 +1,98 @@
+SUMMARY="An interpreted, interactive, object-oriented programming language"
+DESCRIPTION="
+Python is a programming language that lets you work more quickly and integrate \
+your systems more effectively. You can learn to use Python and see almost \
+immediate gains in productivity and lower maintenance costs.
+Python runs on Windows, Linux/Unix, Mac OS X, and has been ported to the Java \
+and .NET virtual machines.
+Python is free to use, even for commercial products, because of its \
+OSI-approved open source license.
+"
+HOMEPAGE="https://www.python.org"
+LICENSE="Python"
+COPYRIGHT="1990-2020 Python Software Foundation"
+REVISION="1"
+SOURCE_URI="https://www.python.org/ftp/python/$portVersion/Python-$portVersion.tar.xz"
+CHECKSUM_SHA256="991c3f8ac97992f3d308fefeb03a64db462574eadbff34ce8bc5bb583d9903ff"
+SOURCE_DIR="Python-$portVersion"
+PATCHES="python_bootstrap-$portVersion.patchset"
+if [ "$secondaryArchSuffix" = _x86 ] ; then
+	PATCHES+="
+		python_bootstrap_x86-$portVersion.patchset
+	"
+fi
+
+ARCHITECTURES=" !x86_gcc2 ?x86 ?x86_64 ?arm arm64 ?riscv64"
+
+GLOBAL_WRITABLE_FILES="
+	non-packaged/lib/python3.9/site-packages directory keep-old
+	"
+
+PROVIDES="
+        python_bootstrap = $portVersion compat >= 3
+        python = $portVersion compat >= 3
+        cmd:2to3 = $portVersion compat >= 3
+        cmd:idle = $portVersion compat >= 3
+        cmd:pydoc = $portVersion compat >= 3
+        cmd:python = $portVersion compat >= 3
+        cmd:python3 = $portVersion compat >= 3
+        cmd:python3.9 = $portVersion compat >= 3
+        cmd:python3.9_config = $portVersion compat >= 3
+        cmd:python3_config = $portVersion compat >= 3
+        cmd:python_config = $portVersion compat >= 3
+        cmd:smtpd.py = $portVersion compat >= 3
+        devel:libpython3.9 = 1.0
+        lib:libpython3.9 = 1.0
+	"
+REQUIRES="
+	haiku
+	lib:libexpat
+	lib:libffi
+	lib:libncurses
+	lib:libz
+	"
+
+BUILD_REQUIRES="
+	devel:libexpat
+	devel:libffi
+	devel:libncurses
+	devel:libz
+	"
+
+BUILD_PREREQUIRES="
+	haiku_devel
+	gcc_cross_$targetArchitecture
+	binutils_cross_$targetArchitecture
+	cmd:aclocal
+	cmd:autoconf
+	cmd:find
+	cmd:gcc
+	cmd:ld
+	cmd:libtoolize
+	cmd:make
+	"
+
+BUILD()
+{
+	libtoolize --force --copy --install
+	aclocal
+	autoconf
+
+	runConfigure ./configure \
+                --target=$targetMachineTriple \
+                --build=$buildMachineTriple \
+		--enable-optimizations \
+		--enable-shared \
+		--with-system-ffi \
+		--with-system-expat \
+		ac_cv_file__dev_ptmx=yes \
+		ac_cv_file__dev_ptc=no \
+		ac_cv_buggy_getaddrinfo=no
+	make
+}
+
+INSTALL()
+{
+	make DESTDIR=$installDestDir install
+	prepareInstalledDevelLibs libpython3
+}
