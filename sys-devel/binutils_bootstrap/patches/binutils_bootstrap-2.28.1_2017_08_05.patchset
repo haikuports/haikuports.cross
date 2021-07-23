@@ -1,4 +1,4 @@
-From 9fe7ea465a5ca2715a2f90a91784192ef44a352e Mon Sep 17 00:00:00 2001
+From 9a6e3d001cc8ec8b37bdffc6df21a930be991b91 Mon Sep 17 00:00:00 2001
 From: =?UTF-8?q?J=C3=A9r=C3=B4me=20Duval?= <jerome.duval@gmail.com>
 Date: Sat, 5 Aug 2017 11:54:22 +0200
 Subject: Haiku patch
@@ -489,10 +489,10 @@ index 24d13f3..84d70b8 100644
    ;;
  
 -- 
-2.13.1
+2.20.1
 
 
-From cc4c78e10331c30afd91bd80f2ffc63731b4084b Mon Sep 17 00:00:00 2001
+From 960cd3cfabecda864d6f28030e5811bb123378be Mon Sep 17 00:00:00 2001
 From: =?UTF-8?q?J=C3=A9r=C3=B4me=20Duval?= <jerome.duval@gmail.com>
 Date: Sat, 5 Aug 2017 12:34:41 +0200
 Subject: Haiku: regenerate configure and Makefile.in.
@@ -698,18 +698,14 @@ index a1c7cd0..aec2bac 100755
    ;;
  
 -- 
-2.13.1
+2.20.1
 
-From ad2b5ef31ff8af63533e72f3aa65c5cd1942b7e2 Mon Sep 17 00:00:00 2001
+
+From 563b1ebbe34b4f2cb0bb203da141dbaf0d974666 Mon Sep 17 00:00:00 2001
 From: PulkoMandy <pulkomandy@pulkomandy.tk>
 Date: Sat, 9 Mar 2019 14:13:33 +0100
-Subject: [PATCH] Add sparc support.
+Subject: Add sparc support.
 
----
- bfd/config.bfd    | 2 +-
- gas/configure.tgt | 2 ++
- ld/configure.tgt  | 1 +
- 3 files changed, 4 insertions(+), 1 deletion(-)
 
 diff --git a/bfd/config.bfd b/bfd/config.bfd
 index ee202b2..f301f0d 100644
@@ -750,5 +746,56 @@ index 30b35af..e6783b7 100644
  sparclite*-*-elf)	targ_emul=elf32_sparc ;;
  sparclite*-*-coff)	targ_emul=coff_sparc ;;
 -- 
-2.18.0
+2.20.1
+
+
+From fe56b5e28f62982030fdf69509cd737d939f0237 Mon Sep 17 00:00:00 2001
+From: Fredrik Holmqvist <fredrik.holmqvist@gmail.com>
+Date: Sat, 6 Mar 2021 16:26:27 +0100
+Subject: Add Haiku AARCH64 support
+
+
+diff --git a/bfd/config.bfd b/bfd/config.bfd
+index f301f0d..f89d06d 100644
+--- a/bfd/config.bfd
++++ b/bfd/config.bfd
+@@ -270,6 +270,11 @@ case "${targ}" in
+     targ_selvecs=aarch64_elf64_be_cloudabi_vec
+     want64=true
+     ;;
++  aarch64-*-haiku*)
++    targ_defvec=aarch64_elf64_le_vec
++    targ_selvecs="aarch64_elf64_be_vec arm_elf32_le_vec arm_elf32_be_vec"
++    want64=true
++    ;;
+   aarch64-*-linux*)
+     targ_defvec=aarch64_elf64_le_vec
+     targ_selvecs="aarch64_elf64_be_vec aarch64_elf32_le_vec aarch64_elf32_be_vec arm_elf32_le_vec arm_elf32_be_vec"
+diff --git a/gas/configure.tgt b/gas/configure.tgt
+index 621aed7..bec606f 100644
+--- a/gas/configure.tgt
++++ b/gas/configure.tgt
+@@ -124,6 +124,7 @@ generic_target=${cpu_type}-$vendor-$os
+ case ${generic_target} in
+   aarch64*-*-elf | aarch64*-*-rtems*)	fmt=elf;;
+   aarch64*-*-fuchsia*)			fmt=elf;;
++  aarch64*-*-haiku*)			fmt=elf em=haiku ;;
+   aarch64*-*-linux*)			fmt=elf em=linux ;;
+ 
+   alpha-*-*vms*)			fmt=evax ;;
+diff --git a/ld/configure.tgt b/ld/configure.tgt
+index e6783b7..9e58835 100644
+--- a/ld/configure.tgt
++++ b/ld/configure.tgt
+@@ -56,6 +56,8 @@ aarch64-*-freebsd*)	targ_emul=aarch64fbsd
+ 			targ_extra_emuls="aarch64fbsdb aarch64elf" ;;
+ aarch64-*-fuchsia*)	targ_emul=aarch64elf
+ 			targ_extra_emuls="aarch64elfb armelf armelfb" ;;
++aarch64-*-haiku*)	targ_emul=aarch64elf
++			targ_extra_emuls="aarch64elfb armelf armelfb" ;;
+ aarch64_be-*-linux*)	targ_emul=aarch64linuxb
+ 			targ_extra_libpath="aarch64linux aarch64linux32 aarch64linux32b armelfb_linux_eabi armelf_linux_eabi"
+ 			targ_extra_emuls="aarch64elfb aarch64elf aarch64elf32 aarch64elf32b armelfb armelf $targ_extra_libpath" ;;
+-- 
+2.20.1
 
