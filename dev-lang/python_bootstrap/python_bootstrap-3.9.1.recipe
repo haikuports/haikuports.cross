@@ -77,22 +77,32 @@ BUILD()
 	libtoolize --force --copy --install
 	aclocal
 	autoconf
+	mkdir -p hostpython
+	# Build a small host python needed for crosscompilation
+	cd hostpython
+	CFLAGS="-pipe $CFLAGS" ../configure
+	make platform
+	cd ..
 
+	export PATH="$(pwd)/hostpython:$PATH"
+	export PYTHONPATH="$(pwd)/hostpython"
 	runConfigure ./configure \
-                --target=$targetMachineTriple \
-                --build=$buildMachineTriple \
-		--enable-optimizations \
+		--build=$buildMachineTriple \
+		--host=$targetMachineTriple \
 		--enable-shared \
+		--with-ensurepip=no \
 		--with-system-ffi \
 		--with-system-expat \
 		ac_cv_file__dev_ptmx=yes \
 		ac_cv_file__dev_ptc=no \
 		ac_cv_buggy_getaddrinfo=no
 	make
+
 }
 
 INSTALL()
 {
+	export PATH="$(pwd)/hostpython:$PATH"
 	make DESTDIR=$installDestDir install
 	prepareInstalledDevelLibs libpython3
 }
