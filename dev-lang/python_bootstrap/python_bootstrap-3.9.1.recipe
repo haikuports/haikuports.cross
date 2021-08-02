@@ -80,7 +80,7 @@ BUILD()
 	mkdir -p hostpython
 	# Build a small host python needed for crosscompilation
 	cd hostpython
-	CFLAGS="-pipe $CFLAGS" ../configure
+	../configure
 	make platform
 	cd ..
 
