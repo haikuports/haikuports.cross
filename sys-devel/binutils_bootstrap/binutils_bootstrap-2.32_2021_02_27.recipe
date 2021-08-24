@@ -1,0 +1,154 @@
+SUMMARY="Assembler, linker and binary tools for target ${targetMachineTriple}"
+DESCRIPTION="The GNU Binutils are a collection of binary tools.
+
+The main ones are:
+- ld - the GNU linker.
+- as - the GNU assembler.
+
+But they also include:
+- addr2line - Converts addresses into filenames and line numbers.
+- ar - A utility for creating, modifying and extracting from archives.
+- c++filt - Filter to demangle encoded C++ symbols.
+- nm - Lists symbols from object files.
+- objcopy - Copys and translates object files.
+- objdump - Displays information from object files.
+- ranlib - Generates an index to the contents of an archive.
+- readelf - Displays information from any ELF format object file.
+- size - Lists the section sizes of an object or archive file.
+- strings - Lists printable strings from files.
+- strip - Discards symbols.
+
+The tools of this package can be used for cross-builds to \
+$effectiveTargetMachineTriple."
+HOMEPAGE="http://www.gnu.org/software/binutils"
+COPYRIGHT="1988-2016 Free Software Foundation, Inc."
+LICENSE="GNU GPL v3
+	GNU LGPL v3"
+REVISION="1"
+binutilsVersion="2.32"
+srcGitRev="4ab0fe4d95a13d203733d2dac3895c014ba7d293"
+SOURCE_URI="https://github.com/haiku/buildtools/archive/$srcGitRev.tar.gz"
+CHECKSUM_SHA256="0b2e8802314734756a4fd360dc61754889c94b0a0c44191a36f9d4abd75e3a37"
+SOURCE_DIR="buildtools-$srcGitRev/binutils"
+
+ARCHITECTURES="!x86_gcc2 x86 x86_64 ppc arm arm64 riscv64 sparc m68k"
+SECONDARY_ARCHITECTURES="x86"
+
+PROVIDES="
+	binutils_bootstrap$secondaryArchSuffix = $portVersion compat >= 2.26
+	binutils$secondaryArchSuffix = $portVersion compat >= 2.26
+	cmd:addr2line$secondaryArchSuffix = $portVersion compat >= 2.26
+	cmd:ar$secondaryArchSuffix = $portVersion compat >= 2.26
+	cmd:as$secondaryArchSuffix = $portVersion compat >= 2.26
+	cmd:c++filt$secondaryArchSuffix = $portVersion compat >= 2.26
+	cmd:elfedit$secondaryArchSuffix = $portVersion compat >= 2.26
+	cmd:gprof$secondaryArchSuffix = $portVersion compat >= 2.26
+	cmd:ld$secondaryArchSuffix = $portVersion compat >= 2.26
+	cmd:ld.bfd$secondaryArchSuffix = $portVersion compat >= 2.26
+	cmd:nm$secondaryArchSuffix = $portVersion compat >= 2.26
+	cmd:objcopy$secondaryArchSuffix = $portVersion compat >= 2.26
+	cmd:objdump$secondaryArchSuffix = $portVersion compat >= 2.26
+	cmd:ranlib$secondaryArchSuffix = $portVersion compat >= 2.26
+	cmd:readelf$secondaryArchSuffix = $portVersion compat >= 2.26
+	cmd:size$secondaryArchSuffix = $portVersion compat >= 2.26
+	cmd:strings$secondaryArchSuffix = $portVersion compat >= 2.26
+	cmd:strip$secondaryArchSuffix = $portVersion compat >= 2.26
+	"
+REQUIRES="
+	haiku$secondaryArchSuffix
+	"
+BUILD_REQUIRES="
+	"
+BUILD_PREREQUIRES="
+	haiku${secondaryArchSuffix}_devel
+	binutils_cross_${effectiveTargetArchitecture}
+	gcc_cross_${effectiveTargetArchitecture}
+	cmd:autoconf
+	cmd:flex
+	cmd:gcc
+	cmd:ld
+	cmd:make
+	cmd:makeinfo
+	cmd:sed
+	cmd:tar
+	"
+
+BUILD_PACKAGE_ACTIVATION_PHASE=INSTALL
+
+sourceDir=$(pwd)
+relativeInstallDir="develop/tools$secondaryArchSubDir"
+installDir="$prefix/$relativeInstallDir"
+objectsDir=$(pwd)/../${portVersionedName}-obj
+
+BUILD()
+{
+	rm -rf $objectsDir
+
+	# Touch all *.info files, as newer texinfos don't like their format
+	(cd $sourceDir; find . -name \*.info | xargs touch)
+
+	mkdir -p $objectsDir
+	cd $objectsDir
+
+	CFLAGS=-O2 CXXFLAGS=-O2 runConfigure "$sourceDir/configure" \
+		--build=$buildMachineTriple --host=$effectiveTargetMachineTriple \
+		--target=$effectiveTargetMachineTriple \
+		--exec-prefix=$installDir \
+		--includedir=$includeDir/binutils \
+		--docdir=$docDir \
+		--disable-nls --disable-shared --disable-werror \
+		--enable-initfini-array \
+		--with-sysroot=/
+		# Note: The sysroot option is normally superfluous. We have to specify
+		# it, however, since we need to configure gcc with a sysroot, which
+		# causes ld to be invoked with --sysroot, which makes ld unhappy, if it
+		# hasn't been configured with a sysroot itself. Ideally we'd fix the
+		# gcc build system issue causing the whole issue.
+	make $jobArgs
+}
+
+INSTALL()
+{
+	cd $objectsDir
+
+	make DESTDIR=$installDestDir install
+
+	# Remove the development libraries and headers. Nobody uses those anyway.
+	rm $installDestDir$libDir/*.a $installDestDir$libDir/*.la
+	rm -r $installDestDir$developDir/headers
+
+	# no info documentation
+	rm -r $installDestDir$infoDir
+
+	### Strip #################################################
+
+	echo "Strip debug info"
+
+	$effectiveTargetMachineTriple-strip --strip-debug $installDestDir$binDir/*
+
+	### Symlinks ##############################################
+
+	echo "Creating required symlinks"
+
+	# There are copies of a subset of the commands below installDir. We
+	# overwrite those with symlinks to the ones in binDir.
+	for file in $installDestDir$installDir/$effectiveTargetMachineTriple/bin/*
+	do
+		symlinkRelative -sfn $installDestDir$binDir/$(basename $file) $file
+	done
+
+	# ld.bfd is a copy of ld -- symlink instead
+	cd $installDestDir$binDir
+	ln -sf ld ld.bfd
+
+	### Cleanup #################################################
+
+	echo "Cleanup"
+
+	# delete man pages for commands that we aren't including
+	cd $installDestDir$manDir
+	for cmd in dlltool nlmconv windmc windres; do
+		rm -f man1/$cmd.1
+	done
+}
+
