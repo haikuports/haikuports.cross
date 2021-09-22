@@ -1,0 +1,78 @@
+SUMMARY="XML parser toolkit"
+DESCRIPTION="
+Expat is an XML parser library written in C. It is a stream-oriented parser in \
+which an application registers handlers for things the parser might find in \
+the XML document (like start tags).
+"
+HOMEPAGE="http://expat.sourceforge.net/"
+COPYRIGHT="
+	1998-2000 Thai Open Source Software Center Ltd and Clark Cooper
+	2001-2006 Expat maintainers.
+	"
+LICENSE="MIT"
+REVISION="1"
+SOURCE_URI="https://downloads.sourceforge.net/expat/expat-$portVersion.tar.bz2"
+CHECKSUM_SHA256="2f9b6a580b94577b150a7d5617ad4643a4301a6616ff459307df3e225bcfbf40"
+PATCHES="expat-$portVersion.patchset"
+SOURCE_DIR="expat-$portVersion"
+REVISION="1"
+ARCHITECTURES="x86_gcc2 x86 x86_64 ppc arm arm64 riscv64 sparc m68k"
+SECONDARY_ARCHITECTURES="x86_gcc2 x86"
+
+
+PROVIDES="
+	expat_bootstrap$secondaryArchSuffix = $portVersion compat >= 2.2
+	lib:libexpat$secondaryArchSuffix = 1.8.1 compat >= 1
+	"
+REQUIRES="
+	haiku$secondaryArchSuffix
+	"
+BUILD_REQUIRES="
+	"
+BUILD_PREREQUIRES="
+	haiku${secondaryArchSuffix}_devel
+	binutils_cross_$effectiveTargetArchitecture
+	gcc_cross_$effectiveTargetArchitecture
+	cmd:aclocal
+	cmd:autoconf
+	cmd:gcc$secondaryArchSuffix
+	cmd:ld$secondaryArchSuffix
+	cmd:libtoolize
+	cmd:make
+	"
+
+BUILD()
+{
+        runConfigure ./configure --host=$effectiveTargetMachineTriple
+        make $jobArgs
+}
+
+INSTALL()
+{
+	make DESTDIR=$installDestDir install
+
+	rm -rf $installDestDir$binDir
+
+	# prepare develop/lib
+	prepareInstalledDevelLibs libexpat
+	fixPkgconfig
+
+	# devel package
+	packageEntries devel \
+		$installDestDir$developDir
+}
+
+TEST()
+{
+	make check
+}
+
+# ----- devel package -------------------------------------------------------
+
+PROVIDES_devel="
+	expat_bootstrap${secondaryArchSuffix}_devel = $portVersion
+	devel:libexpat${secondaryArchSuffix} = 1.8.1 compat >= 1
+	"
+REQUIRES_devel="
+	expat_bootstrap${secondaryArchSuffix} == $portVersion base
+	"
