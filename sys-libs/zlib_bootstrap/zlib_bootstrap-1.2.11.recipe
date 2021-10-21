@@ -61,7 +61,7 @@ BUILD()
 		SET(CMAKE_FIND_ROOT_PATH_MODE_INCLUDE ONLY)
 EOF
 
-	cmake -DCMAKE_TOOLCHAIN_FILE=toolchain.cmake \
+	cmake -DCMAKE_BUILD_TYPE=release -DCMAKE_TOOLCHAIN_FILE=toolchain.cmake \
 		-DCMAKE_INSTALL_PREFIX:PATH=$prefix ..
 
 	# The build host might still sport a cmake which doesn't know Haiku's gcc 4
