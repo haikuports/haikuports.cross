@@ -78,6 +78,7 @@ EOF
 		-DHAIKU_BE_LIBRARY=$systemDevelLibDir/libbe.so \
 		-DHAIKU_NETWORK_LIBRARY=$systemDevelLibDir/libnetwork.so \
 		-DHAIKU_PACKAGE_LIBRARY=$systemDevelLibDir/libpackage.so \
+		-DCMAKE_BUILD_TYPE=release \
 		-DCMAKE_INSTALL_PREFIX:PATH=$prefix \
 		-DLIB=$relativeLibDir \
 		..
