@@ -41,7 +41,7 @@ wrapping when displaying the text."
 HOMEPAGE="http://www.icu-project.org"
 COPYRIGHT="1995-2020 IBM Corporation and others."
 LICENSE="ICU"
-REVISION="1"
+REVISION="2"
 SOURCE_URI="https://github.com/unicode-org/icu/releases/download/release-67-1/icu4c-67_1-src.tgz"
 SOURCE_URI_2="https://github.com/unicode-org/icu/releases/download/release-67-1/icu4c-67_1-data.zip#noarchive"
 #SOURCE_URI_3="http://www.iana.org/time-zones/repository/releases/tzdata2019c.tar.gz#noarchive"
@@ -50,7 +50,7 @@ CHECKSUM_SHA256_2="7c16a59cc8c06128b7ecc1dc4fc056b36b17349312829b17408b9e67b05c4
 SOURCE_DIR="icu"
 PATCHES="icu_bootstrap-67.1.patchset"
 
-ARCHITECTURES="arm64 riscv64"
+ARCHITECTURES="arm64 riscv64 sparc"
 # leave inactive until full testing can be done
 SECONDARY_ARCHITECTURES="!x86"
 
@@ -73,8 +73,6 @@ PROVIDES_devel="
 	devel:libicudata${secondaryArchSuffix} = $portVersion compat >= 67
 	devel:libicui18n${secondaryArchSuffix} = $portVersion compat >= 67
 	devel:libicuio${secondaryArchSuffix} = $portVersion compat >= 67
-	devel:libicutest${secondaryArchSuffix} = $portVersion compat >= 67
-	devel:libicutu${secondaryArchSuffix} = $portVersion compat >= 67
 	devel:libicuuc${secondaryArchSuffix} = $portVersion compat >= 67
 	"
 REQUIRES_devel="
@@ -136,24 +134,28 @@ BUILD()
 	rm -f data/in/icudt??l.dat
 	autoconf
 
-        # make build-architecture-specific output directory and build ICU for the
-        # current architecture
-        mkdir -p $buildOutputDir
-        cd $buildOutputDir
-        runConfigure ../icu/source/configure \
-                --disable-samples --disable-extras --with-data-packaging=archive
-        make $jobArgs
+    # make build-architecture-specific output directory and build ICU for the
+    # current architecture. Use shared data packaging, which means it will
+    # be built as a .so file and loaded using the library path. This is
+    # needed because these tools are run during the next step without being
+    # installed, and the separate .dat files we normally use will not be
+    # found in that case.
+    mkdir -p $buildOutputDir
+    cd $buildOutputDir
+    runConfigure ../icu/source/configure --disable-tests \
+        --disable-samples --disable-extras --with-data-packaging=library
+    make $jobArgs
 
-        # now make target-architecture-specific output directory and build ICU for
-        # the target architecture, pointing at the directory containing the version
-        # that's just been built for the build architecture
-        mkdir -p $targetOutputDir
-        cd $targetOutputDir
-        runConfigure ../icu/source/configure \
-                --host=$effectiveTargetMachineTriple \
-                --with-cross-build=$buildOutputDir \
-                --disable-samples --disable-extras --with-data-packaging=archive
-        make $jobArgs
+    # now make target-architecture-specific output directory and build ICU for
+    # the target architecture, pointing at the directory containing the version
+    # that's just been built for the build architecture
+    mkdir -p $targetOutputDir
+    cd $targetOutputDir
+    runConfigure ../icu/source/configure \
+        --host=$effectiveTargetMachineTriple \
+        --with-cross-build=$buildOutputDir --disable-tools --disable-tests \
+        --disable-samples --disable-extras --with-data-packaging=archive
+    make $jobArgs
 }
 
 INSTALL()
@@ -165,8 +167,6 @@ INSTALL()
                 libicudata \
                 libicui18n \
                 libicuio \
-		libicutest \
-                libicutu \
                 libicuuc
         fixPkgconfig
 

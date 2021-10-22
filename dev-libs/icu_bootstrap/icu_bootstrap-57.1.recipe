@@ -56,7 +56,7 @@ PATCHES+="
 	"
 fi
 
-ARCHITECTURES="x86_gcc2 x86 x86_64 arm arm64 ppc riscv64 sparc m68k"
+ARCHITECTURES="x86_gcc2 x86 x86_64 arm arm64 ppc riscv64 m68k"
 SECONDARY_ARCHITECTURES="x86_gcc2 x86"
 
 PROVIDES="
