@@ -180,7 +180,7 @@ BUILD()
 	mv libgcc.a libgcc_eh.a libgcc_s* libgcov* saved/
 	make clean
 	ln -sfn "$sourceDir/libgcc/gthr-single.h" gthr-default.h
-	make CFLAGS="-O2 $kernelCcFlags" CXXFLAGS="-O2 $kernelCcFlags"
+	make $jobArgs CFLAGS="-O2 $kernelCcFlags" CXXFLAGS="-O2 $kernelCcFlags"
 	mv libgcc.a libgcc-kernel.a
 	mv libgcc_eh.a libgcc_eh-kernel.a
 	mv saved/* .
@@ -198,7 +198,7 @@ BUILD()
 		"../include/$effectiveTargetMachineTriple/bits/c++config.h"
 	sed -i -e 's,#define _GLIBCXX_HAS_GTHREADS 1,/* #undef _GLIBCXX_HAS_GTHREADS */,' \
 		"../config.h"
-	make CFLAGS="-O2 $kernelCcFlags" CXXFLAGS="-O2 $kernelCcFlags"
+	make $jobArgs CFLAGS="-O2 $kernelCcFlags" CXXFLAGS="-O2 $kernelCcFlags"
 	mv .libs/libsupc++.a .libs/libsupc++-kernel.a
 	mv saved/* .libs/
 	rmdir saved
@@ -217,7 +217,7 @@ BUILD()
 	mv libgcc.a libgcc_eh.a libgcc_s* libgcov* libgcc-kernel.a libgcc_eh-kernel.a saved/
 	make clean
 	ln -sfn "$sourceDir/libgcc/gthr-single.h" gthr-default.h
-	make CFLAGS="-O2 $bootCcFlags" CXXFLAGS="-O2 $bootCcFlags"
+	make $jobArgs CFLAGS="-O2 $bootCcFlags" CXXFLAGS="-O2 $bootCcFlags"
 	mv libgcc.a libgcc-boot.a
 	mv libgcc_eh.a libgcc_eh-boot.a
 	mv saved/* .
@@ -235,7 +235,7 @@ BUILD()
 		"../include/$effectiveTargetMachineTriple/bits/c++config.h"
 	sed -i -e 's,#define _GLIBCXX_HAS_GTHREADS 1,/* #undef _GLIBCXX_HAS_GTHREADS */,' \
 		"../config.h"
-	make CFLAGS="-O2 $bootCcFlags" CXXFLAGS="-O2 $bootCcFlags"
+	make $jobArgs CFLAGS="-O2 $bootCcFlags" CXXFLAGS="-O2 $bootCcFlags"
 	mv .libs/libsupc++.a .libs/libsupc++-boot.a
 	mv saved/* .libs/
 	rmdir saved
