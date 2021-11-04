@@ -22,7 +22,7 @@ if [ "$secondaryArchSuffix" = _x86 ] ; then
 	"
 fi
 
-ARCHITECTURES=" !x86_gcc2 ?x86 ?x86_64 ?arm arm64 ?riscv64"
+ARCHITECTURES=" !x86_gcc2 ?x86 ?x86_64 arm arm64 ?riscv64"
 
 GLOBAL_WRITABLE_FILES="
 	non-packaged/lib/python3.9/site-packages directory keep-old
