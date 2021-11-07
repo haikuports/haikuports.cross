@@ -208,7 +208,7 @@ BUILD()
 	local bootCcFlags
 	if [ $effectiveTargetArchitecture == arm ]; then
 		# EFI arm (32-bit) requires software fp
-		bootCcFlags+="-mfloat-abi=soft";
+		bootCcFlags+="-mfloat-abi=soft -nostartfiles -fshort-wchar";
 	fi
 
 	# build bootloader version of libgcc and libgcc_eh.a (no threads, TLS)
