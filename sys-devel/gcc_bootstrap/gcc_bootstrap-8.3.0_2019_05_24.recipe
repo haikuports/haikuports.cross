@@ -65,9 +65,11 @@ PROVIDES_syslibs_devel="
 	devel:libgcc_boot$secondaryArchSuffix
 	devel:libgcc$secondaryArchSuffix
 	devel:libgcc_eh_kernel$secondaryArchSuffix
+	devel:libgcc_eh_boot$secondaryArchSuffix
 	devel:libgcc_eh$secondaryArchSuffix
 	devel:libstdc++$secondaryArchSuffix
 	devel:libsupc++_kernel$secondaryArchSuffix
+	devel:libsupc++_boot$secondaryArchSuffix
 	devel:libsupc++$secondaryArchSuffix
 	"
 REQUIRES_syslibs_devel="
@@ -277,12 +279,17 @@ INSTALL()
 	libstdcxxDir=$objectsDir/$effectiveTargetMachineTriple/libstdc++-v3
 	cp $libstdcxxDir/libsupc++/.libs/libsupc++-kernel.a \
 		$gccLibDir/
+	cp $libstdcxxDir/libsupc++/.libs/libsupc++-boot.a \
+		$gccLibDir/
 	ln -s libstdc++.so $installDestDir$libDir/libsupc++.so
 	cp $gccLibDir/libsupc++*.a $installDestDir$developLibDir/
 
 	# libgcc
 	cp $objectsDir/$effectiveTargetMachineTriple/libgcc/libgcc-kernel.a \
 		$objectsDir/$effectiveTargetMachineTriple/libgcc/libgcc_eh-kernel.a \
+		$gccLibDir/
+	cp $objectsDir/$effectiveTargetMachineTriple/libgcc/libgcc-boot.a \
+		$objectsDir/$effectiveTargetMachineTriple/libgcc/libgcc_eh-boot.a \
 		$gccLibDir/
 	$effectiveTargetMachineTriple-strip --strip-debug \
 		$gccLibDir/libgcc_s.so.$libgccSoVersion
