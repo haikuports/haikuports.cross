@@ -9,7 +9,7 @@ COPYRIGHT="1988-2018 Free Software Foundation, Inc."
 srcGitRev="4ab0fe4d95a13d203733d2dac3895c014ba7d293"
 SOURCE_URI="https://github.com/haiku/buildtools/archive/$srcGitRev.tar.gz"
 CHECKSUM_SHA256="0b2e8802314734756a4fd360dc61754889c94b0a0c44191a36f9d4abd75e3a37"
-REVISION="5"
+REVISION="6"
 
 ARCHITECTURES="!x86_gcc2 x86_64 sparc riscv64 arm arm64 ppc m68k"
 SECONDARY_ARCHITECTURES="?x86"
@@ -174,7 +174,9 @@ BUILD()
 
 	make $jobArgs
 
-	## KERNEL libgcc + libsupc++
+	echo "#################### building special libraries ####################"
+
+	echo "### libgcc-kernel ###"
 
 	# build kernel versions of libgcc.a and libgcc_eh.a (no threads or TLS)
 	cd $objectsDir/$effectiveTargetMachineTriple/libgcc
@@ -185,15 +187,21 @@ BUILD()
 	make $jobArgs CFLAGS="-O2 $kernelCcFlags" CXXFLAGS="-O2 $kernelCcFlags"
 	mv libgcc.a libgcc-kernel.a
 	mv libgcc_eh.a libgcc_eh-kernel.a
+	ln -sfn "$sourceDir/libgcc/gthr-posix.h" gthr-default.h
 	mv saved/* .
 	rmdir saved
+
+	echo "### libsupc++-kernel ###"
 
 	# build kernel version of libsupc++.a (without threads or TLS)
 	cd $objectsDir/$effectiveTargetMachineTriple/libstdc++-v3/libsupc++
 	mkdir -p saved
 	mv .libs/libsupc++* saved/
+	cp "../include/$effectiveTargetMachineTriple/bits/gthr-default.h" \
+		"../config.h" \
+		"../include/$effectiveTargetMachineTriple/bits/c++config.h" \
+		saved/
 	make clean
-	# deactivate threads and tls support
 	cp "../include/$effectiveTargetMachineTriple/bits/gthr-single.h" \
 		"../include/$effectiveTargetMachineTriple/bits/gthr-default.h"
 	sed -i -e 's,#define _GLIBCXX_HAVE_TLS 1,/* #undef _GLIBCXX_HAVE_TLS */,' \
@@ -202,7 +210,10 @@ BUILD()
 		"../config.h"
 	make $jobArgs CFLAGS="-O2 $kernelCcFlags" CXXFLAGS="-O2 $kernelCcFlags"
 	mv .libs/libsupc++.a .libs/libsupc++-kernel.a
-	mv saved/* .libs/
+	mv saved/libsupc++* .libs/
+	mv saved/gthr-default.h "../include/$effectiveTargetMachineTriple/bits/"
+	mv saved/config.h ..
+	mv saved/c++config.h "../include/$effectiveTargetMachineTriple/bits/"
 	rmdir saved
 
 
@@ -213,6 +224,8 @@ BUILD()
 		bootCcFlags+="-mfloat-abi=soft -nostartfiles -fshort-wchar";
 	fi
 
+	echo "### libgcc-boot ###"
+
 	# build bootloader version of libgcc and libgcc_eh.a (no threads, TLS)
 	cd $objectsDir/$effectiveTargetMachineTriple/libgcc
 	mkdir -p saved
@@ -222,15 +235,21 @@ BUILD()
 	make $jobArgs CFLAGS="-O2 $bootCcFlags" CXXFLAGS="-O2 $bootCcFlags"
 	mv libgcc.a libgcc-boot.a
 	mv libgcc_eh.a libgcc_eh-boot.a
+	ln -sfn "$sourceDir/libgcc/gthr-posix.h" gthr-default.h
 	mv saved/* .
 	rmdir saved
+
+	echo "### libsupc++-boot ###"
 
 	# build bootloader version of libsupc++.a (without threads or TLS)
 	cd $objectsDir/$effectiveTargetMachineTriple/libstdc++-v3/libsupc++
 	mkdir -p saved
 	mv .libs/libsupc++* saved/
+	cp "../include/$effectiveTargetMachineTriple/bits/gthr-default.h" \
+		"../config.h" \
+		"../include/$effectiveTargetMachineTriple/bits/c++config.h" \
+		saved/
 	make clean
-	# deactivate threads and tls support
 	cp "../include/$effectiveTargetMachineTriple/bits/gthr-single.h" \
 		"../include/$effectiveTargetMachineTriple/bits/gthr-default.h"
 	sed -i -e 's,#define _GLIBCXX_HAVE_TLS 1,/* #undef _GLIBCXX_HAVE_TLS */,' \
@@ -239,7 +258,10 @@ BUILD()
 		"../config.h"
 	make $jobArgs CFLAGS="-O2 $bootCcFlags" CXXFLAGS="-O2 $bootCcFlags"
 	mv .libs/libsupc++.a .libs/libsupc++-boot.a
-	mv saved/* .libs/
+	mv saved/libsupc++* .libs/
+	mv saved/gthr-default.h "../include/$effectiveTargetMachineTriple/bits/"
+	mv saved/config.h ..
+	mv saved/c++config.h "../include/$effectiveTargetMachineTriple/bits/"
 	rmdir saved
 }
 
