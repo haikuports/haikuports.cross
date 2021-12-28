@@ -24,14 +24,14 @@ HOMEPAGE="http://www.gnu.org/software/binutils"
 COPYRIGHT="1988-2016 Free Software Foundation, Inc."
 LICENSE="GNU GPL v3
 	GNU LGPL v3"
-REVISION="1"
+REVISION="2"
 binutilsVersion="2.36.1"
-srcGitRev="4b7b6c63e80d30d5f465c9187b970b749490595a"
+srcGitRev="7b6c9e88a2b00679382ba16112c848225fcd4a3d"
 SOURCE_URI="https://github.com/haiku/buildtools/archive/$srcGitRev.tar.gz"
-CHECKSUM_SHA256="c5de95ccaa68d271d702689ba3cfd3852170451441c9e084d1f3db40c8cc184f"
+CHECKSUM_SHA256="3f846a0ebeecac5b6ab4473f95df584f6ff2229bf0cc92a073baaf6a83c5379d"
 SOURCE_DIR="buildtools-$srcGitRev/binutils"
 
-ARCHITECTURES="!x86_gcc2 x86 x86_64 ppc arm arm64 riscv64 sparc m68k"
+ARCHITECTURES="all !x86_gcc2"
 SECONDARY_ARCHITECTURES="x86"
 
 PROVIDES="
