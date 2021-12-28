@@ -1,0 +1,39 @@
+From 5f84742620a4f718e94485b6fef3156643930052 Mon Sep 17 00:00:00 2001
+From: Alexander von Gluck IV <kallisti5@unixzen.com>
+Date: Tue, 28 Dec 2021 14:56:36 -0600
+Subject: [PATCH] gcc: backport fix for Canadian builds
+
+---
+ configure    | 2 +-
+ configure.ac | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/configure b/configure
+index 97a67b2..f821b66 100755
+--- a/configure
++++ b/configure
+@@ -16502,7 +16502,7 @@ else
+ fi
+ 
+ 
+-RAW_CXX_FOR_TARGET="$CXX_FOR_TARGET"
++RAW_CXX_FOR_TARGET="$CXX_FOR_TARGET -nostdinc++"
+ 
+ { $as_echo "$as_me:${as_lineno-$LINENO}: checking where to find the target ar" >&5
+ $as_echo_n "checking where to find the target ar... " >&6; }
+diff --git a/configure.ac b/configure.ac
+index 57861b2..0cdc21f 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -3532,7 +3532,7 @@ ACX_CHECK_INSTALLED_TARGET_TOOL(STRIP_FOR_TARGET, strip)
+ ACX_CHECK_INSTALLED_TARGET_TOOL(WINDRES_FOR_TARGET, windres)
+ ACX_CHECK_INSTALLED_TARGET_TOOL(WINDMC_FOR_TARGET, windmc)
+ 
+-RAW_CXX_FOR_TARGET="$CXX_FOR_TARGET"
++RAW_CXX_FOR_TARGET="$CXX_FOR_TARGET -nostdinc++"
+ 
+ GCC_TARGET_TOOL(ar, AR_FOR_TARGET, AR, [binutils/ar])
+ GCC_TARGET_TOOL(as, AS_FOR_TARGET, AS, [gas/as-new])
+-- 
+2.34.1
+

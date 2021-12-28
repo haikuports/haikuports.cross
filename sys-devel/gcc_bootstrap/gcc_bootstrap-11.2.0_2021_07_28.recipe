@@ -1,0 +1,432 @@
+SUMMARY="C/C++ compiler for target ${effectiveTargetMachineTriple}"
+DESCRIPTION="The standard compiler for non-legacy Haiku (i.e. for all \
+architectures other than x86_gcc2)."
+HOMEPAGE="https://gcc.gnu.org/"
+COPYRIGHT="1988-2021 Free Software Foundation, Inc."
+LICENSE="GNU GPL v3
+	GNU LGPL v3"
+REVISION="1"
+gccVersion="${portVersion%%_*}"
+srcGitRev="7b6c9e88a2b00679382ba16112c848225fcd4a3d"
+SOURCE_URI="https://github.com/haiku/buildtools/archive/$srcGitRev.tar.gz"
+CHECKSUM_SHA256="3f846a0ebeecac5b6ab4473f95df584f6ff2229bf0cc92a073baaf6a83c5379d"
+
+# https://review.haiku-os.org/c/buildtools/+/4835
+PATCHES="gcc-11.2.0_2021_07_28.patchset"
+
+SOURCE_DIR="buildtools-$srcGitRev/gcc"
+
+ARCHITECTURES="all !x86_gcc2"
+SECONDARY_ARCHITECTURES="?x86"
+
+libatomicSoVersion="1"
+libatomicLibVersion="1.2.0"
+
+libgccSoVersion="1"
+libgccLibVersion="1"
+
+libgompSoVersion="1"
+libgompLibVersion="1.0.0"
+
+libsspSoVersion="0"
+libsspLibVersion="0.0.0"
+
+libstdcxxSoVersion="6"
+libstdcxxLibVersion="6.0.29"
+
+PROVIDES="
+	gcc_bootstrap$secondaryArchSuffix = $portVersion compat >= 7
+	gcc$secondaryArchSuffix = $portVersion compat >= 7
+	cmd:c++$secondaryArchSuffix = $portVersion compat >= 7
+	cmd:cc$secondaryArchSuffix = $portVersion compat >= 7
+	cmd:cpp$secondaryArchSuffix = $portVersion compat >= 7
+	cmd:g++$secondaryArchSuffix = $portVersion compat >= 7
+	cmd:gcc$secondaryArchSuffix = $portVersion compat >= 7
+	cmd:gcc_ar$secondaryArchSuffix = $portVersion compat >= 7
+	cmd:gcc_nm$secondaryArchSuffix = $portVersion compat >= 7
+	cmd:gcc_ranlib$secondaryArchSuffix = $portVersion compat >= 7
+	cmd:gcov$secondaryArchSuffix = $portVersion compat >= 7
+	cmd:gcov_dump$secondaryArchSuffix = $portVersion compat >= 7
+	cmd:gcov_tool$secondaryArchSuffix = $portVersion compat >= 7
+	cmd:lto_dump$secondaryArchSuffix = $portVersion compat >= 7
+	"
+REQUIRES="
+	haiku$secondaryArchSuffix
+	cmd:as$secondaryArchSuffix
+	lib:libz$secondaryArchSuffix
+	"
+
+SUMMARY_syslibs="C/C++-runtime shared libraries, needed to execute C/C++ programs"
+DESCRIPTION_syslibs="The C/C++-runtime libraries that are part of the gcc \
+distribution. This package contains the shared libraries for the runtime \
+loader, so it is required for executing most c/c++ programs."
+PROVIDES_syslibs="
+	gcc_bootstrap${secondaryArchSuffix}_syslibs = $portVersion compat >= 7
+	lib:libatomic$secondaryArchSuffix = $libatomicLibVersion compat >= $libatomicSoVersion
+	lib:libgcc_s$secondaryArchSuffix = $libgccLibVersion compat >= $libgccSoVersion
+	lib:libgomp$secondaryArchSuffix = $libgompLibVersion compat >= $libgompSoVersion
+	lib:libssp$secondaryArchSuffix = $libsspLibVersion compat >= $libsspSoVersion
+	lib:libstdc++$secondaryArchSuffix = $libstdcxxLibVersion compat >= $libstdcxxSoVersion
+	lib:libsupc++$secondaryArchSuffix = $portVersion compat >= 7
+	"
+REQUIRES_syslibs="
+	haiku$secondaryArchSuffix
+	lib:libz$secondaryArchSuffix
+	"
+
+SUMMARY_syslibs_devel="C/C++-runtime static libraries and C++ headers, needed to build Haiku"
+DESCRIPTION_syslibs_devel="This package is not of general interest - it \
+contains the set of gcc's C/C++-runtime libraries and headers that is \
+required by Haiku's build system when building Haiku."
+PROVIDES_syslibs_devel="
+	gcc_bootstrap${secondaryArchSuffix}_syslibs_devel = $portVersion compat >= 7
+	devel:libatomic$secondaryArchSuffix = $libatomicLibVersion compat >= $libatomicSoVersion
+	devel:libgcc$secondaryArchSuffix = $libgccLibVersion compat >= $libgccSoVersion
+	devel:libgcc_eh$secondaryArchSuffix = $libgccLibVersion compat >= $libgccSoVersion
+	devel:libgcc_eh_kernel$secondaryArchSuffix = $libgccLibVersion compat >= $libgccSoVersion
+	devel:libgcc_kernel$secondaryArchSuffix = $libgccLibVersion compat >= $libgccSoVersion
+	devel:libgcc_s$secondaryArchSuffix = $libgccLibVersion compat >= $libgccSoVersion
+	devel:libgomp$secondaryArchSuffix = $libgompLibVersion compat >= $libgompSoVersion
+	devel:libssp$secondaryArchSuffix = $libsspLibVersion compat >= $libsspSoVersion
+	devel:libssp_nonshared$secondaryArchSuffix = $libsspLibVersion
+	devel:libstdc++$secondaryArchSuffix = $libstdcxxLibVersion compat >= $libstdcxxSoVersion
+	devel:libstdc++fs$secondaryArchSuffix = $portVersion compat >= 7
+	devel:libsupc++$secondaryArchSuffix = $portVersion compat >= 7
+	devel:libsupc++_kernel$secondaryArchSuffix = $portVersion compat >= 7
+	"
+REQUIRES_syslibs_devel=""
+
+BUILD_REQUIRES="
+	haiku${secondaryArchSuffix}_devel
+	devel:libz$secondaryArchSuffix
+	"
+BUILD_PREREQUIRES="
+	binutils_cross_${effectiveTargetArchitecture}
+	gcc_cross_${effectiveTargetArchitecture}
+	cmd:autoconf
+	cmd:awk
+	cmd:find
+	cmd:flex
+	cmd:gcc
+	cmd:ld
+	cmd:make
+	cmd:makeinfo
+	cmd:sed
+	cmd:strip
+	cmd:tar
+	cmd:xargs
+	"
+
+relativeInstallDir="develop/tools$secondaryArchSubDir"
+installDir="$prefix/$relativeInstallDir"
+objectsDir=$sourceDir/../${portVersionedName}-obj
+gccLibDir=lib/gcc/$effectiveTargetMachineTriple/$gccVersion
+
+BUILD()
+{
+	# we need the static libstdc++ to build GCC, so use it for this build
+	# (and we will rename it back immediately after we are done.)
+	crossGccLibDir=$(dirname $($effectiveTargetMachineTriple-gcc -print-sysroot))/$effectiveTargetMachineTriple/lib/
+	cp -f $crossGccLibDir/libstdc++-static.a $crossGccLibDir/libstdc++.a
+
+	rm -rf $objectsDir
+
+	# Touch some files generated by bison, so that bison won't run to update
+	# them. Fixes issues with newer bison versions.
+	# And while at it, touch gperf target, too (as gperf may not be installed).
+	(cd $sourceDir/gcc; touch c-parse.c c-parse.h cexp.c cp/parse.c \
+		cp/parse.h c-gperf.h)
+
+	mkdir -p $objectsDir
+	cd $objectsDir
+
+	local additionalConfigureFlags
+	if [ -n "$secondaryArchSuffix" ]; then
+		additionalConfigureFlags="\
+			--with-hybrid-secondary=${effectiveTargetArchitecture}"
+	fi
+	local kernelCcFlags="-D_KERNEL_MODE"
+	if [ $effectiveTargetArchitecture == x86_64 ]; then
+		# disable multilib support, as x86_64 by default tries to build the
+		# 32-bit libraries, too, which fails as no 32-bit libroot is available
+		additionalConfigureFlags+=" --disable-multilib"
+
+		# deactivate red zone for x86_64
+		kernelCcFlags="$kernelCcFlags -mno-red-zone"
+	fi
+	if [ $effectiveTargetArchitecture == arm ]; then
+		# disable multilib support, as arm by default tries to build the
+		# soft-float libraries, too, which fails as no soft float libroot is
+		# available
+		additionalConfigureFlags+=" --disable-multilib --with-float=hard"
+
+		# TODO: Disable building wtih TLS support for ARM until implemented
+		additionalConfigureFlags+=" --disable-tls"
+	fi
+	if [ $effectiveTargetArchitecture == arm64 ]; then
+		additionalConfigureFlags+=" --disable-multilib --disable-tls"
+	fi
+	if [ $effectiveTargetArchitecture == riscv64 ]; then
+		additionalConfigureFlags+=" --disable-multilib"
+		additionalConfigureFlags+=" --with-arch=rv64gc"
+	fi
+	if [ $effectiveTargetArchitecture == powerpc ]; then
+		# TODO: Disable building wtih TLS support for ARM until implemented
+		additionalConfigureFlags+=" --disable-tls"
+	fi
+
+	export ac_cv_c_bigendian=no
+	CFLAGS="-O2 -U_FORTIFY_SOURCE" CXXFLAGS="-O2" "$sourceDir/configure" \
+		--build=$buildMachineTriple --host=$effectiveTargetMachineTriple \
+		--target=$effectiveTargetMachineTriple \
+		--prefix=$installDir --libexecdir=$installDir/lib --mandir=$manDir \
+		--docdir=$docDir --enable-threads=posix \
+		--disable-nls --enable-shared --with-gnu-ld --with-gnu-as \
+		--enable-version-specific-runtime-libs \
+		--enable-languages=c,c++ --enable-lto \
+		--enable-frame-pointer \
+		--with-pkgversion=$(echo $portVersion | cut -d_ -f2-) \
+		--enable-__cxa-atexit --with-system-zlib --enable-checking=release \
+		--with-bug-url=http://dev.haiku-os.org/ \
+		--with-build-sysroot=$installDestDir/ \
+		--with-default-libstdcxx-abi=gcc4-compatible \
+		--disable-libstdcxx-pch \
+		--enable-libssp \
+		$additionalConfigureFlags
+
+	echo "####################### configure done, building gcc ###############"
+
+	make $jobArgs
+
+	echo "######################## building special libraries ################"
+
+	echo "### libgcc"
+
+	# build kernel versions of libgcc.a and libgcc_eh.a (no threads or TLS)
+	cd $objectsDir/$effectiveTargetMachineTriple/libgcc
+	mkdir -p saved
+	mv libgcc.a libgcc_eh.a libgcc_s* libgcov* saved/
+	make clean
+	ln -sfn "$sourceDir/libgcc/gthr-single.h" gthr-default.h
+	make CFLAGS="-O2 $kernelCcFlags" CXXFLAGS="-O2 $kernelCcFlags"
+	mv libgcc.a libgcc-kernel.a
+	mv libgcc_eh.a libgcc_eh-kernel.a
+	ln -sfn "$sourceDir/libgcc/gthr-posix.h" gthr-default.h
+	mv saved/* .
+	rmdir saved
+
+	# build kernel version of libsupc++.a (without threads or TLS)
+	cd $objectsDir/$effectiveTargetMachineTriple/libstdc++-v3/libsupc++
+	mkdir -p saved
+	mv .libs/libsupc++* saved/
+	cp "../include/$effectiveTargetMachineTriple/bits/gthr-default.h" \
+		"../config.h" \
+		"../include/$effectiveTargetMachineTriple/bits/c++config.h" \
+		saved/
+	make clean
+	cp "../include/$effectiveTargetMachineTriple/bits/gthr-single.h" \
+		"../include/$effectiveTargetMachineTriple/bits/gthr-default.h"
+	sed -i -e 's,#define _GLIBCXX_HAS_GTHREADS 1,/* #undef _GLIBCXX_HAS_GTHREADS */,' \
+		"../config.h"
+	sed -i -e 's,#define _GLIBCXX_HAVE_TLS 1,/* #undef _GLIBCXX_HAVE_TLS */,' \
+		"../include/$effectiveTargetMachineTriple/bits/c++config.h"
+	make CFLAGS="-O2 $kernelCcFlags" CXXFLAGS="-O2 $kernelCcFlags"
+	mv .libs/libsupc++.a .libs/libsupc++-kernel.a
+	mv saved/libsupc++* .libs/
+	mv saved/gthr-default.h "../include/$effectiveTargetMachineTriple/bits/"
+	mv saved/config.h ..
+	mv saved/c++config.h "../include/$effectiveTargetMachineTriple/bits/"
+	rmdir saved
+
+	## BOOTLOADER libgcc + libsupc++
+	local bootCcFlags
+	if [ $effectiveTargetArchitecture == arm ]; then
+		# EFI arm (32-bit) requires software fp
+		bootCcFlags+="-mfloat-abi=soft";
+	fi
+
+	# build bootloader version of libgcc and libgcc_eh.a (no threads, TLS)
+	cd $objectsDir/$effectiveTargetMachineTriple/libgcc
+	mkdir -p saved
+	mv libgcc.a libgcc_eh.a libgcc_s* libgcov* libgcc-kernel.a libgcc_eh-kernel.a saved/
+	make clean
+	ln -sfn "$sourceDir/libgcc/gthr-single.h" gthr-default.h
+	make CFLAGS="-O2 $bootCcFlags" CXXFLAGS="-O2 $bootCcFlags"
+	mv libgcc.a libgcc-boot.a
+	mv libgcc_eh.a libgcc_eh-boot.a
+	mv saved/* .
+	rmdir saved
+
+	# build bootloader version of libsupc++.a (without threads or TLS)
+	cd $objectsDir/$effectiveTargetMachineTriple/libstdc++-v3/libsupc++
+	mkdir -p saved
+	mv .libs/libsupc++* saved/
+	make clean
+	# deactivate threads and tls support
+	cp "../include/$effectiveTargetMachineTriple/bits/gthr-single.h" \
+	        "../include/$effectiveTargetMachineTriple/bits/gthr-default.h"
+	sed -i -e 's,#define _GLIBCXX_HAVE_TLS 1,/* #undef _GLIBCXX_HAVE_TLS */,' \
+	        "../include/$effectiveTargetMachineTriple/bits/c++config.h"
+	sed -i -e 's,#define _GLIBCXX_HAS_GTHREADS 1,/* #undef _GLIBCXX_HAS_GTHREADS */,' \
+	        "../config.h"
+	make CFLAGS="-O2 $bootCcFlags" CXXFLAGS="-O2 $bootCcFlags"
+	mv .libs/libsupc++.a .libs/libsupc++-boot.a
+	mv saved/* .libs/
+	rmdir saved
+}
+
+INSTALL()
+{
+	cd $objectsDir
+
+	make DESTDIR=$installDestDir install
+
+	# now that we are done with "make", remove stdlibc++
+	crossGccLibDir=$(dirname $($effectiveTargetMachineTriple-gcc -print-sysroot))/$effectiveTargetMachineTriple/lib/
+	rm -f $crossGccLibDir/libstdc++.a
+
+	### Libraries #############################################
+
+	echo "Moving libraries around"
+
+	# Move/copy libraries such that copies of the runtime (shared) libs exist
+	# in $libDir and copies of static libraries exist in $developLibDir. These
+	# are put into separate packages gcc_syslibs and gcc_syslibs_devel, which
+	# are both used by Haiku's build system.
+	mkdir -p $installDestDir$libDir
+	mkdir -p $installDestDir$developLibDir
+
+	echo "changing to $installDestDir$installDir"
+	cd $installDestDir$installDir
+
+	# libatomic
+	cp -d $gccLibDir/libatomic.so \
+		$gccLibDir/libatomic.so.$libatomicSoVersion \
+		$gccLibDir/libatomic.so.$libatomicLibVersion \
+		$installDestDir$libDir/
+	rm $gccLibDir/libatomic*.a
+
+	# libgomp
+	cp -d $gccLibDir/libgomp.so \
+		$gccLibDir/libgomp.so.$libgompSoVersion \
+		$gccLibDir/libgomp.so.$libgompLibVersion \
+		$installDestDir$libDir/
+	rm $gccLibDir/libgomp*.a
+
+	# libssp
+	cp -d $gccLibDir/libssp.so \
+		$gccLibDir/libssp.so.$libsspSoVersion \
+		$gccLibDir/libssp.so.$libsspLibVersion \
+		$installDestDir$libDir/
+	rm $gccLibDir/libssp.a
+	cp $gccLibDir/libssp_nonshared.a $installDestDir$developLibDir
+
+	# libstdc++
+	cp -d $gccLibDir/libstdc++.so \
+		$gccLibDir/libstdc++.so.$libstdcxxSoVersion \
+		$gccLibDir/libstdc++.so.$libstdcxxLibVersion \
+		$installDestDir$libDir/
+	rm $gccLibDir/libstdc++.a
+
+	# libsupc++
+	libstdcxxDir=$objectsDir/$effectiveTargetMachineTriple/libstdc++-v3
+	cp $libstdcxxDir/libsupc++/.libs/libsupc++-kernel.a \
+		$gccLibDir/
+	ln -s libstdc++.so $installDestDir$libDir/libsupc++.so
+	cp $gccLibDir/libsupc++*.a $installDestDir$developLibDir/
+
+	# libgcc
+	cp $objectsDir/$effectiveTargetMachineTriple/libgcc/libgcc-kernel.a \
+		$objectsDir/$effectiveTargetMachineTriple/libgcc/libgcc_eh-kernel.a \
+		$gccLibDir/
+	cp -d $gccLibDir/libgcc_s.so \
+		$gccLibDir/libgcc_s.so.$libgccSoVersion \
+		$installDestDir$libDir/
+	cp $gccLibDir/libgcc*.a $installDestDir$developLibDir/
+
+	# gcc and c++ headers
+	mkdir -p $installDestDir$includeDir/gcc
+	cp -r $gccLibDir/include $installDestDir$includeDir/gcc/
+	cp -r $gccLibDir/include-fixed $installDestDir$includeDir/gcc/
+	mv $installDestDir$includeDir/gcc/include/c++ $installDestDir$includeDir/
+
+	### Strip #################################################
+
+	echo "Strip"
+
+	 $effectiveTargetMachineTriple-strip --strip-debug \
+		$gccLibDir/*.a \
+		$installDestDir$developLibDir/*.a
+
+	### Disable ASLR ##########################################
+
+	#echo "Add SYS:ENV attribute to disable ASLR"
+
+	#cd $installDestDir$installDir
+	#for f in bin/*; do
+	#	if [ -r "$f" ]; then
+	#		addattr SYS:ENV DISABLE_ASLR=1 $f
+	#	fi
+	#done
+	#for f in cc1 cc1plus collect2 f951 lto1; do
+	#	addattr SYS:ENV DISABLE_ASLR=1 \
+	#		$gccLibDir/$f
+	#done
+
+	### Symlinks ##############################################
+
+	echo "Creating required symlinks"
+
+	# create missing cc symlink
+	ln -sf gcc $installDestDir$installDir/bin/cc
+
+	# make all tools available via default paths
+	mkdir -p  $installDestDir$binDir
+	for f in c++ cc cpp g++ gcc gcc-ar gcc-nm gcc-ranlib gcov gcov-dump \
+		gcov-tool lto-dump ; do
+		symlinkRelative -sfn $installDestDir$installDir/bin/$f $installDestDir$binDir
+	done
+
+	# symlink all libraries from libDir -> developLibDir
+	mkdir -p $installDestDir$developLibDir
+	for l in libatomic libgomp libssp libgcc_s libstdc++ \
+			libsupc++; do
+		for f in $installDestDir$libDir/$l*; do
+			symlinkRelative -sfn $f $installDestDir$developLibDir/
+		done
+	done
+
+	### Cleanup ###############################################
+
+	echo "Cleanup"
+	rm -rf $installDestDir$installDir/info
+	rm -rf $installDestDir$installDir/share
+
+	### Sub Packages ##########################################
+
+	packageEntries "syslibs" \
+		$relativeLibDir/libatomic.so \
+		$relativeLibDir/libatomic.so.$libatomicSoVersion \
+		$relativeLibDir/libatomic.so.$libatomicLibVersion \
+		$relativeLibDir/libgcc_s.so \
+		$relativeLibDir/libgcc_s.so.$libgccSoVersion \
+		$relativeLibDir/libgomp.so \
+		$relativeLibDir/libgomp.so.$libgompSoVersion \
+		$relativeLibDir/libgomp.so.$libgompLibVersion \
+		$relativeLibDir/libssp.so \
+		$relativeLibDir/libssp.so.$libsspSoVersion \
+		$relativeLibDir/libssp.so.$libsspLibVersion \
+		$relativeLibDir/libstdc++.so \
+		$relativeLibDir/libstdc++.so.$libstdcxxSoVersion \
+		$relativeLibDir/libstdc++.so.$libstdcxxLibVersion \
+		$relativeLibDir/libsupc++.so
+
+	packageEntries "syslibs_devel" \
+		$relativeDevelopLibDir \
+		$relativeIncludeDir
+
+	rm -rf $installDestDir$includeDir
+	rm -rf $installDestDir$developLibDir
+
+	echo "Done"
+}
