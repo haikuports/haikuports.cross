@@ -5,7 +5,7 @@ HOMEPAGE="https://gcc.gnu.org/"
 COPYRIGHT="1988-2021 Free Software Foundation, Inc."
 LICENSE="GNU GPL v3
 	GNU LGPL v3"
-REVISION="1"
+REVISION="2"
 gccVersion="${portVersion%%_*}"
 srcGitRev="7b6c9e88a2b00679382ba16112c848225fcd4a3d"
 SOURCE_URI="https://github.com/haiku/buildtools/archive/$srcGitRev.tar.gz"
@@ -52,8 +52,6 @@ PROVIDES="
 	"
 REQUIRES="
 	haiku$secondaryArchSuffix
-	cmd:as$secondaryArchSuffix
-	lib:libz$secondaryArchSuffix
 	"
 
 SUMMARY_syslibs="C/C++-runtime shared libraries, needed to execute C/C++ programs"
@@ -62,6 +60,7 @@ distribution. This package contains the shared libraries for the runtime \
 loader, so it is required for executing most c/c++ programs."
 PROVIDES_syslibs="
 	gcc_bootstrap${secondaryArchSuffix}_syslibs = $portVersion compat >= 7
+	gcc${secondaryArchSuffix}_syslibs = $portVersion compat >= 7
 	lib:libatomic$secondaryArchSuffix = $libatomicLibVersion compat >= $libatomicSoVersion
 	lib:libgcc_s$secondaryArchSuffix = $libgccLibVersion compat >= $libgccSoVersion
 	lib:libgomp$secondaryArchSuffix = $libgompLibVersion compat >= $libgompSoVersion
@@ -71,7 +70,6 @@ PROVIDES_syslibs="
 	"
 REQUIRES_syslibs="
 	haiku$secondaryArchSuffix
-	lib:libz$secondaryArchSuffix
 	"
 
 SUMMARY_syslibs_devel="C/C++-runtime static libraries and C++ headers, needed to build Haiku"
@@ -80,25 +78,27 @@ contains the set of gcc's C/C++-runtime libraries and headers that is \
 required by Haiku's build system when building Haiku."
 PROVIDES_syslibs_devel="
 	gcc_bootstrap${secondaryArchSuffix}_syslibs_devel = $portVersion compat >= 7
+	gcc${secondaryArchSuffix}_syslibs_devel = $portVersion compat >= 7
 	devel:libatomic$secondaryArchSuffix = $libatomicLibVersion compat >= $libatomicSoVersion
 	devel:libgcc$secondaryArchSuffix = $libgccLibVersion compat >= $libgccSoVersion
 	devel:libgcc_eh$secondaryArchSuffix = $libgccLibVersion compat >= $libgccSoVersion
 	devel:libgcc_eh_kernel$secondaryArchSuffix = $libgccLibVersion compat >= $libgccSoVersion
 	devel:libgcc_kernel$secondaryArchSuffix = $libgccLibVersion compat >= $libgccSoVersion
+	devel:libgcc_eh_boot$secondaryArchSuffix = $libgccLibVersion compat >= $libgccSoVersion
+	devel:libgcc_boot$secondaryArchSuffix = $libgccLibVersion compat >= $libgccSoVersion
 	devel:libgcc_s$secondaryArchSuffix = $libgccLibVersion compat >= $libgccSoVersion
 	devel:libgomp$secondaryArchSuffix = $libgompLibVersion compat >= $libgompSoVersion
 	devel:libssp$secondaryArchSuffix = $libsspLibVersion compat >= $libsspSoVersion
 	devel:libssp_nonshared$secondaryArchSuffix = $libsspLibVersion
 	devel:libstdc++$secondaryArchSuffix = $libstdcxxLibVersion compat >= $libstdcxxSoVersion
-	devel:libstdc++fs$secondaryArchSuffix = $portVersion compat >= 7
 	devel:libsupc++$secondaryArchSuffix = $portVersion compat >= 7
 	devel:libsupc++_kernel$secondaryArchSuffix = $portVersion compat >= 7
+	devel:libsupc++_boot$secondaryArchSuffix = $portVersion compat >= 7
 	"
 REQUIRES_syslibs_devel=""
 
 BUILD_REQUIRES="
 	haiku${secondaryArchSuffix}_devel
-	devel:libz$secondaryArchSuffix
 	"
 BUILD_PREREQUIRES="
 	binutils_cross_${effectiveTargetArchitecture}
@@ -186,7 +186,7 @@ BUILD()
 		--enable-languages=c,c++ --enable-lto \
 		--enable-frame-pointer \
 		--with-pkgversion=$(echo $portVersion | cut -d_ -f2-) \
-		--enable-__cxa-atexit --with-system-zlib --enable-checking=release \
+		--enable-__cxa-atexit --enable-checking=release \
 		--with-bug-url=http://dev.haiku-os.org/ \
 		--with-build-sysroot=$installDestDir/ \
 		--with-default-libstdcxx-abi=gcc4-compatible \
@@ -352,9 +352,10 @@ INSTALL()
 
 	### Strip #################################################
 
-	echo "Strip"
+	echo "Strip debug info"
 
-	 $effectiveTargetMachineTriple-strip --strip-debug \
+	$effectiveTargetMachineTriple-strip --strip-debug bin/*
+	$effectiveTargetMachineTriple-strip --strip-debug \
 		$gccLibDir/*.a \
 		$installDestDir$developLibDir/*.a
 
@@ -381,7 +382,7 @@ INSTALL()
 	ln -sf gcc $installDestDir$installDir/bin/cc
 
 	# make all tools available via default paths
-	mkdir -p  $installDestDir$binDir
+	mkdir -p $installDestDir$binDir
 	for f in c++ cc cpp g++ gcc gcc-ar gcc-nm gcc-ranlib gcov gcov-dump \
 		gcov-tool lto-dump ; do
 		symlinkRelative -sfn $installDestDir$installDir/bin/$f $installDestDir$binDir
@@ -389,8 +390,7 @@ INSTALL()
 
 	# symlink all libraries from libDir -> developLibDir
 	mkdir -p $installDestDir$developLibDir
-	for l in libatomic libgomp libssp libgcc_s libstdc++ \
-			libsupc++; do
+	for l in libatomic libgomp libssp libgcc_s libstdc++ libsupc++; do
 		for f in $installDestDir$libDir/$l*; do
 			symlinkRelative -sfn $f $installDestDir$developLibDir/
 		done
