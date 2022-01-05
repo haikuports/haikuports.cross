@@ -5,7 +5,7 @@ HOMEPAGE="https://gcc.gnu.org/"
 COPYRIGHT="1988-2021 Free Software Foundation, Inc."
 LICENSE="GNU GPL v3
 	GNU LGPL v3"
-REVISION="4"
+REVISION="5"
 gccVersion="${portVersion%%_*}"
 srcGitRev="7b6c9e88a2b00679382ba16112c848225fcd4a3d"
 SOURCE_URI="https://github.com/haiku/buildtools/archive/$srcGitRev.tar.gz"
@@ -244,10 +244,10 @@ BUILD()
 
 
 	## BOOTLOADER libgcc + libsupc++
-	local bootCcFlags
+	local bootCcFlags="-nostartfiles "
 	if [ $effectiveTargetArchitecture == arm ]; then
 		# EFI arm (32-bit) requires software fp
-		bootCcFlags+="-mfloat-abi=soft -nostartfiles -fshort-wchar";
+		bootCcFlags+="-mfloat-abi=soft -fshort-wchar";
 	fi
 
 	echo "### libgcc-boot ###"
