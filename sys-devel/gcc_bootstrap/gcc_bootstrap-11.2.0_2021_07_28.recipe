@@ -5,7 +5,7 @@ HOMEPAGE="https://gcc.gnu.org/"
 COPYRIGHT="1988-2021 Free Software Foundation, Inc."
 LICENSE="GNU GPL v3
 	GNU LGPL v3"
-REVISION="3"
+REVISION="4"
 gccVersion="${portVersion%%_*}"
 srcGitRev="7b6c9e88a2b00679382ba16112c848225fcd4a3d"
 SOURCE_URI="https://github.com/haiku/buildtools/archive/$srcGitRev.tar.gz"
@@ -183,7 +183,7 @@ BUILD()
 		--target=$effectiveTargetMachineTriple \
 		--prefix=$installDir --libexecdir=$installDir/lib --mandir=$manDir \
 		--docdir=$docDir --enable-threads=posix \
-		--disable-nls --enable-shared --with-gnu-ld --with-gnu-as \
+		--disable-nls --enable-shared --disable-plugin --with-gnu-ld --with-gnu-as \
 		--enable-version-specific-runtime-libs \
 		--enable-languages=c,c++ --enable-lto \
 		--enable-frame-pointer \
@@ -200,9 +200,9 @@ BUILD()
 
 	make $jobArgs
 
-	echo "######################## building special libraries ################"
+	echo "#################### building special libraries ####################"
 
-	echo "### libgcc"
+	echo "### libgcc-kernel ###"
 
 	# build kernel versions of libgcc.a and libgcc_eh.a (no threads or TLS)
 	cd $objectsDir/$effectiveTargetMachineTriple/libgcc
@@ -210,12 +210,14 @@ BUILD()
 	mv libgcc.a libgcc_eh.a libgcc_s* libgcov* saved/
 	make clean
 	ln -sfn "$sourceDir/libgcc/gthr-single.h" gthr-default.h
-	make CFLAGS="-O2 $kernelCcFlags" CXXFLAGS="-O2 $kernelCcFlags"
+	make $jobArgs CFLAGS="-O2 $kernelCcFlags" CXXFLAGS="-O2 $kernelCcFlags"
 	mv libgcc.a libgcc-kernel.a
 	mv libgcc_eh.a libgcc_eh-kernel.a
 	ln -sfn "$sourceDir/libgcc/gthr-posix.h" gthr-default.h
 	mv saved/* .
 	rmdir saved
+
+	echo "### libsupc++-kernel ###"
 
 	# build kernel version of libsupc++.a (without threads or TLS)
 	cd $objectsDir/$effectiveTargetMachineTriple/libstdc++-v3/libsupc++
@@ -232,7 +234,7 @@ BUILD()
 		"../config.h"
 	sed -i -e 's,#define _GLIBCXX_HAVE_TLS 1,/* #undef _GLIBCXX_HAVE_TLS */,' \
 		"../include/$effectiveTargetMachineTriple/bits/c++config.h"
-	make CFLAGS="-O2 $kernelCcFlags" CXXFLAGS="-O2 $kernelCcFlags"
+	make $jobArgs CFLAGS="-O2 $kernelCcFlags" CXXFLAGS="-O2 $kernelCcFlags"
 	mv .libs/libsupc++.a .libs/libsupc++-kernel.a
 	mv saved/libsupc++* .libs/
 	mv saved/gthr-default.h "../include/$effectiveTargetMachineTriple/bits/"
@@ -240,12 +242,15 @@ BUILD()
 	mv saved/c++config.h "../include/$effectiveTargetMachineTriple/bits/"
 	rmdir saved
 
+
 	## BOOTLOADER libgcc + libsupc++
 	local bootCcFlags
 	if [ $effectiveTargetArchitecture == arm ]; then
 		# EFI arm (32-bit) requires software fp
-		bootCcFlags+="-mfloat-abi=soft";
+		bootCcFlags+="-mfloat-abi=soft -nostartfiles -fshort-wchar";
 	fi
+
+	echo "### libgcc-boot ###"
 
 	# build bootloader version of libgcc and libgcc_eh.a (no threads, TLS)
 	cd $objectsDir/$effectiveTargetMachineTriple/libgcc
@@ -253,27 +258,37 @@ BUILD()
 	mv libgcc.a libgcc_eh.a libgcc_s* libgcov* libgcc-kernel.a libgcc_eh-kernel.a saved/
 	make clean
 	ln -sfn "$sourceDir/libgcc/gthr-single.h" gthr-default.h
-	make CFLAGS="-O2 $bootCcFlags" CXXFLAGS="-O2 $bootCcFlags"
+	make $jobArgs CFLAGS="-O2 $bootCcFlags" CXXFLAGS="-O2 $bootCcFlags"
 	mv libgcc.a libgcc-boot.a
 	mv libgcc_eh.a libgcc_eh-boot.a
+	ln -sfn "$sourceDir/libgcc/gthr-posix.h" gthr-default.h
 	mv saved/* .
 	rmdir saved
+
+	echo "### libsupc++-boot ###"
 
 	# build bootloader version of libsupc++.a (without threads or TLS)
 	cd $objectsDir/$effectiveTargetMachineTriple/libstdc++-v3/libsupc++
 	mkdir -p saved
 	mv .libs/libsupc++* saved/
+	cp "../include/$effectiveTargetMachineTriple/bits/gthr-default.h" \
+		"../config.h" \
+		"../include/$effectiveTargetMachineTriple/bits/c++config.h" \
+		saved/
 	make clean
 	# deactivate threads and tls support
 	cp "../include/$effectiveTargetMachineTriple/bits/gthr-single.h" \
-	        "../include/$effectiveTargetMachineTriple/bits/gthr-default.h"
+		"../include/$effectiveTargetMachineTriple/bits/gthr-default.h"
 	sed -i -e 's,#define _GLIBCXX_HAVE_TLS 1,/* #undef _GLIBCXX_HAVE_TLS */,' \
-	        "../include/$effectiveTargetMachineTriple/bits/c++config.h"
+		"../include/$effectiveTargetMachineTriple/bits/c++config.h"
 	sed -i -e 's,#define _GLIBCXX_HAS_GTHREADS 1,/* #undef _GLIBCXX_HAS_GTHREADS */,' \
-	        "../config.h"
-	make CFLAGS="-O2 $bootCcFlags" CXXFLAGS="-O2 $bootCcFlags"
+		"../config.h"
+	make $jobArgs CFLAGS="-O2 $bootCcFlags" CXXFLAGS="-O2 $bootCcFlags"
 	mv .libs/libsupc++.a .libs/libsupc++-boot.a
-	mv saved/* .libs/
+	mv saved/libsupc++* .libs/
+	mv saved/gthr-default.h "../include/$effectiveTargetMachineTriple/bits/"
+	mv saved/config.h ..
+	mv saved/c++config.h "../include/$effectiveTargetMachineTriple/bits/"
 	rmdir saved
 }
 
@@ -334,12 +349,17 @@ INSTALL()
 	libstdcxxDir=$objectsDir/$effectiveTargetMachineTriple/libstdc++-v3
 	cp $libstdcxxDir/libsupc++/.libs/libsupc++-kernel.a \
 		$gccLibDir/
+	cp $libstdcxxDir/libsupc++/.libs/libsupc++-boot.a \
+		$gccLibDir/
 	ln -s libstdc++.so $installDestDir$libDir/libsupc++.so
 	cp $gccLibDir/libsupc++*.a $installDestDir$developLibDir/
 
 	# libgcc
 	cp $objectsDir/$effectiveTargetMachineTriple/libgcc/libgcc-kernel.a \
 		$objectsDir/$effectiveTargetMachineTriple/libgcc/libgcc_eh-kernel.a \
+		$gccLibDir/
+	cp $objectsDir/$effectiveTargetMachineTriple/libgcc/libgcc-boot.a \
+		$objectsDir/$effectiveTargetMachineTriple/libgcc/libgcc_eh-boot.a \
 		$gccLibDir/
 	cp -d $gccLibDir/libgcc_s.so \
 		$gccLibDir/libgcc_s.so.$libgccSoVersion \
