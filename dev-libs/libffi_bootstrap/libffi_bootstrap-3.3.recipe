@@ -11,7 +11,7 @@ REVISION="1"
 SOURCE_URI="ftp://sourceware.org/pub/libffi/libffi-$portVersion.tar.gz"
 CHECKSUM_SHA256="72fba7922703ddfa7a028d513ac15a85c8d54c8d67f55fa5a4802885dc652056"
 
-ARCHITECTURES="!x86_gcc2 ?x86 ?x86_64 arm arm64 ?riscv64 ?sparc ?m68k"
+ARCHITECTURES="!x86_gcc2 ?x86 ?x86_64 arm arm64 riscv64 ?sparc ?m68k"
 SECONDARY_ARCHITECTURES="!x86_gcc2 ?x86"
 
 PROVIDES="
