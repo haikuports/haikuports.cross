@@ -9,6 +9,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
+    - name: tools
+      run: sudo apt install -y nasm
     - name: git haiku
       run: git -C .. clone https://review.haiku-os.org/haiku
     - name: git buildtools
@@ -22,4 +24,4 @@ jobs:
     - name: setup
       run: mkdir ../bootstrap
     - name: configure
-      run: cd ../bootstrap && apt install -y nasm && ../haiku/configure --build-cross-tools riscv64 --cross-tools-source ../buildtools --bootstrap ../haikuporter/haikuporter ../haikuports.cross ../haikuports -j$(nproc)
+      run: cd ../bootstrap && ../haiku/configure --build-cross-tools riscv64 --cross-tools-source ../buildtools --bootstrap ../haikuporter/haikuporter ../haikuports.cross ../haikuports -j$(nproc)
