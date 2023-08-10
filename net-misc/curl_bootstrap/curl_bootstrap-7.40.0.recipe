@@ -46,7 +46,7 @@ BUILD()
 
 	autoreconf -i
 	runConfigure ./configure \
-		--enable-ipv6 \
+		--enable-ipv6 --disable-static \
 		--build=$buildMachineTriple --host=$effectiveTargetMachineTriple
 	make $jobArgs
 }
