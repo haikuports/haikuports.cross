@@ -52,6 +52,7 @@ BUILD()
 	./bootstrap
 	SED='sed' NM='nm' LD=ld runConfigure ./configure \
 		--with-gnu-ld \
+		--disable-static \
 		--host=$effectiveTargetMachineTriple \
 		--program-prefix=${effectiveTargetMachineTriple}-
 	make $jobArgs
