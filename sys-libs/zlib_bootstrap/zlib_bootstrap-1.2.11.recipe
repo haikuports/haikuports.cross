@@ -3,7 +3,7 @@ DESCRIPTION="zlib is designed to be a free, general-purpose, legally unencumbere
 HOMEPAGE="http://www.zlib.net/"
 COPYRIGHT="1995-2005 Jean-loup Gailly and Mark Adler"
 LICENSE="Zlib"
-SOURCE_URI="http://zlib.net/zlib-1.2.11.tar.gz"
+SOURCE_URI="https://zlib.net/fossils/zlib-1.2.11.tar.gz"
 CHECKSUM_SHA256="c3e5e9fdd5004dcb542feda5ee4f0ff0744628baf8ed2dd5d66f8ca1197cb1a1"
 REVISION="1"
 ARCHITECTURES="x86_gcc2 x86 x86_64 arm arm64 ppc m68k riscv64 sparc"
@@ -73,8 +73,10 @@ EOF
 
 INSTALL()
 {
-	cd build
-	make DESTDIR=$installDestDir install
+	make -C build DESTDIR=$installDestDir install
+
+	# remove static library
+	rm $installDestDir/$libDir/libz.a
 
 	prepareInstalledDevelLibs libz
 
