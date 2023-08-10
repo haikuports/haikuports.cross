@@ -43,7 +43,7 @@ SOURCE_DIR="libffi-$portVersion"
 
 BUILD()
 {
-	runConfigure ./configure --disable-docs --build=$buildMachineTriple --host=$targetMachineTriple
+	runConfigure ./configure --disable-docs --build=$buildMachineTriple --host=$targetMachineTriple --disable-static
 	make $jobArgs
 }
 
