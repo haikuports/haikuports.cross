@@ -1,0 +1,23 @@
+From 9660bfad19eca01e4a67c3126e3f8b5ed50ec077 Mon Sep 17 00:00:00 2001
+From: David Karoly <karolyd577@gmail.com>
+Date: Thu, 10 Aug 2023 18:40:40 +0200
+Subject: libgcc: fix config for arm64
+
+
+diff --git a/libgcc/config.host b/libgcc/config.host
+index ac7894e..3b04c0d 100644
+--- a/libgcc/config.host
++++ b/libgcc/config.host
+@@ -408,7 +408,9 @@ aarch64*-*-fuchsia*)
+ 	;;
+ aarch64*-*-haiku*)
+ 	tmake_file="${tmake_file} ${cpu_type}/t-aarch64"
++	tmake_file="${tmake_file} ${cpu_type}/t-lse t-slibgcc-libgcc"
+ 	tmake_file="${tmake_file} ${cpu_type}/t-softfp t-softfp"
++	tmake_file="${tmake_file} t-dfprules"
+ 	md_unwind_header=aarch64/haiku-unwind.h
+ 	;;
+ aarch64*-*-linux*)
+-- 
+2.41.0
+
