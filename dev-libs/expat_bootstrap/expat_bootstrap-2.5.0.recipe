@@ -7,22 +7,25 @@ the XML document (like start tags).
 HOMEPAGE="http://expat.sourceforge.net/"
 COPYRIGHT="
 	1998-2000 Thai Open Source Software Center Ltd and Clark Cooper
-	2001-2006 Expat maintainers.
+	2001-2022 Expat maintainers.
 	"
 LICENSE="MIT"
 REVISION="1"
 SOURCE_URI="https://downloads.sourceforge.net/expat/expat-$portVersion.tar.bz2"
-CHECKSUM_SHA256="2f9b6a580b94577b150a7d5617ad4643a4301a6616ff459307df3e225bcfbf40"
+CHECKSUM_SHA256="6f0e6e01f7b30025fa05c85fdad1e5d0ec7fd35d9f61b22f34998de11969ff67"
 PATCHES="expat-$portVersion.patchset"
 SOURCE_DIR="expat-$portVersion"
 REVISION="1"
 ARCHITECTURES="x86_gcc2 x86 x86_64 ppc arm arm64 riscv64 sparc m68k"
 SECONDARY_ARCHITECTURES="x86_gcc2 x86"
 
+libVersion=1.8.10
+libVersionCompat="$libVersion compat >= ${libVersion%%.*}"
+portVersionCompat="$portVersion compat >= 2.2"
 
 PROVIDES="
-	expat_bootstrap$secondaryArchSuffix = $portVersion compat >= 2.2
-	lib:libexpat$secondaryArchSuffix = 1.8.1 compat >= 1
+	expat_bootstrap$secondaryArchSuffix = $portVersionCompat
+	lib:libexpat$secondaryArchSuffix = $libVersionCompat
 	"
 REQUIRES="
 	haiku$secondaryArchSuffix
@@ -43,7 +46,7 @@ BUILD_PREREQUIRES="
 
 BUILD()
 {
-        runConfigure ./configure --host=$effectiveTargetMachineTriple
+        runConfigure ./configure --host=$effectiveTargetMachineTriple --disable-static
         make $jobArgs
 }
 
@@ -71,7 +74,7 @@ TEST()
 
 PROVIDES_devel="
 	expat_bootstrap${secondaryArchSuffix}_devel = $portVersion
-	devel:libexpat${secondaryArchSuffix} = 1.8.1 compat >= 1
+	devel:libexpat${secondaryArchSuffix} = $libVersionCompat
 	"
 REQUIRES_devel="
 	expat_bootstrap${secondaryArchSuffix} == $portVersion base
