@@ -1,0 +1,67 @@
+name: bootstrap
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+jobs:
+  bootstrap:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        target: [arm, arm64, riscv64, x86_64]
+
+    steps:
+    - name: checkout haiku (from github due to performance)
+      uses: actions/checkout@v3
+      with:
+        repository: haiku/haiku
+        path: haiku
+
+    - name: tag current commit from haiku
+      working-directory: haiku
+      run: git tag $(git ls-remote https://review.haiku-os.org/haiku refs/tags/hrev* | awk '/'$(git rev-parse HEAD)'/ { gsub(/refs\/tags\//, ""); print $2 }') 
+
+    - name: checkout buildtools (from github due to performance)
+      uses: actions/checkout@v3
+      with:
+        repository: haiku/buildtools
+        path: buildtools
+
+    - name: checkout haikuporter
+      uses: actions/checkout@v3
+      with:
+        repository: haikuports/haikuporter
+        path: haikuporter
+
+    - name: checkout haikuports
+      uses: actions/checkout@v3
+      with:
+        repository: haikuports/haikuports
+        path: haikuports
+
+    - name: checkout haikuports.cross
+      uses: actions/checkout@v3
+      with:
+        path: haikuports.cross
+
+    - name: create build directory
+      run: mkdir build
+
+    - name: install ubuntu packages
+      run: sudo apt install -y nasm
+
+    - name: install jam
+      working-directory: buildtools/jam
+      run: |
+        make
+        ./jam0 install
+
+    - name: configure for ${{ matrix.target }}
+      working-directory: build
+      run: ../haiku/configure --build-cross-tools ${{ matrix.target }} --cross-tools-source ../buildtools --bootstrap ../haikuporter/haikuporter ../haikuports.cross ../haikuports -j$(nproc)
+
+    - name: jam @bootstrap-raw for ${{ matrix.target }}
+      working-directory: build
+      run: jam -j$(nproc) -q @bootstrap-raw
