@@ -1,18 +1,21 @@
 SUMMARY="A Massively Spiffy Yet Delicately Unobtrusive Compression Library"
 DESCRIPTION="zlib is designed to be a free, general-purpose, legally unencumbered -- that is, not covered by any patents -- lossless data-compression library for use on virtually any computer hardware and operating system. The zlib data format is itself portable across platforms. Unlike the LZW compression method used in Unix compress(1) and in the GIF image format, the compression method currently used in zlib essentially never expands the data. (LZW can double or triple the file size in extreme cases.) zlib's memory footprint is also independent of the input data and can be reduced, if necessary, at some cost in compression."
-HOMEPAGE="http://www.zlib.net/"
-COPYRIGHT="1995-2005 Jean-loup Gailly and Mark Adler"
+HOMEPAGE="https://zlib.net/"
+COPYRIGHT="1995-2022 Jean-loup Gailly and Mark Adler"
 LICENSE="Zlib"
-SOURCE_URI="https://zlib.net/fossils/zlib-1.2.11.tar.gz"
-CHECKSUM_SHA256="c3e5e9fdd5004dcb542feda5ee4f0ff0744628baf8ed2dd5d66f8ca1197cb1a1"
+SOURCE_URI="https://zlib.net/zlib-$portVersion.tar.xz"
+CHECKSUM_SHA256="d14c38e313afc35a9a8760dadf26042f51ea0f5d154b0630a31da0540107fb98"
 REVISION="1"
 ARCHITECTURES="x86_gcc2 x86 x86_64 arm arm64 ppc m68k riscv64 sparc"
-SECONDARY_ARCHITECTURES="x86_gcc2 x86"
+SECONDARY_ARCHITECTURES="x86"
+
+libVersion="$portVersion"
+libVersionCompat="$libVersion compat >= ${libVersion%%.*}"
 
 PROVIDES="
-	zlib_bootstrap$secondaryArchSuffix = $portVersion compat >= 1
-	zlib$secondaryArchSuffix = $portVersion compat >= 1
-	lib:libz$secondaryArchSuffix = $portVersion compat >= 1
+	zlib_bootstrap$secondaryArchSuffix = $libVersionCompat
+	zlib$secondaryArchSuffix = $libVersionCompat
+	lib:libz$secondaryArchSuffix = $libVersionCompat
 	"
 REQUIRES="
 	haiku$secondaryArchSuffix
@@ -89,9 +92,9 @@ INSTALL()
 # ----- devel package -------------------------------------------------------
 
 PROVIDES_devel="
-	zlib_bootstrap${secondaryArchSuffix}_devel = $portVersion compat >= 1
-	zlib${secondaryArchSuffix}_devel = $portVersion compat >= 1
-	devel:libz${secondaryArchSuffix} = $portVersion compat >= 1
+	zlib_bootstrap${secondaryArchSuffix}_devel = $libVersionCompat
+	zlib${secondaryArchSuffix}_devel = $libVersionCompat
+	devel:libz${secondaryArchSuffix} = $libVersionCompat
 	"
 REQUIRES_devel="
 	zlib_bootstrap${secondaryArchSuffix} == $portVersion base
