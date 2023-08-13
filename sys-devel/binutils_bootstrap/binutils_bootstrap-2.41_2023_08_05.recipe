@@ -30,8 +30,8 @@ SOURCE_URI="https://github.com/haiku/buildtools/archive/$srcGitRev.tar.gz"
 CHECKSUM_SHA256="d615e4cf5565ba95ec9c199d871c44f36f6068bab6200ae3204f1c4c4f69de18"
 SOURCE_DIR="buildtools-$srcGitRev/binutils"
 
-ARCHITECTURES="?all !x86_gcc2"
-SECONDARY_ARCHITECTURES="?x86"
+ARCHITECTURES="all !x86_gcc2"
+SECONDARY_ARCHITECTURES="x86"
 
 portVersionCompat="$portVersion compat >= 2.41"
 
