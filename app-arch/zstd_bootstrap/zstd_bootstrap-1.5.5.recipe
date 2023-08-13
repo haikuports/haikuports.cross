@@ -7,14 +7,15 @@ compression / speed trade-off, while being backed by a very fast decoder. It \
 also offers a special mode for small data, called dictionary compression, and \
 can create dictionaries from any sample set."
 HOMEPAGE="https://facebook.github.io/zstd/"
-COPYRIGHT="2016-2018 Facebook, Inc."
+COPYRIGHT="2016-2023 Facebook, Inc.
+	Meta Platforms, Inc. and affiliates"
 LICENSE="BSD (2-clause)
 	GNU GPL v2"
-REVISION="2"
+REVISION="1"
 SOURCE_URI="https://github.com/facebook/zstd/archive/v$portVersion.tar.gz"
 SOURCE_FILENAME="zstd-$portVersion.tar.gz"
 SOURCE_DIR="zstd-$portVersion"
-CHECKSUM_SHA256="0d9ade222c64e912d6957b11c923e214e2e010a18f39bec102f572e693ba2867"
+CHECKSUM_SHA256="98e9c3d949d1b924e28e01eccb7deed865eefebf25c2f21c702e5cd5b63b85e1"
 PATCHES="zstd-$portVersion.patchset"
 if [ "$effectiveTargetArchitecture" = x86_gcc2 ]; then
 PATCHES="$PATCHES
@@ -23,7 +24,7 @@ PATCHES="$PATCHES
 fi
 
 ARCHITECTURES="all"
-SECONDARY_ARCHITECTURES="x86_gcc2 x86"
+SECONDARY_ARCHITECTURES="x86"
 
 libVersion="$portVersion"
 libVersionCompat="$libVersion compat >= ${libVersion%%.*}"
@@ -79,7 +80,7 @@ EOF
 	    . -DCMAKE_BUILD_TYPE=Release -DBUILD_TESTING=OFF \
 		-DZSTD_BUILD_STATIC=OFF \
 		-DZSTD_BUILD_PROGRAMS=OFF -DZSTD_BUILD_TESTS=OFF $cmakeDirArgs
-	make
+	make $jobArgs
 }
 
 INSTALL()
