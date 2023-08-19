@@ -58,6 +58,17 @@ jobs:
         make
         ./jam0 install
 
+    - name: generate cache key, based on host, target, haiku and buildtools
+      id: cache-key
+      run: echo "key=${{ runner.os }}-${{ matrix.target }}-$(git -C haiku rev-parse HEAD)-$(git -C buildtools rev-parse HEAD)" >> "$GITHUB_OUTPUT"
+
+    - name: Cache build (${{ steps.cache-key.outputs.key }})
+      id: cache-build
+      uses: actions/cache/restore@v3
+      with:
+        path: build
+        key: ${{ steps.cache-key.outputs.key }}
+
     - name: configure for ${{ matrix.target }}
       working-directory: build
       run: ../haiku/configure --build-cross-tools ${{ matrix.target }} --cross-tools-source ../buildtools --bootstrap ../haikuporter/haikuporter ../haikuports.cross ../haikuports -j$(nproc)
@@ -65,3 +76,10 @@ jobs:
     - name: jam @bootstrap-raw for ${{ matrix.target }}
       working-directory: build
       run: jam -j$(nproc) -q @bootstrap-raw
+
+    - name: save build files in cache (${{ steps.cache-key.outputs.key }})
+      uses: actions/cache/save@v3
+      if: always()
+      with:
+        path: build
+        key: ${{ steps.cache-key.outputs.key }}
