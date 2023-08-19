@@ -75,7 +75,7 @@ jobs:
 
     - name: jam @bootstrap-raw for ${{ matrix.target }}
       working-directory: build
-      run: jam -j$(nproc) -q @bootstrap-raw
+      run: jam -q @bootstrap-raw
 
     - name: save build files in cache (${{ steps.cache-key.outputs.key }})
       uses: actions/cache/save@v3
