@@ -1,0 +1,19 @@
+From: Yn0ga <ynoga@protonmail.com>
+Date: Sat, 07 October 2023 22:48:10 +0200
+Subject: Add PowerPC-haiku support in configure.host file
+
+diff --git a/configure.host b/configure.host
+index b291bd0..4cc69be 100644
+--- a/configure.host
++++ b/configure.host
+@@ -205,7 +205,7 @@ case "${host}" in
+   powerpc-*-eabi*)
+        TARGET=POWERPC; TARGETDIR=powerpc
+        ;;
+-  powerpc-*-beos*)
++  powerpc-*-beos* | powerpc-*-haiku*)
+        TARGET=POWERPC; TARGETDIR=powerpc
+        ;;
+   powerpc-*-darwin* | powerpc64-*-darwin*)
+--
+1.7.5
