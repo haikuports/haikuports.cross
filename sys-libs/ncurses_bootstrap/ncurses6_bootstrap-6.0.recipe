@@ -5,7 +5,7 @@ CHECKSUM_SHA256="f551c24b30ce8bfb6e96d9f59b42fbea30fa3a6123384172f9e7284bcf64726
 LICENSE="MIT"
 COPYRIGHT="1998-2011 Free Software Foundation, Inc."
 REVISION="1"
-ARCHITECTURES="x86_gcc2 x86 x86_64 ppc arm arm64 riscv64 sparc m68k"
+ARCHITECTURES="x86_gcc2 x86 x86_64 arm arm64 riscv64 sparc m68k"
 SECONDARY_ARCHITECTURES="x86_gcc2 x86"
 
 PATCHES="ncurses_bootstrap-$portVersion.patchset

@@ -30,7 +30,7 @@ PATCHES="
 	bash-4.4.patchset
 	"
 
-ARCHITECTURES="x86_gcc2 x86 x86_64 ppc arm"
+ARCHITECTURES="x86_gcc2 x86 x86_64 arm"
 
 PROVIDES="
 	bash_bootstrap = $portVersion
