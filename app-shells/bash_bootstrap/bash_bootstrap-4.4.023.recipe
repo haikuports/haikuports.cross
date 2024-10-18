@@ -76,8 +76,10 @@ PATCH()
 		eval f=\$sourceDir$i/bash44-$i
 		sed -e "s|\.\./bash-4.4/||" "$f" | patch -p0
 	done
+
 	# store bash settings under ~/config/settings
-	find -type f | xargs sed -i -e 's,~/\.,~/config/settings/,g'
+	find -type f -name "*.c" -o -name "*.def" -o -name "*.h" -o -name "*.1" \
+		| xargs sed -i -e 's,~/\.,~/config/settings/,g'
 }
 
 BUILD()
