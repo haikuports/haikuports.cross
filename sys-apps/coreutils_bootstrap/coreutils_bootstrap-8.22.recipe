@@ -160,7 +160,7 @@ PATCH()
 
 BUILD()
 {
-	PERL=missing FORCE_UNSAFE_CONFIGURE=1 CFLAGS="-w" \
+	PERL=missing FORCE_UNSAFE_CONFIGURE=1 CFLAGS="-w -O2" \
 		runConfigure ./configure \
 		--build=$buildMachineTriple --host=$targetMachineTriple \
 		--without-included-regex \
