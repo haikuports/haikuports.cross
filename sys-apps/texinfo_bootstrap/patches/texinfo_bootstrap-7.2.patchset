@@ -1,0 +1,134 @@
+From 7d052efe328e096c46d5a2638999ad5b6699a519 Mon Sep 17 00:00:00 2001
+From: Jerome Duval <jerome.duval@gmail.com>
+Date: Tue, 22 Dec 2015 11:52:48 +0000
+Subject: Haiku patch
+
+
+diff --git a/system.h b/system.h
+index e32937f..4ed2c07 100644
+--- a/system.h
++++ b/system.h
+@@ -105,6 +105,10 @@ extern char *strerror ();
+ # endif
+ #endif /* O_BINARY */
+ 
++#if defined(__HAIKU__)
++# define DEFAULT_INFOPATH "/system/documentation/info:/system/non-packaged/documentation/info:/boot/home/config/documentation/info:/boot/home/config/non-packaged/documentation/info:."
++#endif
++
+ #if O_BINARY
+ # ifdef HAVE_IO_H
+ #  include <io.h>
+-- 
+2.37.3
+
+From f7572109b64db9ea5aa44078eaad25ad2a2283f8 Mon Sep 17 00:00:00 2001
+From: Alexander Kanavin <alex@linutronix.de>
+Date: Thu, 28 Nov 2024 13:16:15 +0100
+Subject: [PATCH] Makefile.am: do not build manpages
+
+This requires help2man.
+
+Upstream-Status: Inappropriate [oe-core doesn't provide help2man]
+Signed-off-by: Alexander Kanavin <alex@linutronix.de>
+---
+ Makefile.am | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/Makefile.am b/Makefile.am
+index f733797..1013fcf 100644
+--- a/Makefile.am
++++ b/Makefile.am
+@@ -76,7 +76,7 @@
+ endif
+ endif
+   SUBDIRS += install-info po po_document tp Pod-Simple-Texinfo \
+-             texindex util doc man
++             texindex util doc
+   SUBDIRS += js
+ endif
+ 
+-- 
+2.39.5
+
+From db2c41668d62c234fa69c71db18c162500dd403f Mon Sep 17 00:00:00 2001
+From: Joshua Lock <josh@linux.intel.com>
+Date: Fri, 16 Sep 2011 15:35:48 -0700
+Subject: [PATCH] texinfo: several changes to build without zlib and ncurses
+
+We already DEPEND on the native texinfo being present before building so
+there isn't any need to try and build the required native texinfo binaries
+before cross-compiling. This simplifies the recipe somewhat!
+
+Upstream-Status: Inappropriate oe specific
+
+Signed-off-by: Joshua Lock <josh@linux.intel.com>
+---
+ configure.ac | 24 +-----------------------
+ 1 file changed, 1 insertion(+), 23 deletions(-)
+
+diff --git a/configure.ac b/configure.ac
+index 00626a3..5b725fe 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -267,29 +267,7 @@ AC_CANONICAL_BUILD
+ # $native_tools is also added to SUBDIRS in the main Makefile.am,
+ # so that make compiles the native tools first.
+ #
+-if test "$cross_compiling" = no; then
+-  native_tools=
+-else
+-  native_tools=tools
+-  test -d "$native_tools" || mkdir "$native_tools"
+-  confdir=`(cd "$srcdir";pwd)`
+-  # Make sure the secondary configure won't fail with
+-  # "error: source directory already configured".
+-  rm -f config.status
+-  AC_MSG_NOTICE([[Doing configure of native tools (${build}).]])
+-  cd "$native_tools" || exit 1
+-  # Run secondary configure in alternate environment or
+-  # it gets the wrong CC etc.
+-  # env -i gives this build host configure a clean environment;
+-  # consequently, we have to re-initialize $PATH.
+-  env -i CC="$BUILD_CC" AR="$BUILD_AR" RANLIB="$BUILD_RANLIB" \
+-      PATH="$PATH" \
+-      tools_only=1 \
+-    ${confdir}/configure --build=${build} --host=${build} \
+-                         --disable-rpath --disable-nls
+-  cd .. || exit 1
+-  AC_MSG_NOTICE([[Continuing with main configure (${host}).]])
+-fi
++native_tools=
+ AC_SUBST(native_tools)
+ AM_CONDITIONAL(TOOLS_ONLY, [[test "x$tools_only" = x1]])
+ 
+From a6f09f5cdecd63e6be9662695fbef1fb07a3cc34 Mon Sep 17 00:00:00 2001
+From: PulkoMandy <pulkomandy@pulkomandy.tk>
+Date: Thu, 20 Nov 2025 20:09:24 +0100
+Subject: [PATCH] Hardcode native tools directory
+
+Previous patches from Yocto fix the build, but result in native_tools
+not being set (and makedoc being built anyway?).
+
+Hardcode the path to makedoc so the build of the target part of the code
+can complete (it is the only part we really care about anyways).
+---
+ info/Makefile.am | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/info/Makefile.am b/info/Makefile.am
+index 8a70baa..ea2a227 100644
+--- a/info/Makefile.am
++++ b/info/Makefile.am
+@@ -90,7 +90,7 @@ cmd_sources = $(srcdir)/session.c $(srcdir)/echo-area.c $(srcdir)/infodoc.c \
+ # more than once.
+ funs.h: makedoc$(EXEEXT) $(cmd_sources)
+ 	rm -f $(generated_sources)
+-	$(top_builddir)/$(native_tools)/info/makedoc $(cmd_sources)
++	$(top_builddir)/tools/info/makedoc $(cmd_sources)
+ 
+ # The following hack is necessary to hint make before the automatic
+ # dependencies are built.
+-- 
+2.51.0
+
