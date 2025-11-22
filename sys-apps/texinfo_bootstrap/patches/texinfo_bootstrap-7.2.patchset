@@ -125,7 +125,7 @@ index 8a70baa..ea2a227 100644
  funs.h: makedoc$(EXEEXT) $(cmd_sources)
  	rm -f $(generated_sources)
 -	$(top_builddir)/$(native_tools)/info/makedoc $(cmd_sources)
-+	$(top_builddir)/tools/info/makedoc $(cmd_sources)
++	$(top_builddir)/../build-host/info/makedoc $(cmd_sources)
  
  # The following hack is necessary to hint make before the automatic
  # dependencies are built.
