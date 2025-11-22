@@ -1,0 +1,98 @@
+From 424c0a46e79aa5ee26f00a91af333cebbb8de850 Mon Sep 17 00:00:00 2001
+From: PulkoMandy <pulkomandy@pulkomandy.tk>
+Date: Sat, 22 Nov 2025 11:39:37 +0100
+Subject: [PATCH 1/3] Assume getcwd is not broken
+
+Otherwise some files try to replace it with getwd, that doesn't exist on
+Haiku.
+---
+ aclocal.m4 | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/aclocal.m4 b/aclocal.m4
+index ae2d8ae..14ee5d0 100644
+--- a/aclocal.m4
++++ b/aclocal.m4
+@@ -669,8 +669,8 @@ main()
+ 	exit (xpwd == 0);
+ }
+ ]])], [bash_cv_getcwd_malloc=yes], [bash_cv_getcwd_malloc=no],
+-   [AC_MSG_WARN(cannot check whether getcwd allocates memory when cross-compiling -- defaulting to no)
+-    bash_cv_getcwd_malloc=no]
++   [AC_MSG_WARN(cannot check whether getcwd allocates memory when cross-compiling -- defaulting to yes)
++    bash_cv_getcwd_malloc=yes]
+ )])
+ AC_MSG_RESULT($bash_cv_getcwd_malloc)
+ if test $bash_cv_getcwd_malloc = no; then
+-- 
+2.51.0
+
+From 65d7757c8b2bdbc2c3d1dd006c5fddf8e04c8c1e Mon Sep 17 00:00:00 2001
+From: PulkoMandy <pulkomandy@pulkomandy.tk>
+Date: Sat, 22 Nov 2025 11:40:19 +0100
+Subject: [PATCH 2/3] Assume the cross-compiler provides bool
+
+This cannot be checked by the configure script so it needs to be
+manually set. Since gcc defaults to C23 now, bool is a keyword, and so
+we should use that mode.
+---
+ buildconf.h.in | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/buildconf.h.in b/buildconf.h.in
+index b99d26c..24a6ed3 100644
+--- a/buildconf.h.in
++++ b/buildconf.h.in
+@@ -39,7 +39,7 @@
+ #define HAVE_RENAME
+ 
+ /* defining this implies a C23 environment */
+-#undef HAVE_C_BOOL
++#define HAVE_C_BOOL 1
+ 
+ /* Don't assume this; it's from C99; let syntax.h define a replacement */
+ /* #undef HAVE_ISBLANK */
+-- 
+2.51.0
+
+From 420d669161517bdc1a51b04b7acab63f05c547a6 Mon Sep 17 00:00:00 2001
+From: PulkoMandy <pulkomandy@pulkomandy.tk>
+Date: Sat, 22 Nov 2025 11:41:19 +0100
+Subject: [PATCH 3/3] Disable some non-existing constants in Haiku
+
+The getconf implementation in bash checks for some constants existence,
+but not all of them.
+---
+ examples/loadables/getconf.c | 6 ++++++
+ 1 file changed, 6 insertions(+)
+
+diff --git a/examples/loadables/getconf.c b/examples/loadables/getconf.c
+index 3981250..045733e 100644
+--- a/examples/loadables/getconf.c
++++ b/examples/loadables/getconf.c
+@@ -286,7 +286,9 @@ static const struct conf vars[] =
+ #else
+     { "_POSIX_ARG_MAX", _POSIX_ARG_MAX, CONSTANT },
+ #endif
++#ifdef _SC_ASYNCHRONOUS_IO
+     { "_POSIX_ASYNCHRONOUS_IO", _SC_ASYNCHRONOUS_IO, SYSCONF },
++#endif
+ #ifdef _SC_CHILD_MAX
+     { "_POSIX_CHILD_MAX", _SC_CHILD_MAX, SYSCONF },
+ #else
+@@ -838,8 +840,12 @@ static const struct conf vars[] =
+     { "POSIX2_PBS_MESSAGE", _SC_2_PBS_MESSAGE, SYSCONF },
+     { "SYMLOOP_MAX", _SC_SYMLOOP_MAX, SYSCONF },
+     { "STREAM_MAX", _SC_STREAM_MAX, SYSCONF },
++#ifdef _SC_AIO_LISTIO_MAX
+     { "AIO_LISTIO_MAX", _SC_AIO_LISTIO_MAX, SYSCONF },
++#endif
++#ifdef _SC_AIO_MAX
+     { "AIO_MAX", _SC_AIO_MAX, SYSCONF },
++#endif
+ #ifdef _SC_AIO_PRIO_DELTA_MAX
+     { "AIO_PRIO_DELTA_MAX", _SC_AIO_PRIO_DELTA_MAX, SYSCONF },
+ #endif
+-- 
+2.51.0
+
