@@ -9,7 +9,7 @@ CHECKSUM_SHA256="e86de7dfef6b352aa1bf647de3a6213d1567c70129eccbf8977706d9c91919c
 PATCHES="texinfo_bootstrap-$portVersion.patchset"
 SOURCE_DIR="texinfo-$portVersion"
 
-ARCHITECTURES="arm64"
+ARCHITECTURES="arm arm64"
 
 portVersionCompat="$portVersion compat >= ${portVersion%%.*}"
 
@@ -48,14 +48,23 @@ BUILD_PREREQUIRES="
 
 BUILD()
 {
+	# Build makeinfo for the host. Texinfo tries to do that on its own, but
+	# that's broken and disabled in the patches (there is confusion between
+	# target and build machine flags).
+	mkdir -p build-host
+	cd build-host
+	runConfigure ../configure
+	make -C gnulib/lib
+	make -C info
+	cd ..
+
 	${targetMachineTriple}-libtoolize --force --copy --install
 	mkdir -p build
 	cd build
 	CFLAGS="-fPIC -O1" runConfigure ../configure \
 		--build=$buildMachineTriple --host=$targetMachineTriple --enable-perl-xs=no
 	
-	make -C tools/gnulib/lib
-	make -C tools
+	make -C gnulib/lib
 	make
 }
 
