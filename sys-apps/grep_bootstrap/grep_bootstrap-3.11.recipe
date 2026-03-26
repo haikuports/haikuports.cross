@@ -1,0 +1,49 @@
+SUMMARY="GNU regular expression matcher"
+DESCRIPTION="The grep command searches one or more input files for lines containing a match to a specified pattern. By default, grep prints the matching lines."
+HOMEPAGE="http://www.gnu.org/software/grep/"
+LICENSE="GNU GPL v3"
+COPYRIGHT="1992-2012 Free Software Foundation, Inc."
+SOURCE_URI="https://ftp.gnu.org/gnu/grep/grep-$portVersion.tar.xz"
+CHECKSUM_SHA256="1db2aedde89d0dea42b16d9528f894c8d15dae4e190b59aecc78f5a951276eab"
+REVISION="1"
+ARCHITECTURES="all"
+
+PATCHES="grep_bootstrap-$portVersion.patchset"
+
+PROVIDES="
+	grep_bootstrap = $portVersion compat >= 3
+	grep = $portVersion compat >= 3
+	cmd:egrep = $portVersion compat >= 2
+	cmd:fgrep = $portVersion compat >= 2
+	cmd:grep = $portVersion compat >= 2
+	"
+REQUIRES="
+	haiku
+	"
+BUILD_REQUIRES="
+	"
+BUILD_PREREQUIRES="
+	haiku_devel
+	binutils_cross_$targetArchitecture
+	gcc_cross_$targetArchitecture
+	cmd:aclocal
+	cmd:autoconf
+	cmd:automake
+	cmd:libtoolize
+	cmd:make
+	"
+
+SOURCE_DIR="grep-$portVersion"
+
+BUILD()
+{
+	runConfigure ./configure \
+		--build=$buildMachineTriple --host=$targetMachineTriple \
+		--disable-perl-regexp --disable-nls
+	make $jobArgs
+}
+
+INSTALL()
+{
+	make DESTDIR=$installDestDir install
+}
