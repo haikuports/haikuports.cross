@@ -1,0 +1,187 @@
+SUMMARY="Libraries to support Unicode and globalization"
+SUMMARY_devel="The ICU development files"
+DESCRIPTION="International Components for Unicode (ICU) is a mature, widely \
+used set of C/C++ and Java libraries providing Unicode and Globalization \
+support for software applications. ICU is widely portable and gives \
+applications the same results on all platforms and between C/C++ and Java \
+software.
+ICU is released under a nonrestrictive open source license that is suitable \
+for use with both commercial software and with other open source or free \
+software.
+
+Here are a few highlights of the services provided by ICU:
+
+* Code Page Conversion: Convert text data to or from Unicode and nearly any \
+other character set or encoding. ICU's conversion tables are based on charset \
+data collected by IBM over the course of many decades, and is the most \
+complete available anywhere.
+* Collation: Compare strings according to the conventions and standards of a \
+particular language, region or country. ICU's collation is based on the \
+Unicode Collation Algorithm plus locale-specific comparison rules from the \
+Common Locale Data Repository, a comprehensive source for this type of data.
+* Formatting: Format numbers, dates, times and currency amounts according the \
+conventions of a chosen locale. This includes translating month and day names \
+into the selected language, choosing appropriate abbreviations, ordering \
+fields correctly, etc. This data also comes from the Common Locale Data \
+Repository.
+* Time Calculations: Multiple types of calendars are provided beyond the \
+traditional Gregorian calendar. A thorough set of timezone calculation APIs \
+are provided.
+* Unicode Support: ICU closely tracks the Unicode standard, providing easy \
+access to all of the many Unicode character properties, Unicode Normalization, \
+Case Folding and other fundamental operations as specified by the Unicode \
+Standard.
+* Regular Expression: ICU's regular expressions fully support Unicode while \
+providing very competitive performance.
+* Bidi: support for handling text containing a mixture of left to right \
+(English) and right to left (Arabic or Hebrew) data.
+* Text Boundaries: Locate the positions of words, sentences, paragraphs within \
+a range of text, or identify locations that would be suitable for line \
+wrapping when displaying the text."
+HOMEPAGE="http://www.icu-project.org"
+COPYRIGHT="1995-2020 IBM Corporation and others."
+LICENSE="ICU"
+REVISION="1"
+SOURCE_URI="https://github.com/unicode-org/icu/releases/download/release-${portVersion/\./-}/icu4c-${portVersion/\./_}-src.tgz"
+CHECKSUM_SHA256="86ce8e60681972e60e4dcb2490c697463fcec60dd400a5f9bffba26d0b52b8d0"
+SOURCE_URI_2="https://github.com/unicode-org/icu/releases/download/release-${portVersion/\./-}/icu4c-${portVersion/\./_}-data.zip#noarchive"
+CHECKSUM_SHA256_2="67d5ab39c5187e1dd0fed60a3fe52794dce9784b4c045cb85e19f5d317fd783f"
+SOURCE_DIR="icu"
+PATCHES="icu74_bootstrap-$portVersion.patchset"
+
+ARCHITECTURES="all !x86_gcc2"
+SECONDARY_ARCHITECTURES="x86"
+
+PROVIDES="
+	icu74_bootstrap$secondaryArchSuffix = $portVersion compat >= 74
+	lib:libicudata$secondaryArchSuffix = $portVersion compat >= 74
+	lib:libicui18n$secondaryArchSuffix = $portVersion compat >= 74
+	lib:libicuio$secondaryArchSuffix = $portVersion compat >= 74
+	lib:libicuuc$secondaryArchSuffix = $portVersion compat >= 74
+	"
+REQUIRES="
+	haiku$secondaryArchSuffix
+	"
+
+PROVIDES_devel="
+	icu74_bootstrap${secondaryArchSuffix}_devel = $portVersion
+	cmd:icu_config${secondaryArchSuffix} = $portVersion compat >= 74
+	devel:libicudata${secondaryArchSuffix} = $portVersion compat >= 74
+	devel:libicui18n${secondaryArchSuffix} = $portVersion compat >= 74
+	devel:libicuio${secondaryArchSuffix} = $portVersion compat >= 74
+	devel:libicuuc${secondaryArchSuffix} = $portVersion compat >= 74
+	"
+REQUIRES_devel="
+	icu74_bootstrap${secondaryArchSuffix} == $portVersion base
+	"
+
+if [ -z "$secondaryArchSuffix" ]; then
+	SUMMARY_tools="The ICU support tools"
+	PROVIDES_tools="
+		icu74_bootstrap_tools = $portVersion
+		cmd:derb
+		cmd:escapesrc
+		cmd:genbrk
+		cmd:genccode
+		cmd:gencfu
+		cmd:gencmn
+		cmd:gencnval
+		cmd:gendict
+		cmd:gennorm2
+		cmd:genrb
+		cmd:gensprep
+		cmd:icuinfo
+		cmd:icupkg
+		cmd:makeconv
+		cmd:pkgdata
+		"
+	REQUIRES_tools="
+		icu74_bootstrap == $portVersion base
+		haiku
+		"
+fi
+
+BUILD_REQUIRES="
+	gcc${secondaryArchSuffix}_syslibs_devel
+	"
+BUILD_PREREQUIRES="
+	haiku${secondaryArchSuffix}_devel
+	cmd:autoconf
+	cmd:awk
+	cmd:gcc$secondaryArchSuffix
+	cmd:ld$secondaryArchSuffix
+	cmd:make
+	cmd:sed
+	"
+
+sourceDir=$(pwd)
+buildOutputDir=$sourceDir/../icu-build
+targetOutputDir=$sourceDir/../icu-target
+
+BUILD()
+{
+	cd source
+
+	# Created during build and prevent rebuilds.
+	#rm -rf tools/tzcode/vanguard
+	#cp ../../../sources-3/tzdata*.tar.gz tools/tzcode/
+
+	unzip -oq ../../../sources-2/icu4c-*-data.zip
+	rm -f data/in/icudt??l.dat
+	autoconf
+
+	# make build-architecture-specific output directory and build ICU for the
+	# current architecture. Use shared data packaging, which means it will
+	# be built as a .so file and loaded using the library path. This is
+	# needed because these tools are run during the next step without being
+	# installed, and the separate .dat files we normally use will not be
+	# found in that case.
+	mkdir -p $buildOutputDir
+	cd $buildOutputDir
+	runConfigure ../icu/source/configure --disable-tests \
+		--disable-samples --disable-extras --with-data-packaging=library
+	make $jobArgs
+
+	# now make target-architecture-specific output directory and build ICU for
+	# the target architecture, pointing at the directory containing the version
+	# that's just been built for the build architecture
+	mkdir -p $targetOutputDir
+	cd $targetOutputDir
+	runConfigure ../icu/source/configure \
+		--host=$effectiveTargetMachineTriple \
+		--with-cross-build=$buildOutputDir --disable-tools --disable-tests \
+		--disable-samples --disable-extras --with-data-packaging=archive
+	make $jobArgs
+}
+
+INSTALL()
+{
+	cd $targetOutputDir
+	make DESTDIR=$installDestDir install
+
+	prepareInstalledDevelLibs \
+		libicudata \
+		libicui18n \
+		libicuio \
+		libicuuc
+	fixPkgconfig
+
+	# Update icu-config to point to the develop/lib dir
+	fixDevelopLibDirReferences \
+		$installDestDir$binDir/icu-config
+
+    # devel package
+    packageEntries devel \
+            $installDestDir$developDir \
+            $installDestDir$libDir/icu \
+            $installDestDir$binDir/icu-config \
+            $installDestDir$manDir/man1/icu-config.1
+
+    rm -r $installDestDir$binDir $installDestDir$manDir
+}
+
+TEST()
+{
+	cd source
+	make check
+}
