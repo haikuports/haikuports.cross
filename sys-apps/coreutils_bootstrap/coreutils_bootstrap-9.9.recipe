@@ -21,20 +21,11 @@ COPYRIGHT="1994-2013 Free Software Foundation, Inc."
 LICENSE="GNU GPL v3"
 SOURCE_URI="http://ftp.gnu.org/gnu/coreutils/coreutils-$portVersion.tar.xz"
 SOURCE_DIR="coreutils-$portVersion"
-CHECKSUM_SHA256="5b3e94998152c017e6c75d56b9b994188eb71bf46d4038a642cb9141f6ff1212"
+CHECKSUM_SHA256="19bcb6ca867183c57d77155eae946c5eced88183143b45ca51ad7d26c628ca75"
 REVISION="1"
-ARCHITECTURES="x86_gcc2 x86 x86_64 ppc arm arm64 riscv64 sparc m68k"
+ARCHITECTURES="all"
 
-PATCHES="
-	coreutils-$portVersion.patchset
-	import-Haiku-changes.patch
-	0001-man-dummyman-too-many-non-option-arguments.patch
-"
-if [ $effectiveTargetArchitecture = x86_gcc2 ]; then
-	PATCHES+="
-		coreutils-$portVersion.gcc2.patchset
-	"
-fi
+PATCHES="coreutils_bootstrap-$portVersion.patchset"
 
 PROVIDES="
 	coreutils_bootstrap = $portVersion compat >= 8
@@ -174,6 +165,4 @@ BUILD()
 INSTALL()
 {
 	make DESTDIR=$installDestDir install
-
-	$targetMachineTriple-strip $installDestDir$binDir/*
 }
