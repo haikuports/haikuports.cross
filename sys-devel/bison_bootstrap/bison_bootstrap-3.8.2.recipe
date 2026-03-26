@@ -15,10 +15,9 @@ LICENSE="GNU GPL v3"
 REVISION="1"
 SOURCE_URI="https://ftpmirror.gnu.org/bison/bison-$portVersion.tar.xz
 	https://ftp.gnu.org/gnu/bison/bison-$portVersion.tar.xz"
-CHECKSUM_SHA256="075cef2e814642e30e10e8155e93022e4a91ca38a65aa1d5467d4e969f97f338"
-PATCHES="bison_bootstrap-${portVersion}.patchset"
+CHECKSUM_SHA256="9bba0214ccf7f1079c5d59210045227bcf619519840ebfa80cd3849cff5a5bf2"
 
-ARCHITECTURES="x86_gcc2 x86 x86_64 ppc arm arm64 riscv64 sparc m68k"
+ARCHITECTURES="all"
 SECONDARY_ARCHITECTURES="x86 x86_gcc2"
 
 
