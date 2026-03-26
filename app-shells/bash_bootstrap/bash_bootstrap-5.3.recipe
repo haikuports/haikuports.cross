@@ -15,7 +15,7 @@ PATCHES="
 	bash-5.3.patchset
 	"
 
-ARCHITECTURES="arm"
+ARCHITECTURES="arm arm64"
 
 PROVIDES="
 	bash_bootstrap = $portVersion
