@@ -1,0 +1,58 @@
+From 59a3a8cb376fd0ccd471b52967714665e4bd7393 Mon Sep 17 00:00:00 2001
+From: Jerome Duval <jerome.duval@gmail.com>
+Date: Sat, 30 Sep 2017 12:12:08 +0200
+Subject: Adjust haiku configuration of upstream libtool for packaging.
+
+
+diff --git a/m4/libtool.m4 b/m4/libtool.m4
+index 79a2451..000d334 100644
+--- a/m4/libtool.m4
++++ b/m4/libtool.m4
+@@ -2729,8 +2729,9 @@ haiku*)
+   soname_spec='$libname$release$shared_ext$major'
+   shlibpath_var=LIBRARY_PATH
+   shlibpath_overrides_runpath=no
+-  sys_lib_dlsearch_path_spec='/boot/home/config/lib /boot/common/lib /boot/system/lib'
+-  hardcode_into_libs=yes
++  sys_lib_search_path_spec='/boot/system/non-packaged/develop/lib /boot/system/develop/lib'
++  sys_lib_dlsearch_path_spec='/boot/home/config/non-packaged/lib /boot/home/config/lib /boot/system/non-packaged/lib /boot/system/lib'
++  hardcode_into_libs=no
+   ;;
+ 
+ hpux9* | hpux10* | hpux11*)
+-- 
+2.50.1
+
+
+From 4088182e6eddae2bd91aca42aaf1db1f24cd9104 Mon Sep 17 00:00:00 2001
+From: Adrien Destugues <pulkomandy@pulkomandy.tk>
+Date: Sat, 11 Apr 2020 21:12:42 +0200
+Subject: Do not explicitly link dependencies on Haiku.
+
+This is not needed, the runtime_loader can figure them out.
+
+diff --git a/m4/libtool.m4 b/m4/libtool.m4
+index 000d334..c0c4b2d 100644
+--- a/m4/libtool.m4
++++ b/m4/libtool.m4
+@@ -5148,7 +5148,7 @@ _LT_EOF
+ 
+     haiku*)
+       _LT_TAGVAR(archive_cmds, $1)='$CC -shared $libobjs $deplibs $compiler_flags $wl-soname $wl$soname -o $lib'
+-      _LT_TAGVAR(link_all_deplibs, $1)=yes
++      _LT_TAGVAR(link_all_deplibs, $1)=no
+       ;;
+ 
+     os2*)
+@@ -6792,7 +6792,7 @@ if test yes != "$_lt_caught_CXX_error"; then
+ 
+       haiku*)
+         _LT_TAGVAR(archive_cmds, $1)='$CC -shared $libobjs $deplibs $compiler_flags $wl-soname $wl$soname -o $lib'
+-        _LT_TAGVAR(link_all_deplibs, $1)=yes
++        _LT_TAGVAR(link_all_deplibs, $1)=no
+         ;;
+ 
+       hpux9*)
+-- 
+2.50.1
+
