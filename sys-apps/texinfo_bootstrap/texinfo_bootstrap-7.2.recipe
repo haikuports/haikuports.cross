@@ -48,12 +48,14 @@ BUILD_PREREQUIRES="
 
 BUILD()
 {
+	autoreconf
+
 	# Build makeinfo for the host. Texinfo tries to do that on its own, but
 	# that's broken and disabled in the patches (there is confusion between
 	# target and build machine flags).
 	mkdir -p build-host
 	cd build-host
-	runConfigure ../configure
+	runConfigure ../configure --enable-perl-xs=no
 	make -C gnulib/lib
 	make -C info
 	cd ..
