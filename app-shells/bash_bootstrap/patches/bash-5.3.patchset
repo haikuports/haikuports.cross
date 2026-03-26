@@ -1,13 +1,10 @@
-From 424c0a46e79aa5ee26f00a91af333cebbb8de850 Mon Sep 17 00:00:00 2001
+From d942246bdec5cff2bb33513c90483f166a0b7c98 Mon Sep 17 00:00:00 2001
 From: PulkoMandy <pulkomandy@pulkomandy.tk>
 Date: Sat, 22 Nov 2025 11:39:37 +0100
-Subject: [PATCH 1/3] Assume getcwd is not broken
+Subject: Assume getcwd is not broken
 
 Otherwise some files try to replace it with getwd, that doesn't exist on
 Haiku.
----
- aclocal.m4 | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
 
 diff --git a/aclocal.m4 b/aclocal.m4
 index ae2d8ae..14ee5d0 100644
@@ -25,19 +22,17 @@ index ae2d8ae..14ee5d0 100644
  AC_MSG_RESULT($bash_cv_getcwd_malloc)
  if test $bash_cv_getcwd_malloc = no; then
 -- 
-2.51.0
+2.50.1
 
-From 65d7757c8b2bdbc2c3d1dd006c5fddf8e04c8c1e Mon Sep 17 00:00:00 2001
+
+From 999d985a21d374de2d316efd237fe1bb12888996 Mon Sep 17 00:00:00 2001
 From: PulkoMandy <pulkomandy@pulkomandy.tk>
 Date: Sat, 22 Nov 2025 11:40:19 +0100
-Subject: [PATCH 2/3] Assume the cross-compiler provides bool
+Subject: Assume the cross-compiler provides bool
 
 This cannot be checked by the configure script so it needs to be
 manually set. Since gcc defaults to C23 now, bool is a keyword, and so
 we should use that mode.
----
- buildconf.h.in | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/buildconf.h.in b/buildconf.h.in
 index b99d26c..24a6ed3 100644
@@ -53,18 +48,16 @@ index b99d26c..24a6ed3 100644
  /* Don't assume this; it's from C99; let syntax.h define a replacement */
  /* #undef HAVE_ISBLANK */
 -- 
-2.51.0
+2.50.1
 
-From 420d669161517bdc1a51b04b7acab63f05c547a6 Mon Sep 17 00:00:00 2001
+
+From 11c746f2f346baada225d7ea4413a223a6b35229 Mon Sep 17 00:00:00 2001
 From: PulkoMandy <pulkomandy@pulkomandy.tk>
 Date: Sat, 22 Nov 2025 11:41:19 +0100
-Subject: [PATCH 3/3] Disable some non-existing constants in Haiku
+Subject: Disable some non-existing constants in Haiku
 
 The getconf implementation in bash checks for some constants existence,
 but not all of them.
----
- examples/loadables/getconf.c | 6 ++++++
- 1 file changed, 6 insertions(+)
 
 diff --git a/examples/loadables/getconf.c b/examples/loadables/getconf.c
 index 3981250..045733e 100644
@@ -94,5 +87,63 @@ index 3981250..045733e 100644
      { "AIO_PRIO_DELTA_MAX", _SC_AIO_PRIO_DELTA_MAX, SYSCONF },
  #endif
 -- 
-2.51.0
+2.50.1
+
+
+From a7202b92b349e4151e6944a1194bfcad09fd9ae6 Mon Sep 17 00:00:00 2001
+From: Sam Roberts <sam@smrobtzz.dev>
+Date: Mon, 30 Mar 2026 15:19:53 -0400
+Subject: aclocal.m4: never define GETCWD_BROKEN
+
+I have no idea why, but this gets defined despite
+bash_cv_getcwd_malloc being forced to yes
+
+diff --git a/aclocal.m4 b/aclocal.m4
+index 14ee5d0..a11de57 100644
+--- a/aclocal.m4
++++ b/aclocal.m4
+@@ -673,10 +673,6 @@ main()
+     bash_cv_getcwd_malloc=yes]
+ )])
+ AC_MSG_RESULT($bash_cv_getcwd_malloc)
+-if test $bash_cv_getcwd_malloc = no; then
+-AC_DEFINE(GETCWD_BROKEN)
+-AC_LIBOBJ(getcwd)
+-fi
+ ])
+ 
+ dnl
+-- 
+2.50.1
+
+
+From bec94e6be71bb3e7550ce39ab829fdfa3a4746f2 Mon Sep 17 00:00:00 2001
+From: Sam Roberts <sam@smrobtzz.dev>
+Date: Mon, 20 Apr 2026 23:51:46 -0400
+Subject: remove usage of getwd
+
+
+diff --git a/lib/intl/dcigettext.c b/lib/intl/dcigettext.c
+index b831491..7ae0909 100644
+--- a/lib/intl/dcigettext.c
++++ b/lib/intl/dcigettext.c
+@@ -137,16 +137,7 @@ extern int errno;
+ # endif
+ # define tfind __tfind
+ #else
+-# if !defined HAVE_GETCWD
+-char *getwd ();
+-#  define getcwd(buf, max) getwd (buf)
+-# else
+-#  if VMS
+-#   define getcwd(buf, max) (getcwd) (buf, max, 0)
+-#  else
+ char *getcwd (char *, size_t);
+-#  endif
+-# endif
+ # ifndef HAVE_STPCPY
+ static char *stpcpy (char *dest, const char *src);
+ # endif
+-- 
+2.50.1
 
