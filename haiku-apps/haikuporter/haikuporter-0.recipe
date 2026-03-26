@@ -4,10 +4,10 @@ Haikuporter allows you to build ports (and native) applications for the Haiku \
 operating system into installable packages.
 "
 HOMEPAGE="https://github.com/haikuports/haikuporter"
-srcRev="226a85daf6255ad9b8528a349cea5214c36d97eb"
+srcRev="ebf0598d535d66a086e01815ed4d5fc402cb3029"
 SOURCE_URI="https://github.com/haikuports/haikuporter/archive/$srcRev.tar.gz"
 SOURCE_FILENAME="haikuporter-$srcRev.tar.gz"
-CHECKSUM_SHA256="c7be6a9659bdccf77b8683d20dd6ca6664f7da12938b4ccde7738da327dc3336"
+CHECKSUM_SHA256="05026066424e49235975f1008997d57268081a661c2f11e5bb4a15d2a364fad7"
 LICENSE="MIT"
 COPYRIGHT="2007-2013 Brecht Machiels et al"
 REVISION="1"
@@ -37,7 +37,7 @@ INSTALL()
 {
 	haikuporterDir=$libDir/haikuporter
 	mkdir -p $installDestDir$haikuporterDir
-	cp -r haikuporter HaikuPorter $installDestDir$haikuporterDir
+	cp -r haikuporter haikuporter.py HaikuPorter $installDestDir$haikuporterDir
 
 	mkdir -p $installDestDir$binDir
 	symlinkRelative -s "$installDestDir$haikuporterDir/haikuporter" \
