@@ -1,0 +1,51 @@
+From 9826fd66c374f5e189c71f36c2624d9290abcdd5 Mon Sep 17 00:00:00 2001
+From: Sam Roberts <sam@smrobtzz.dev>
+Date: Thu, 26 Mar 2026 15:21:35 -0400
+Subject: [PATCH 1/2] libstdc++: force shared libgcc
+
+---
+ libstdc++-v3/configure | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/libstdc++-v3/configure b/libstdc++-v3/configure
+index 3d52ad1..8a33940 100755
+--- a/libstdc++-v3/configure
++++ b/libstdc++-v3/configure
+@@ -68729,7 +68729,7 @@ _ACEOF
+ if ac_fn_c_try_link "$LINENO"; then :
+   glibcxx_shared_libgcc=yes
+ else
+-  glibcxx_shared_libgcc=no
++  glibcxx_shared_libgcc=yes
+ fi
+ rm -f core conftest.err conftest.$ac_objext \
+     conftest$ac_exeext conftest.$ac_ext
+-- 
+2.50.1 (Apple Git-155)
+
+
+From 5ac826502d38c94e31938819c2a37252ed500774 Mon Sep 17 00:00:00 2001
+From: Sam Roberts <sam@smrobtzz.dev>
+Date: Mon, 13 Apr 2026 17:03:41 -0400
+Subject: [PATCH 2/2] config: always set LIMITS_H_TEST = true
+
+---
+ gcc/config/t-haiku | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/gcc/config/t-haiku b/gcc/config/t-haiku
+index ba1f7f5..66edeec 100644
+--- a/gcc/config/t-haiku
++++ b/gcc/config/t-haiku
+@@ -1,7 +1,7 @@
+ # There are system headers elsewhere, but these are the ones that
+ # we are most likely to want to apply any fixes to.
+ NATIVE_SYSTEM_HEADER_DIR = /boot/system/develop/headers
+-LIMITS_H_TEST = [ -f $(SYSTEM_HEADER_DIR)/posix/limits.h ]
++LIMITS_H_TEST = true
+ 
+ # Haiku-specific attributes
+ haiku.o: $(srcdir)/config/haiku.c
+-- 
+2.50.1 (Apple Git-155)
+
