@@ -8,7 +8,7 @@ terminals. There is even limited support for hardcopy terminals.
 "
 HOMEPAGE="http://www.gnu.org/software/less/" 
 SOURCE_URI="http://ftp.gnu.org/gnu/less/less-$portVersion.tar.gz"
-CHECKSUM_SHA256="9fe8287c647afeafb4149c5dedaeacfd20971ed7c26c7553794bb750536b5f57"
+CHECKSUM_SHA256="2819f55564d86d542abbecafd82ff61e819a3eec967faa36cd3e68f1596a44b8"
 LICENSE="GNU GPL v3"
 COPYRIGHT="1984-2012 Mark Nudelman"
 REVISION="1"
@@ -40,20 +40,12 @@ BUILD_PREREQUIRES="
 	cmd:aclocal
 	"
 
-PATCHES="less_bootstrap-451.patch"
+PATCHES="less_bootstrap-$portVersion.patch"
 
-GLOBAL_WRITABLE_FILES="
-	settings/etc/sysless.src keep-old
-	settings/etc/sysless keep-old
-"
-
-SOURCE_DIR="less-451"
+SOURCE_DIR="less-$portVersion"
 
 BUILD()
 {
-	# permissions are fucked up in the tarball
-	chmod -R +w .
-
 	autoconf
 	runConfigure ./configure --host=$targetMachineTriple \
 		--with-editor=nano --sysconfdir=$settingsDir/etc
