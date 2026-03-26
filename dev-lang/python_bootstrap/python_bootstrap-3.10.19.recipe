@@ -13,7 +13,7 @@ LICENSE="Python"
 COPYRIGHT="1990-2020 Python Software Foundation"
 REVISION="1"
 SOURCE_URI="https://www.python.org/ftp/python/$portVersion/Python-$portVersion.tar.xz"
-CHECKSUM_SHA256="991c3f8ac97992f3d308fefeb03a64db462574eadbff34ce8bc5bb583d9903ff"
+CHECKSUM_SHA256="c8f4a596572201d81dd7df91f70e177e19a70f1d489968b54b5fbbf29a97c076"
 SOURCE_DIR="Python-$portVersion"
 PATCHES="python_bootstrap-$portVersion.patchset"
 if [ "$secondaryArchSuffix" = _x86 ] ; then
@@ -22,27 +22,24 @@ if [ "$secondaryArchSuffix" = _x86 ] ; then
 	"
 fi
 
-ARCHITECTURES=" !x86_gcc2 ?x86 ?x86_64 arm arm64 ppc riscv64"
-
-GLOBAL_WRITABLE_FILES="
-	non-packaged/lib/python3.9/site-packages directory keep-old
-	"
+ARCHITECTURES="all !x86_gcc2"
 
 PROVIDES="
         python_bootstrap = $portVersion compat >= 3
         python = $portVersion compat >= 3
+        python3.10 = $portVersion compat >= 3
         cmd:2to3 = $portVersion compat >= 3
         cmd:idle = $portVersion compat >= 3
         cmd:pydoc = $portVersion compat >= 3
         cmd:python = $portVersion compat >= 3
         cmd:python3 = $portVersion compat >= 3
-        cmd:python3.9 = $portVersion compat >= 3
-        cmd:python3.9_config = $portVersion compat >= 3
+        cmd:python3.10 = $portVersion compat >= 3
+        cmd:python3.10_config = $portVersion compat >= 3
         cmd:python3_config = $portVersion compat >= 3
         cmd:python_config = $portVersion compat >= 3
         cmd:smtpd.py = $portVersion compat >= 3
-        devel:libpython3.9 = 1.0
-        lib:libpython3.9 = 1.0
+        devel:libpython3.10 = 1.0
+        lib:libpython3.10 = 1.0
 	"
 REQUIRES="
 	haiku
@@ -74,9 +71,6 @@ BUILD_PREREQUIRES="
 
 BUILD()
 {
-	libtoolize --force --copy --install
-	aclocal
-	autoconf
 	mkdir -p hostpython
 	# Build a small host python needed for crosscompilation
 	cd hostpython
