@@ -15,7 +15,7 @@ HOMEPAGE="http://www.gnu.org/software/sed"
 SOURCE_URI="http://ftp.gnu.org/gnu/sed/sed-$portVersion.tar.xz"
 CHECKSUM_SHA256="6e226b732e1cd739464ad6862bd1a1aba42d7982922da7a53519631d24975181"
 REVISION="1"
-ARCHITECTURES="x86_gcc2 x86 x86_64 ppc arm arm64 riscv64 sparc m68k"
+ARCHITECTURES="all"
 PATCHES="sed_bootstrap-$portVersion.patchset"
 
 PROVIDES="
