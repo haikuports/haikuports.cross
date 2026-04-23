@@ -41,5 +41,5 @@ INSTALL()
 
 	mkdir -p $installDestDir$binDir
 	symlinkRelative -s "$installDestDir$haikuporterDir/haikuporter" \
-		"$installDestDir$binDir"
+		"$installDestDir$binDir"/
 }

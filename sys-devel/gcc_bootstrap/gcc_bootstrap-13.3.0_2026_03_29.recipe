@@ -414,7 +414,7 @@ INSTALL()
 	mkdir -p $installDestDir$binDir
 	for f in c++ cc cpp g++ gcc gcc-ar gcc-nm gcc-ranlib gcov gcov-dump \
 		gcov-tool lto-dump ; do
-		symlinkRelative -sfn $installDestDir$installDir/bin/$f $installDestDir$binDir
+		symlinkRelative -sfn $installDestDir$installDir/bin/$f $installDestDir$binDir/
 	done
 
 	# symlink all libraries from libDir -> developLibDir
