@@ -81,6 +81,13 @@ relativeInstallDir="develop/tools$secondaryArchSubDir"
 installDir="$prefix/$relativeInstallDir"
 objectsDir=$(pwd)/../${portVersionedName}-obj
 
+PATCH()
+{
+	# clear out the "missing" script so that we don't get errors for tools
+	# that are not installed (e.g. makeinfo)
+	echo "#!/bin/sh" >missing
+}
+
 BUILD()
 {
 	rm -rf $objectsDir
