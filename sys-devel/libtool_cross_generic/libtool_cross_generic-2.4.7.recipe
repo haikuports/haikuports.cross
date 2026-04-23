@@ -12,6 +12,7 @@ REVISION="1"
 ARCHITECTURES="all"
 SECONDARY_ARCHITECTURES="x86_gcc2 x86"
 
+SOURCE_DIR="libtool-$portVersion"
 PATCHES="libtool_cross_generic-$portVersion.patchset"
 
 PROVIDES="
@@ -27,6 +28,7 @@ REQUIRES="
 	cmd:sed
 	cmd:tar
 	"
+
 BUILD_REQUIRES="
 	"
 BUILD_PREREQUIRES="
@@ -42,11 +44,21 @@ BUILD_PREREQUIRES="
 	cmd:sed
 	"
 
-SOURCE_DIR="libtool-$portVersion"
-
 BUILD()
 {
-	./bootstrap --force
+	export MAKEINFO=/bin/true
+	export HELP2MAN=/bin/true
+	export PATCH=/bin/true
+	export XZ=/bin/true
+	touch README-release
+
+	cp m4/libtool.m4 m4/libtool.m4.bak
+	./bootstrap --force --skip-git
+	mv m4/libtool.m4.bak m4/libtool.m4
+		# bootstrap copies back the file from the system over the current ones.
+		# But we must run it, because libtool is shipped with old aclocal-1.15
+		# files and we have only a newer aclocal. So just restore the file.
+
 	runConfigure ./configure \
 		--with-gnu-ld \
 		--disable-static \
