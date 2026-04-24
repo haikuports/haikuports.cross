@@ -1,21 +1,34 @@
 SUMMARY="A commandline-tool and library for downloading data from URLs"
+DESCRIPTION="Curl is a command line tool for transferring data with URL \
+syntax, supporting DICT, FILE, FTP, FTPS, Gopher, HTTP, HTTPS, IMAP, IMAPS, \
+LDAP, LDAPS, POP3, POP3S, RTMP, RTSP, SCP, SFTP, SMTP, SMTPS, Telnet and TFTP.
+curl supports SSL certificates, HTTP POST, HTTP PUT, FTP uploading, HTTP form \
+based upload, proxies, cookies, user+password authentication (Basic, Digest, \
+NTLM, Negotiate, kerberos...), file transfer resume, proxy tunneling and a \
+busload of other useful tricks."
 HOMEPAGE="http://curl.haxx.se"
-COPYRIGHT="1996-2014, Daniel Stenberg. All rights reserved."
+COPYRIGHT="1996-2024 Daniel Stenberg"
 LICENSE="Curl"
+REVISION="1"
 SOURCE_URI="http://curl.haxx.se/download/curl-$portVersion.tar.bz2"
 CHECKSUM_SHA256="eba3230c1b659211a7afa0fbf475978cbf99c412e4d72d9aa92d020c460742d4"
-REVISION="1"
+SOURCE_DIR="curl-$portVersion"
+
 ARCHITECTURES="all"
 SECONDARY_ARCHITECTURES="x86_gcc2 x86"
+
+libVersion="4.8.0"
+libVersionCompat="$libVersion compat >= ${libVersion%%.*}"
+portVersionCompat="$portVersion compat >= 7.16"
 
 PROVIDES="
 	curl_bootstrap$secondaryArchSuffix = $portVersion
 	curl$secondaryArchSuffix = $portVersion
-	lib:libcurl$secondaryArchSuffix = 4.3.0 compat >= 4
+	lib:libcurl$secondaryArchSuffix = $libVersionCompat
 	"
 if [ -z "$secondaryArchSuffix" ]; then
 	PROVIDES="$PROVIDES
-		cmd:curl = $portVersion compat >= 7.16
+		cmd:curl = $portVersionCompat
 		"
 fi
 
@@ -23,30 +36,39 @@ REQUIRES="
 	haiku$secondaryArchSuffix
 	lib:libz$secondaryArchSuffix
 	"
+
+PROVIDES_devel="
+	curl_bootstrap${secondaryArchSuffix}_devel = $portVersion
+	curl${secondaryArchSuffix}_devel = $portVersion
+	cmd:curl_config$secondaryArchSuffix = $portVersionCompat
+	devel:libcurl$secondaryArchSuffix = $libVersionCompat
+	"
+REQUIRES_devel="
+	curl_bootstrap$secondaryArchSuffix == $portVersion base
+	devel:libz$secondaryArchSuffix
+	"
+
 BUILD_REQUIRES="
 	devel:libz$secondaryArchSuffix
 	"
 BUILD_PREREQUIRES="
 	haiku${secondaryArchSuffix}_devel
-	cmd:autoconf
 	cmd:gcc$secondaryArchSuffix
 	cmd:ld$secondaryArchSuffix
-	cmd:libtoolize
 	cmd:make
 	"
-
-SOURCE_DIR="curl-$portVersion"
 
 BUILD()
 {
 	certsInstallDir="$portPackageLinksDir/ca_root_certificates"
 	certsDir="$certsInstallDir/$relativeDataRootDir/ssl"
 
-	autoreconf -i
 	runConfigure ./configure \
-	    --without-ssl --without-libpsl \
-		--enable-ipv6 --disable-static \
-		--build=$buildMachineTriple --host=$effectiveTargetMachineTriple
+		--build=$buildMachineTriple --host=$effectiveTargetMachineTriple \
+		--without-ssl \
+		--without-libpsl \
+		--enable-ipv6 \
+		--disable-static
 	make $jobArgs
 }
 
@@ -75,26 +97,3 @@ TEST()
 {
 	make check
 }
-
-DESCRIPTION="
-Curl is a command line tool for transferring data with URL syntax, supporting \
-DICT, FILE, FTP, FTPS, Gopher, HTTP, HTTPS, IMAP, IMAPS, LDAP, LDAPS, POP3, \
-POP3S, RTMP, RTSP, SCP, SFTP, SMTP, SMTPS, Telnet and TFTP. curl supports SSL \
-certificates, HTTP POST, HTTP PUT, FTP uploading, HTTP form based upload, \
-proxies, cookies, user+password authentication (Basic, Digest, NTLM, \
-Negotiate, kerberos...), file transfer resume, proxy tunneling and a busload \
-of other useful tricks.
-"
-
-# ----- devel package -------------------------------------------------------
-
-PROVIDES_devel="
-	curl_bootstrap${secondaryArchSuffix}_devel = $portVersion
-	curl${secondaryArchSuffix}_devel = $portVersion
-	cmd:curl_config$secondaryArchSuffix = $portVersion compat >= 7.16
-	devel:libcurl$secondaryArchSuffix = 4.3.0 compat >= 4
-	"
-REQUIRES_devel="
-	curl_bootstrap$secondaryArchSuffix == $portVersion base
-	devel:libz$secondaryArchSuffix
-	"
