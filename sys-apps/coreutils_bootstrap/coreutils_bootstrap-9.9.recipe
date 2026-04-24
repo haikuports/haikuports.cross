@@ -151,13 +151,19 @@ PATCH()
 
 BUILD()
 {
+	extraArgs=""
+	if [ "$effectiveTargetArchitecture" = x86_gcc2 ] || [ "$effectiveTargetArchitecture" = x86 ]; then
+		extraArgs="--disable-year2038"
+	fi
+
 	PERL=missing FORCE_UNSAFE_CONFIGURE=1 CFLAGS="-w -O2" \
 		runConfigure ./configure \
 		--build=$buildMachineTriple --host=$targetMachineTriple \
 		--without-included-regex \
 		--disable-rpath --with-gnu-ld \
 		--enable-no-install-program=df,uptime \
-		--enable-install-program=hostname --disable-nls
+		--enable-install-program=hostname --disable-nls \
+		$extraArgs
 	touch doc/*.info
 	make $jobArgs
 }
