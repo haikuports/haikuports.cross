@@ -1,13 +1,17 @@
 SUMMARY="A Massively Spiffy Yet Delicately Unobtrusive Compression Library"
 DESCRIPTION="zlib is designed to be a free, general-purpose, legally unencumbered -- that is, not covered by any patents -- lossless data-compression library for use on virtually any computer hardware and operating system. The zlib data format is itself portable across platforms. Unlike the LZW compression method used in Unix compress(1) and in the GIF image format, the compression method currently used in zlib essentially never expands the data. (LZW can double or triple the file size in extreme cases.) zlib's memory footprint is also independent of the input data and can be reduced, if necessary, at some cost in compression."
 HOMEPAGE="https://zlib.net/"
-COPYRIGHT="1995-2022 Jean-loup Gailly and Mark Adler"
+COPYRIGHT="1995-2026 Jean-loup Gailly and Mark Adler"
 LICENSE="Zlib"
-SOURCE_URI="https://zlib.net/fossils/zlib-$portVersion.tar.gz"
-CHECKSUM_SHA256="b3a24de97a8fdbc835b9833169501030b8977031bcb54b3b3ac13740f846ab30"
+SOURCE_URI="
+	https://zlib.net/fossils/zlib-$portVersion.tar.gz
+	https://github.com/madler/zlib/releases/download/v$portVersion/zlib-$portVersion.tar.gz
+	"
+CHECKSUM_SHA256="bb329a0a2cd0274d05519d61c667c062e06990d72e125ee2dfa8de64f0119d16"
 REVISION="1"
 ARCHITECTURES="x86_gcc2 x86 x86_64 arm arm64 ppc m68k riscv64 sparc"
 SECONDARY_ARCHITECTURES="x86"
+PATCHES="zlib-$portVersion.patchset"
 
 libVersion="$portVersion"
 libVersionCompat="$libVersion compat >= ${libVersion%%.*}"
@@ -36,47 +40,25 @@ BUILD_PREREQUIRES="
 
 SOURCE_DIR="zlib-$portVersion"
 
-PATCH()
-{
-	sed -i 's,${CMAKE_INSTALL_PREFIX}/bin',$binDir, CMakeLists.txt
-	sed -i 's,${CMAKE_INSTALL_PREFIX}/include',$includeDir, CMakeLists.txt
-	sed -i 's,${CMAKE_INSTALL_PREFIX}/lib',$libDir, CMakeLists.txt
-	sed -i 's,${CMAKE_INSTALL_PREFIX}/share/man',$manDir, CMakeLists.txt
-	sed -i 's,${CMAKE_INSTALL_PREFIX}/share/pkgconfig',$developLibDir/pkgconfig, \
-		CMakeLists.txt
-}
-
 BUILD()
 {
-	rm -rf build
-	mkdir build
-	cd build
+    export mandir=$manDir # ./configure won't accept --mandir, but respects $mandir
+	export CFLAGS="-O2 -g -DNDEBUG" # similar to cmake's "RelWithDebugInfo" as used before.
+    export CROSS_PREFIX=$effectiveTargetMachineTriple-
+    export LDSHAREDLIBC=
 
-	# prepare a toolchain file
-	cat > toolchain.cmake << EOF
-		SET(CMAKE_SYSTEM_NAME Haiku)
-		SET(CMAKE_SYSTEM_VERSION 1)
-		SET(CMAKE_C_COMPILER $effectiveTargetMachineTriple-gcc)
-		SET(CMAKE_CXX_COMPILER $effectiveTargetMachineTriple-g++)
-		SET(CMAKE_FIND_ROOT_PATH $crossSysrootDir)
-		SET(CMAKE_FIND_ROOT_PATH_MODE_PROGRAM NEVER)
-		SET(CMAKE_FIND_ROOT_PATH_MODE_LIBRARY ONLY)
-		SET(CMAKE_FIND_ROOT_PATH_MODE_INCLUDE ONLY)
-EOF
-
-	cmake -DCMAKE_BUILD_TYPE=release -DCMAKE_TOOLCHAIN_FILE=toolchain.cmake \
-		-DCMAKE_POLICY_VERSION_MINIMUM=3.5 -DCMAKE_INSTALL_PREFIX:PATH=$prefix ..
-
-	# The build host might still sport a cmake which doesn't know Haiku's gcc 4
-	# doesn't support -nostart anymore. Hack the link script accordingly.
-	sed -i 's,-nostart,-shared,g' CMakeFiles/zlib.dir/link.txt
+	./configure \
+		--prefix=$prefix \
+		--libdir=$libDir \
+		--includedir=$includeDir \
+		--sharedlibdir=$libDir
 
 	make $jobArgs
 }
 
 INSTALL()
 {
-	make -C build DESTDIR=$installDestDir install
+	make DESTDIR=$installDestDir install
 
 	# remove static library
 	rm $installDestDir/$libDir/libz.a
