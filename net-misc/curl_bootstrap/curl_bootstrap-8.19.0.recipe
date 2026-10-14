@@ -29,6 +29,7 @@ PROVIDES="
 if [ -z "$secondaryArchSuffix" ]; then
 	PROVIDES="$PROVIDES
 		cmd:curl = $portVersionCompat
+		cmd:wcurl = $portVersionCompat
 		"
 fi
 
